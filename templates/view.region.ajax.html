@@ -1,0 +1,12 @@
+{?*is_present*}
+{?*islogged*}<button id="actor-edit" data-region-id="{*region_id*}">Редактировать</button>{*islogged*?}
+<fieldset class="region-content">
+    <legend> {*region_title*} </legend>
+
+    {*region_text*}
+</fieldset>
+{*is_present*?}
+{?!*is_present*}
+{?*islogged*}<button id="actor-edit" data-region-id="{*region_id*}">Добавить</button>{*islogged*?}
+<br/>По региону <strong>{*region_id*}</strong> нет информации.
+{*is_present*?!}

@@ -45,7 +45,7 @@ switch ($_GET['source']) {
             'region_text'       =>  $region_data['content'],
             'islogged'          =>  LMEConfig::get_auth()->isLogged()
         );
-        $tpl_file = 'view.content.ajax.html';
+        $tpl_file = 'view.region.ajax.html';
         $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
 
         break;
