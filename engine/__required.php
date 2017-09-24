@@ -6,7 +6,6 @@
 if (version_compare(phpversion(), '7.0', '<')) {
     die('PHP 7.0+ required for this engine');
 }
-ini_set('pcre.backtrack_limit', 1024*1024);
 
 // defines
 define('PATH_CONFIG',   __ROOT__ . '/engine/.config/');
@@ -17,6 +16,10 @@ define('PATH_STORAGE',  __ROOT__ . '/storage/');
 
 // Base libs
 require_once (__ROOT__ . '/engine/core.functions.php');
+
+// WebSun Template Engine
+ini_set('pcre.backtrack_limit', 1024*1024);
+require_once (__ROOT__ . '/engine/external/websun.php');
 
 // Classes
 require_once (__ROOT__ . '/engine/classes/class.INI_Config.php');
@@ -29,8 +32,17 @@ require_once (__ROOT__ . '/engine/classes/proto.UnitPrototype.php');
 // INIT
 $main_config = new INI_Config(PATH_CONFIG . 'config.ini');
 $main_config->append(PATH_CONFIG . 'db.ini');
-$main_config->append(PATH_CONFIG . 'phpauth.ini', 'phpauth');
 
+$dbi = new DBConnectionLite('livemap', $main_config);
+
+// PHPAuth
+if ($main_config->get('auth/phpauth_enabled')) {
+    require_once (__ROOT__ . '/engine/external/phpauth/config.class.php');
+    require_once (__ROOT__ . '/engine/external/phpauth/auth.class.php');
+
+    $authconfig     = new PHPAuth\Config( PATH_CONFIG . 'phpauth.ini' );
+    $auth_instance  = new PHPAuth\Auth( $dbi->getconnection(), $authconfig);
+}
 
 
 
