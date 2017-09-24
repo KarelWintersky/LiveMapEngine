@@ -1,0 +1,39 @@
+AddDefaultCharset utf-8
+ErrorDocument 404 /404.html
+
+# disable access to specific files
+<FilesMatch "\.(gitignore|htaccess)$">
+    order deny,allow
+    deny from all
+</FilesMatch>
+
+# disable caching for all scripts
+<FilesMatch "\.(pl|php|cgi|spl|scgi|fcgi)$">
+    FileETag None
+    <ifModule mod_headers.c>
+        Header unset ETag
+        Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+    </ifModule>
+</FilesMatch>
+
+# RemoveHandler .html .htm
+AddType application/x-httpd-php .php .htm .html .phtml
+AddType application/octet-stream .pdf
+AddType image/x-icon .ico
+
+### MOD_REWRITE
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !^favicon\.ico
+RewriteCond %{SCRIPT_FILENAME}  !-d
+RewriteCond %{SCRIPT_FILENAME}  !-f
+
+RewriteCond %{QUERY_STRING} ^(.*)$
+
+RewriteRule ^api/get/([^/]+)$   controller.api-get.php?source=$1 [L,QSA]
+RewriteRule ^api/put/([^/]+)$   controller.api-put.php?source=$1 [L,QSA]
+RewriteRule ^map/([^/]+)$       controller.map.php?alias=$1 [L,QSA]
+
