@@ -14,28 +14,30 @@ Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}
 <ul>
     {?!*is_logged*}
     <li>
-        <a href="/login">Вход в систему</a>
+        <a href="/auth/login">Вход в систему</a>
     </li>
     <li>
-        <a href="/register">Регистрация в системе</a>
+        <a href="/auth/register">Регистрация в системе</a>
     </li>
     <li>
-        <a href="/recover">Напомнить пароль</a>
+        <a href="/auth/recover">Напомнить пароль</a>
     </li>
+    {?*autoactivation*}
     <li>
-        <a href="/activateaccount">Перейти к активации аккаунта</a>
+        <a href="/auth/activateaccount">Перейти к активации аккаунта</a>
     </li>
+    {*autoactivation*?}
     <li>
-        <a href="/resetpassword">Перейти к вводу ключа восстановления аккаунта</a>
+        <a href="/auth/resetpassword">Перейти к вводу ключа восстановления аккаунта</a>
     </li>
     {*is_logged*?!}
 
     {?*is_logged*}
     <li>
-        <a href="/mysettings">Настройки аккаунта</a>
+        <a href="/auth/profile">Настройки аккаунта</a>
     </li>
     <li>
-        <a href="/logout">Выход (логаут)</a>
+        <a href="/auth/logout">Выход (логаут)</a>
     </li>
     {*is_logged*?}
 </ul>

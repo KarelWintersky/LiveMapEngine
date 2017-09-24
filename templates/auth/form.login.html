@@ -7,29 +7,37 @@
 <body>
 
 <h2>Вход в систему</h2>
+<div style="display: block; padding-left: 2em;">
+    <form action="/auth/action:login" method="post">
+        <table width="40%">
+            <tr>
+                <td>E-Mail: </td>
+                <td><input type="text" size="30" name="login:data:name" tabindex="1" id="af-login" autofocus value="{*new_username*}"></td>
+            </tr>
+            <tr>
+                <td>Password: </td>
+                <td><input type="password" size="30" name="login:data:password" tabindex="2"></td>
+            </tr>
+            <tr>
+                <td>Remember: </td>
+                <td><input type="checkbox" tabindex="3" name="login:data:remember_me" value="1" checked> </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button name="login:data:action" type="submit" tabindex="4" value="login">Войти</button>
+                    {?*autoactivation*}
+                    | <button name="login:data:action" value="resendactivation">Выслать повторно ссылку для активации</button>
+                    {*autoactivation*?}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><span id="auth_result"></span></td>
+            </tr>
+        </table>
+    </form>
+</div>
 
-<form action="/auth/action:login" method="post">
-    <div class="field">
-        <label for="log_in_email">E-Mail: </label>
-        <input type="text" size="15" id="log_in_email" name="auth:login_email" value="{*new_username*}">
-    </div>
-    <div class="field">
-        <label for="log_in_password">Пароль:</label>
-        <input type="password" size="15" id="log_in_password" name="auth:login_password">
-    </div>
-    <div class="field">
-        <label for="log_in_remember_me">Помнить меня:</label>
-        <input type="checkbox" id="log_in_remember_me" name="auth:login_remember_me" value="1" required checked>
-    </div>
-    <br/>
-    <div>
-        <button name="auth:loginaction" value="login">Войти</button>
-        {?*autoactivation*}
-        |
-        <button name="auth:loginaction" value="resendactivation">Выслать повторно ссылку для активации</button>
-        {*autoactivation*?}
-    </div>
-</form>
 <br>
 
 <!--

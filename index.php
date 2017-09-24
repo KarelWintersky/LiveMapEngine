@@ -10,10 +10,10 @@ require_once (__ROOT__ . '/engine/__required.php');
 require_once (__ROOT__ . '/engine/units/unit.MapsListRender.php');
 
 $main_template = new Template('index.html', '$/templates');
+$main_template->set('autoactivation', LMEConfig::get_mainconfig()->get('auth/auto_activation'));
 
 // is logged
 $auth = LMEConfig::get_auth();
-
 $is_logged = $auth->isLogged();
 
 if ($is_logged) {
