@@ -99,7 +99,8 @@
 </script>
 
 <script type="text/javascript" id="build-layout">
-    $("#map").css('width', '{*map_viewport_width*}px').css('height', '{*map_viewport_height*}px');
+    $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
+    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
     document.title = theMap['map']['title'];
 
     var colorbox_width  =   theMap.colorbox.width      || 800;
@@ -150,7 +151,7 @@
             window.location.hash = 'view=[' + id_region + ']';
 
             $.colorbox({
-                href: '/view/'+id_region,
+                href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
                 width: colorbox_width,
                 height: colorbox_height,
                 onClosed: function(){

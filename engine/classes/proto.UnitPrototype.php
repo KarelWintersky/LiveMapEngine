@@ -7,12 +7,12 @@
 class UnitPrototype {
     private $template;
 
-    public function __construct( $route )
+    public function __construct( )
     {
 
     }
 
-    public function run( $route )
+    public function run()
     {
     }
 

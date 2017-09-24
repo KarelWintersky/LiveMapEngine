@@ -19,9 +19,6 @@
             border: 2px solid navy;
             margin-top: 0;
         }
-        .leaflet-container {
-            background-color: {*viewport.background_color*};
-        }
     </style>
 </head>
 <body>
@@ -31,6 +28,8 @@
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
 <script type="text/javascript" id="build-layout">
     $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
+    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
+
     document.title = theMap['map']['title'];
 
     var polymap = Object.create(null);

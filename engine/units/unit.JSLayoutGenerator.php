@@ -8,6 +8,9 @@ class JSLayoutGenerator extends UnitPrototype {
     private $map_alias;
     private $map_source;
 
+    private $template_file = '';
+    private $template_path = '';
+
     /**
      * @param $map_alias
      * @param string $mode
@@ -16,6 +19,9 @@ class JSLayoutGenerator extends UnitPrototype {
     {
         $this->map_alias = $map_alias;
         $this->map_source = $mode;
+
+        $this->template_file = 'viewmap.jslayout.js';
+        $this->template_path = '$/templates';
     }
 
     /**
@@ -86,7 +92,7 @@ class JSLayoutGenerator extends UnitPrototype {
             }
 
             // теперь генерируем подстановочные значения для шаблона
-            $this->template = new Template('themap.js', '$/templates');
+            $this->template = new Template($this->template_file, $this->template_path);
             $this->template->set('/map', array(
                 'title'         =>  $json->title,
                 'alias'         =>  $this->map_alias,
@@ -106,11 +112,11 @@ class JSLayoutGenerator extends UnitPrototype {
             ));
             $this->template->set('/viewport', array(
                 'width'         =>  $json->viewport->width,
-                'height'        =>  $json->viewport->height
+                'height'        =>  $json->viewport->height,
+                'background_color'  =>  $json->viewport->background_color
             ));
             $this->template->set('/map/regions_list', $regions_for_js);
         } else {
-            // Если ничего не передано - возвращаем пустой файл
         }
     }
 

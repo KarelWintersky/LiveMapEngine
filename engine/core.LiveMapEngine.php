@@ -56,5 +56,53 @@ class LiveMapEngine
 
     }
 
+    /**
+     * @param $map_alias
+     * @param $id_region
+     * @return array
+     */
+    public function getMapRegionData($map_alias, $id_region)
+    {
+        $info = array();
+        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
+
+        try {
+            $query = "
+            SELECT title, content, edit_date
+            FROM {$table}
+            WHERE
+                id_region     = :id_region
+            AND alias_map     = :alias_map
+            ORDER BY edit_date DESC
+            LIMIT 1
+            ";
+            $sth = $this->dbi->getconnection()->prepare($query);
+            $sth->execute(array(
+                'id_region'     =>  $id_region,
+                'alias_map'     =>  $map_alias
+            ));
+            $row = $sth->fetch();
+
+            if ($row) {
+                $info = array(
+                    'is_present'    =>  1,
+                    'content'       =>  $row['content'],
+                    'title'         =>  $row['title'],
+                    'edit_date'     =>  $row['edit_date']
+                );
+            } else {
+                $info = array(
+                    'is_present'    =>  0,
+                    'title'         =>  $id_region,
+                    'content'       =>  ''
+                );
+            }
+
+        } catch (\PDOException $e) {
+            die('Method: ' . __FUNCTION__ . ' <br/> Message:  ' .$e->getMessage());
+        }
+        return $info;
+    }
+
 
 }

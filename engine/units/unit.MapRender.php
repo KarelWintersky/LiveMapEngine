@@ -8,33 +8,78 @@ class MapRender extends UnitPrototype
     private $template;
     private $map_alias;
 
-    public function __construct( $map_alias )
+    private $template_file = '';
+    private $template_path = '';
+
+    public function __construct($map_alias)
     {
         $this->map_alias = $map_alias;
+
+        $this->template_file = '';
+        $this->template_path = '$/templates';
     }
 
-    public function run( $ext = '' )
+    private function makemap_folio()
     {
-        $is_correct = false;
-        // проверяем второй параметр роутинга - это имя карты.
-        if (!empty($this->map_alias) && is_dir(PATH_STORAGE . '/' . $this->map_alias) && is_file(PATH_STORAGE . '/' . $this->map_alias . '/index.json')) {
+        $this->template_file = 'view.map.folio.html';
+        $this->template = new Template($this->template_file, $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
+    }
 
-            $filename = PATH_STORAGE . '/' . $this->map_alias . '/index.json';
-            $json = json_decode( file_get_contents( $filename ) );
+    private function makemap_colorbox()
+    {
+        $this->template_file = 'view.map.colorbox.html';
+        $this->template = new Template($this->template_file, $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
 
-            // подставляем данные в шаблон
-            $this->template = new Template('viewmap.folio.html', '$/templates');
-            $this->template->set('/map_alias', $this->map_alias);
-            $this->template->set('/viewport/background_color', $json->viewport->background_color);
-            $is_correct = true;
+        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
+        $regions_with_data = $lm_engine->getRegionsWithInfo( $this->map_alias );
+
+        $regions_with_data_order_by_title = $regions_with_data;
+        usort($regions_with_data_order_by_title, function($value1, $value2){
+            return ($value1['title'] > $value2['title']);
+        });
+
+        $regions_with_data_order_by_date = $regions_with_data;
+        usort($regions_with_data_order_by_date, function($value1, $value2){
+            return ($value1['edit_date'] < $value2['edit_date']);
+        });
+
+        $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
+        $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
+
+        $this->template->set('/', array(
+            // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
+            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data),
+            'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
+            'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
+            'map_regions_count'             =>  count($regions_with_data)
+        ));
+
+    }
+
+    public function run( $skin = 'colorbox' )
+    {
+        $this->template = new Template($this->template_file, $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
+
+        if ($skin === 'colorbox') {
+
+            $this->makemap_colorbox();
+
+        } elseif ($skin === 'folio') {
+
+            $this->makemap_folio();
+
         } else {
-            // файл конфигурации карты не найден
+            unset($this->template);
             $this->template = new Template('404.html', '$/templates');
-            $this->template->set('error_message', "File `index.json` not found at " . PATH_STORAGE . $this->map_alias . '/ ');
+            $this->template->set('error_message', "Unknown skin mode {$skin} for map {$this->map_alias}");
             die( $this->template->render() );
         }
 
-        return $is_correct;
+        return true;
     }
 
     public function content()

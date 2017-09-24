@@ -8,7 +8,6 @@ define('__ROOT__', __DIR__);
 
 require_once (__ROOT__ . '/engine/__required.php');
 require_once (__ROOT__ . '/engine/units/unit.MapRender.php');
-require_once (__ROOT__ . '/engine/core.LiveMapEngine.php');
 
 $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -49,7 +48,7 @@ $template_data = array(
     'map_regions_count'                 =>  count($regions_with_data)
 );
 
-$template_file = 'viewmap.colorbox.html';
+$template_file = 'view.map.colorbox.html';
 $html = websun_parse_template_path($template_data, $template_file, PATH_TEMPLATES);
 echo $html;
 

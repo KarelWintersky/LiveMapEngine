@@ -16,8 +16,9 @@ var theMap = {
         "polygon_fillOpacity":   {*defaults.fillopacity*}
     },
     "viewport"  : {
-        "width" : "{*viewport.width*}",
-        "height": "{*viewport.height*}"
+        "width"             : "{*viewport.width*}",
+        "height"            : "{*viewport.height*}",
+        'background_color'  : "{*viewport.background_color*}"
     },
     "colorbox"  : {
         'width'                 :   '80%',

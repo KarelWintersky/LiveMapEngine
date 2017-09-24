@@ -51,4 +51,8 @@ if ($main_config->get('auth/phpauth_enabled')) {
     );
 }
 
+// LiveMap Engine
+require_once (__ROOT__ . '/engine/core.LiveMapEngine.php');
+
+
 
