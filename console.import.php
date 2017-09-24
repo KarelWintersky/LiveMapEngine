@@ -74,49 +74,49 @@ $image_dims_default = array(
 
 // Уточняем тип изображения карты - image / vector
 $image_type = CLIConsole::readline('Уточните тип изображения [vector|bitmap] : ', '/^vector|bitmap$/');
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Тип изображения принят как  `<strong>{$image_type}</strong>`");
 
 // Имя слоя с разметкой регионов
-$svg_layer_paths_name = CLIConsole::readline_default("Уточните имя слоя с разметкой регионов [Paths] : ", '/.*/', "Paths");
+$svg_layer_paths_name = CLIConsole::readline_default(PHP_EOL . "Уточните имя слоя с разметкой регионов [Paths] : ", "Paths");
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с разметкой регионов установлено в `<strong>{$svg_layer_paths_name}</strong>`");
 
-CLIConsole::echo_status("<font color='yellow'>[INFO]</font> Имя слоя с разметкой регионов установлено в <font color='cyan'>{}</font>");
-
-// $svg_layer_paths_name = ($svg_layer_paths_name !== "") ? $svg_layer_paths_name : "Paths";
-
+// имя слоя с информацией об изображениях (подложка карты)
 if ($image_type === 'bitmap') {
-    $svg_layer_images_name = CLIConsole::readline_default("Уточните имя слоя с разметкой регионов [Image] : ", '/.*/', "Image");
-    // $svg_layer_images_name = ($svg_layer_images_name !== "") ? $svg_layer_images_name : "Image";
+    $svg_layer_images_name = CLIConsole::readline_default(PHP_EOL . "Уточните имя слоя с информацией об изображениях [Image] : ", "Image");
 } else {
     $svg_layer_images_name = "";
 }
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с информацией об изображениях установлено в `<strong>{$svg_layer_images_name}</strong>`");
 
+// парсим SVG
 $svg->parse($svg_layer_paths_name, $svg_layer_images_name);
 
-$image_dims_actual = $svg->getImageDefinition() ?? $image_dims_default;
-unset($image_dims_actual['xhref']);
 
+// выводим сообщение о связанном изображении
+$image_dims_actual = $svg->getImageDefinition() ?? $image_dims_default;
 if (!$image_dims_actual) {
-    CLIConsole::echo_status(PHP_EOL . "<font color='yellow'>[INFO]</font> Файл разметки определен как не содержащий информации о связанном изображении."
-    .PHP_EOL
+    CLIConsole::echo_status(PHP_EOL . "<font color='yellow'>[INFO]</font> Файл разметки определен как не содержащий информации о связанном изображении. "
     ."Скорее всего он прилагается к векторному изображению. Нужно уточнить несколько значений: "
     .PHP_EOL);
 } else {
-    CLIConsole::echo_status(PHP_EOL . "<font color='yellow'>[INFO]</font> В файле разметки обнаружена информациz о связанном изображении."
-        .PHP_EOL
+    CLIConsole::echo_status(PHP_EOL . "<font color='yellow'>[INFO]</font> В файле разметки обнаружена информация о связанном изображении. "
         ."Давайте уточним несколько значений: "
         .PHP_EOL);
 }
-// уточняем параметры изображения
+unset($image_dims_actual['xhref']);
 
+// уточняем параметры связанного изображения (подложки)
 array_walk($image_dims_actual, function($dim_value, $dim_id) use ($image_type){
     $msg = "Уточните значение <strong>{$dim_id}</strong> [$dim_value] : ";
 
     if ($dim_value !== 0) {
-        $result = CLIConsole::readline_default($msg, '/.*/', $dim_value);
+        $result = CLIConsole::readline_default($msg, $dim_value);
     } else {
         $result = CLIConsole::readline($msg, '/^\d+$/');
     }
+    CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Значение `<strong>{$dim_id}</strong>` установлено в `<strong>{$result}</strong>`");
+
     return $result;
 });
 
-var_dump($image_dims_actual);
 
