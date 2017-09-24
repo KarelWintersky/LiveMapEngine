@@ -54,12 +54,11 @@ class CLIConsole
     /**
      * @param $prompt -
      * @param $allowed_pattern
-     * @param bool|FALSE $strict_mode
      * @return bool|string
      */
-    public static function readline($prompt, $allowed_pattern = '/.*/', $strict_mode = FALSE)
+    public static function readline($prompt, $allowed_pattern = '/.*/'/*, $strict_mode = FALSE */)
     {
-        if ($strict_mode) {
+        /*if ($strict_mode) {
             if ((substr($allowed_pattern, 0, 1) !== '/') || (substr($allowed_pattern, -1, 1) !== '/')) {
                 return FALSE;
             }
@@ -68,7 +67,7 @@ class CLIConsole
                 $allowed_pattern = '/' . $allowed_pattern;
             if (substr($allowed_pattern, -1, 1) !== '/')
                 $allowed_pattern .= '/';
-        }
+        }*/
 
         do {
             $result = readline(self::html_to_escaped_string($prompt));

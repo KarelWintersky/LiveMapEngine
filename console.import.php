@@ -60,12 +60,12 @@ if ($svg->svg_parsing_error) {
 }
 
 /* ==== MAIN ==== */
+CLIConsole::echo_status("<strong>Parsing {$arg_source} file...</strong>" . PHP_EOL);
+
 // имя файла с изображением карты
 $image_filename = CLIConsole::readline("Укажите имя файла с изображением карты: ", '/.+/');
-CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя файла с изображением карты установлено в `<strong>{$image_filename}</strong>`");
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя файла с изображением карты установлено в `<strong>{$image_filename}</strong>`" . PHP_EOL);
 
-
-CLIConsole::echo_status("<strong>Parsing {$arg_source} file...</strong>" . PHP_EOL);
 
 $image_dims_default = array(
     'width'     =>  0,
@@ -76,23 +76,22 @@ $image_dims_default = array(
 
 // Уточняем тип изображения карты - image / vector
 $image_type = CLIConsole::readline('Уточните тип изображения [vector|bitmap] : ', '/^vector|bitmap$/');
-CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Тип изображения принят как  `<strong>{$image_type}</strong>`");
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Тип изображения принят как  `<strong>{$image_type}</strong>`" . PHP_EOL);
 
 // Имя слоя с разметкой регионов
-$svg_layer_paths_name = CLIConsole::readline_default(PHP_EOL . "Уточните имя слоя с разметкой регионов [Paths] : ", "Paths");
-CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с разметкой регионов установлено в `<strong>{$svg_layer_paths_name}</strong>`");
+$svg_layer_paths_name = CLIConsole::readline_default("Уточните имя слоя с разметкой регионов [Paths] : ", "Paths");
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с разметкой регионов установлено в `<strong>{$svg_layer_paths_name}</strong>`" . PHP_EOL);
 
 // имя слоя с информацией об изображениях (подложка карты)
 if ($image_type === 'bitmap') {
-    $svg_layer_images_name = CLIConsole::readline_default(PHP_EOL . "Уточните имя слоя с информацией об изображениях [Image] : ", "Image");
+    $svg_layer_images_name = CLIConsole::readline_default("Уточните имя слоя с информацией об изображениях [Image] : ", "Image");
 } else {
     $svg_layer_images_name = "";
 }
-CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с информацией об изображениях установлено в `<strong>{$svg_layer_images_name}</strong>`");
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя слоя с информацией об изображениях установлено в `<strong>{$svg_layer_images_name}</strong>`" . PHP_EOL);
 
 // парсим SVG
 $svg->parse($svg_layer_paths_name, $svg_layer_images_name);
-
 
 // выводим сообщение о связанном изображении
 $image_dims_actual = $svg->getImageDefinition() ?? $image_dims_default;
@@ -121,7 +120,13 @@ array_walk($image_dims_actual, function($dim_value, $dim_id) use ($image_type){
     return $result;
 });
 
-//
+// уточняем map_alias
+$map_alias = CLIConsole::readline("Укажите <strong>alias</strong> карты (от 6 символов): ", '/.{6}/');
+
+// map_title
+// viewport_width
+// viewport_height
+
 
 
 
