@@ -35,5 +35,8 @@ RewriteCond %{QUERY_STRING} ^(.*)$
 
 RewriteRule ^api/get/([^/]+)$   controller.api-get.php?source=$1 [L,QSA]
 RewriteRule ^api/put/([^/]+)$   controller.api-put.php?source=$1 [L,QSA]
+RewriteRule ^auth/([^/]+)$      controller.auth.php?query=$1 [L,QSA]
 RewriteRule ^map/([^/]+)$       controller.map.php?alias=$1 [L,QSA]
+
+RewriteRule ^test(.*)$          test.php?query=$1 [L,QSA]
 

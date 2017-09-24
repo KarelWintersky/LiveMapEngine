@@ -37,10 +37,6 @@
 
     // build polygons
     Object.keys( theMap.regions ).forEach(function( key ){
-        // path = полигон L.polygon([...], {color: 'red'})
-        // circle = круг L.circle([50.5, 30.5], {radius: 200})
-        // rect = прямоугольник L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]], {color: "#ff7800", weight: 1})
-
         var path = theMap.regions[ key ]['path'];
         var polygon_color   =   theMap.regions[ key ]['color']      ||  theMap.defaults.polygon_color;
         var polygon_width   =   theMap.regions[ key ]['width']      ||  theMap.defaults.polygon_width;

@@ -1,1 +1,4 @@
 .todo
+config.ini
+db.ini
+phpauth.ini

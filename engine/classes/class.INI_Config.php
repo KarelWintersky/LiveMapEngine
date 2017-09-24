@@ -43,8 +43,8 @@ class INI_Config
         } else {
             $message = "<strong>FATAL ERROR:</strong> Config file `{$filepath}` not found. " . PHP_EOL;
 
-            if (function_exists('echo_status_cli')) {
-                echo_status_cli($message);
+            if (class_exists('CLIConsole') && method_exists('CLIConsole', 'echo_status') ) {
+                CLIConsole::echo_status($message);
                 die(1);
             } else {
                 if (php_sapi_name() === "cli") {

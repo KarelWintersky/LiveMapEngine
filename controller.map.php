@@ -7,7 +7,6 @@
 define('__ROOT__', __DIR__);
 
 require_once (__ROOT__ . '/engine/__required.php');
-
 require_once (__ROOT__ . '/engine/units/unit.MapRender.php');
 
 // alias = mapname
