@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class DBConnectionLite v 1.1
+ * Class DBConnectionLite v 1.2
  * Используется вариативный конфиг (либо инстанс INI_Config и ключ подключения, либо ключ подключения для статика)
  * based on DBConnection ver 1.8
  */
@@ -110,9 +110,13 @@ class DBConnectionLite extends \PDO
         return $this->pdo_connection;
     }
 
-
-
-
+    /**
+     * @return string
+     */
+    public function get_table_prefix():string
+    {
+        return $this->table_prefix;
+    }
 }
 
 /* end class.DBConnectionLite.php */

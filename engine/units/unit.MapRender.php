@@ -16,17 +16,14 @@ class MapRender extends UnitPrototype
     public function run( $ext = '' )
     {
         $is_correct = false;
-
         // проверяем второй параметр роутинга - это имя карты.
-
         if (!empty($this->map_alias) && is_dir(PATH_STORAGE . '/' . $this->map_alias) && is_file(PATH_STORAGE . '/' . $this->map_alias . '/index.json')) {
 
             $filename = PATH_STORAGE . '/' . $this->map_alias . '/index.json';
-
             $json = json_decode( file_get_contents( $filename ) );
 
             // подставляем данные в шаблон
-            $this->template = new Template('map.html', '$/templates');
+            $this->template = new Template('viewmap.folio.html', '$/templates');
             $this->template->set('/map_alias', $this->map_alias);
             $this->template->set('/viewport/background_color', $json->viewport->background_color);
             $is_correct = true;

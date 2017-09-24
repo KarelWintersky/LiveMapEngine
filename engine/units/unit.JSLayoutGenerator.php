@@ -18,8 +18,6 @@ class JSLayoutGenerator extends UnitPrototype {
         $this->map_source = $mode;
     }
 
-
-
     /**
      *
      */
@@ -78,7 +76,6 @@ class JSLayoutGenerator extends UnitPrototype {
                     $s->parse("Paths", "Image");
                     $image_data = $s->getImageDefinition();
                     $paths_data = $s->getPathsDefinition( $image_data );
-
                 }
 
                 $regions_for_js = $s->exportSPaths( $paths_data );
