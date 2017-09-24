@@ -60,6 +60,10 @@ if ($svg->svg_parsing_error) {
 }
 
 /* ==== MAIN ==== */
+// имя файла с изображением карты
+$image_filename = CLIConsole::readline("Укажите имя файла с изображением карты: ", '/.+/');
+CLIConsole::echo_status("<font color='cyan'>[NOTE]</font> Имя файла с изображением карты установлено в `<strong>{$image_filename}</strong>`");
+
 
 CLIConsole::echo_status("<strong>Parsing {$arg_source} file...</strong>" . PHP_EOL);
 
@@ -69,8 +73,6 @@ $image_dims_default = array(
     'ox'        =>  0,
     'oy'        =>  0
 );
-
-
 
 // Уточняем тип изображения карты - image / vector
 $image_type = CLIConsole::readline('Уточните тип изображения [vector|bitmap] : ', '/^vector|bitmap$/');
@@ -118,5 +120,21 @@ array_walk($image_dims_actual, function($dim_value, $dim_id) use ($image_type){
 
     return $result;
 });
+
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
