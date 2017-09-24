@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Живые карты</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+{?*is_logged*}
+<h2>Статус</h2>
+Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}
+{*is_logged*?}
+<h2>Действия</h2>
+
+<ul>
+    {?!*is_logged*}
+    <li>
+        <a href="/login">Вход в систему</a>
+    </li>
+    <li>
+        <a href="/register">Регистрация в системе</a>
+    </li>
+    <li>
+        <a href="/recover">Напомнить пароль</a>
+    </li>
+    <li>
+        <a href="/activateaccount">Перейти к активации аккаунта</a>
+    </li>
+    <li>
+        <a href="/resetpassword">Перейти к вводу ключа восстановления аккаунта</a>
+    </li>
+    {*is_logged*?!}
+
+    {?*is_logged*}
+    <li>
+        <a href="/mysettings">Настройки аккаунта</a>
+    </li>
+    <li>
+        <a href="/logout">Выход (логаут)</a>
+    </li>
+    {*is_logged*?}
+</ul>
+
+<h2>А это просто список карт... </h2>
+{*content_maps*}
+
+
+
+</body>
+</html>

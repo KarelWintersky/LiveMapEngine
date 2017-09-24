@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Живые карты -- вход в систему</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+
+<h2>Вход в систему</h2>
+
+<form action="/auth/action:login" method="post">
+    <div class="field">
+        <label for="log_in_email">E-Mail: </label>
+        <input type="text" size="15" id="log_in_email" name="auth:login_email" value="{*new_username*}">
+    </div>
+    <div class="field">
+        <label for="log_in_password">Пароль:</label>
+        <input type="password" size="15" id="log_in_password" name="auth:login_password">
+    </div>
+    <div class="field">
+        <label for="log_in_remember_me">Помнить меня:</label>
+        <input type="checkbox" id="log_in_remember_me" name="auth:login_remember_me" value="1" required checked>
+    </div>
+    <br/>
+    <div>
+        <button name="auth:loginaction" value="login">Войти</button>
+        {?*autoactivation*}
+        |
+        <button name="auth:loginaction" value="resendactivation">Выслать повторно ссылку для активации</button>
+        {*autoactivation*?}
+    </div>
+</form>
+<br>
+
+<!--
+resend activation email делается на этой же странице - либо логин, либо ресенд.
+
+Resend Activation: auth->resendActivation(email)
+-->
+<hr>
+<a href="/">На главную...</a>
+
+</body>
+</html>

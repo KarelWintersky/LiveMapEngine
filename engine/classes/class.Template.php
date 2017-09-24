@@ -132,9 +132,9 @@ class Template {
     /**
      * @param $path
      */
-    public function testget( $path )
+    public function dump()
     {
-        var_dump( $this->get( $path ));
+        var_dump( $this->template_data );
     }
 
     /**

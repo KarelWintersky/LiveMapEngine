@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Живые карты -- регистрация нового пользователя</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+        .hint {
+            font-size: small; font-style: italic; color: red;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function() { document.getElementById("reg_username").focus(); }
+    </script>
+</head>
+<body>
+
+<h2>Регистрация</h2>
+
+<form action="/auth/action:register" method="post">
+    <div>
+        <label for="reg_username">Меня зовут:</label>
+        <input type="text" size="25" id="reg_username" name="auth:reg_username" required tabindex="1" autofocus>
+    </div>
+    <div>
+        <label for="reg_gender">Я: </label>
+        <select id="reg_gender" name="auth:reg_gender">
+            <option value="M">кавалер</option>
+            <option value="F">дама</option>
+            <option value="N">существо</option>
+        </select>
+    </div>
+    <div>
+        <label for="reg_city">Мой город:</label>
+        <input type="text" size="25" id="reg_city" name="auth:reg_city">
+    </div>
+    <!--
+    <div>
+        <label for="reg_birthday">Мой день рожденья (ДД/ММ/ГГГГ):</label>
+        <input type="text" size="25" id="reg_birthday" name="auth:reg_birthday">
+    </div>
+    -->
+    <div>
+        <label for="reg_email">E-Mail:</label>
+        <input type="email" size="15" id="reg_email" name="auth:reg_email">
+    </div>
+    <div>
+        <label for="reg_password">Пароль:</label>
+        <input type="text" size="15" id="reg_password" name="auth:reg_password">
+    </div>
+    <div>
+        <label for="reg_password_again">Повторите пароль:</label>
+        <input type="text" size="15" id="reg_password_again" name="auth:reg_password_again">
+    </div>
+{?*strong_password*}
+    <div class="hint">В пароле должна быть хотя бы 1 цифра, 1 строчная и 1 прописная буква.</div>
+{*strong_password*?}
+    <div>
+        <button name="auth:reg_new_user_try">Регистрация >>> </button>
+    </div>
+</form>
+<hr>
+<a href="/">На стартовую...</a>
+
+</body>
+</html>
