@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/frontend/leaflet.css">
+    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.css">
+    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.tabs.css">
+
+    <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
+    <script type="text/javascript" src="/frontend/jquery.colorbox-min.js"></script>
+    <script type="text/javascript" src="/frontend/leaflet.js"></script>
+
+    <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
+
+    <style>
+        #map {
+            margin: 2em;
+            border: 2px solid navy;
+            margin-top: 0;
+        }
+        .leaflet-container {
+            background-color: {*viewport.background_color*};
+        }
+    </style>
+</head>
+<body>
+<span>Selected region: <strong id="selected_region"></strong></span>
+<span style="float: right"><a href="/">К СПИСКУ КАРТ</a></span>
+<hr/>
+<div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+<script type="text/javascript" id="build-layout">
+    $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
+    document.title = theMap['map']['title'];
+
+    var polymap = Object.create(null);
+
+    // build polygons
+    Object.keys( theMap.regions ).forEach(function( key ){
+        // path = полигон L.polygon([...], {color: 'red'})
+        // circle = круг L.circle([50.5, 30.5], {radius: 200})
+        // rect = прямоугольник L.rectangle([[54.559322, -5.767822], [56.1210604, -3.021240]], {color: "#ff7800", weight: 1})
+
+        var path = theMap.regions[ key ]['path'];
+        var polygon_color   =   theMap.regions[ key ]['color']      ||  theMap.defaults.polygon_color;
+        var polygon_width   =   theMap.regions[ key ]['width']      ||  theMap.defaults.polygon_width;
+        var polygon_opacity =   theMap.regions[ key ]['opacity']    ||  theMap.defaults.polygon_opacity;
+        var polygon_fillcolor = theMap.regions[ key ]['fillColor']  ||  theMap.defaults.polygon_fillColor;
+        var polygon_fillopacity = theMap.regions[ key ]['fillOpacity'] || theMap.defaults.polygon_fillOpacity;
+
+        polymap[ key ] = L.polygon( path, {
+            color: polygon_color,
+            width: polygon_width,
+            opacity: polygon_opacity,
+            fillColor: polygon_fillcolor,
+            fillOpacity: polygon_fillopacity
+        });
+    } );
+</script>
+<script type="text/javascript" id="create-map-and-layout">
+    var map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -3,
+        maxZoom: 2,
+        preferCanvas: true
+    });
+    var bounds = [
+        [0, 0],
+        [theMap['map']['height']-1 , theMap['map']['width']-1 ]
+    ];
+
+    var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
+
+    // draw polygons on map, bind on-click function
+    Object.keys( polymap ).forEach(function(id_region){
+        polymap[ id_region ].addTo(map).on('click', function(){
+            var t = theMap['regions'][ id_region ]['title'] || id_region;
+            $("#selected_region").html(t);
+        });
+    });
+
+    map.fitBounds(bounds);
+    map.setZoom( theMap['map']['zoom']);
+</script>
+</body>
+</html>

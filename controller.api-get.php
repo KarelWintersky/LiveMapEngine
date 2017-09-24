@@ -14,10 +14,13 @@ switch ($_GET['source']) {
         require_once (__ROOT__ . '/engine/units/unit.JSLayoutGenerator.php');
 
         $map_alias = $_GET['map'] ?? NULL;
+        $map_source = $_GET['datasrc'] ?? 'file';
 
-        $js = new JSLayoutGenerator( $map_alias );
+        $js = new JSLayoutGenerator( $map_alias, $map_source );
         $js->run();
         $content = $js->content();
+
+        break;
     }
 
 } // end switch

@@ -6,6 +6,7 @@
 class JSLayoutGenerator extends UnitPrototype {
     private $template;
     private $map_alias;
+    private $map_source;
 
     /**
      * @param $map_alias
@@ -14,7 +15,10 @@ class JSLayoutGenerator extends UnitPrototype {
     public function __construct( $map_alias, $mode = 'file' )
     {
         $this->map_alias = $map_alias;
+        $this->map_source = $mode;
     }
+
+
 
     /**
      *
@@ -37,17 +41,6 @@ class JSLayoutGenerator extends UnitPrototype {
             }
 
             $json = json_decode( file_get_contents( $filename ) );
-
-            /*
-            Наличие параметров изображения в JSON-файле (имитирующем пользовательский ввод) означает, что брать
-            эти данные из файла разметки НЕ НУЖНО.
-
-            Кроме того, эти данные могут быть извлечены только из файла разметки, связанного с битмапом. То есть в случае
-            типа карты 'vector' они должны быть заданы обязательно.
-
-            Кроме того, если файл сохранен как plain SVG - мы ОБЯЗАНЫ опираться на информацию в index.json
-
-             */
 
             if (!empty($json->image)) {
                 $image_data = array(
