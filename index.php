@@ -25,7 +25,7 @@ if ($is_logged) {
 
 // maps
 $all_maps = new MapsListRender('');
-$all_maps->run('');
+$all_maps->run();
 $content_maps = $all_maps->content();
 $main_template->set('content_maps', $content_maps);
 

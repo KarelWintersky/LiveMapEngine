@@ -8,7 +8,7 @@ class MapsListRender extends UnitPrototype {
 
     }
 
-    public function run( $route )
+    public function run( )
     {
         // читаем список каталогов в /storage и оформляем это как список
         $dir = scandir(PATH_STORAGE);

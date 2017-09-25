@@ -46,8 +46,8 @@ class MapRender extends UnitPrototype
             return ($value1['edit_date'] < $value2['edit_date']);
         });
 
-        $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
-        $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
+        // $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
+        // $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
 
         $this->template->set('/', array(
             // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
@@ -56,15 +56,37 @@ class MapRender extends UnitPrototype
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
             'map_regions_count'             =>  count($regions_with_data)
         ));
+    }
 
+    private function makemap_iframe()
+    {
+        $this->template_file = 'view.map.iframe.html';
+        $this->template = new Template($this->template_file, $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
+
+        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
+        $regions_with_data = $lm_engine->getRegionsWithInfo( $this->map_alias );
+
+        $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
+        $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
+
+        $this->template->set('/', array(
+            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data),
+        ));
     }
 
     public function run( $skin = 'colorbox' )
     {
         $this->template = new Template($this->template_file, $this->template_path);
         $this->template->set('/map_alias', $this->map_alias);
+        $this->template->set('/html_callback', '/');
 
-        if ($skin === 'colorbox') {
+        if ($skin === 'iframe') {
+
+            $this->makemap_iframe();
+
+        } elseif ($skin === 'colorbox') {
 
             $this->makemap_colorbox();
 

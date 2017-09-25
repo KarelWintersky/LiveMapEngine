@@ -152,5 +152,32 @@ ORDER BY edit_date ;
 
     }
 
+    /**
+     * Сохраняет информацию по региону для SVG-карты.
+     * Для сохранения данных по региону на тайловой карте нужна другая функция (похожая)
+     * @param $region_data
+     * @return array
+     */
+    public function storeMapRegionData($data)
+    {
+        $success = array(
+            'state'     =>  FALSE,
+            'message'   =>  ''
+        );
+        $table_data     = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
+
+        $query = "
+        INSERT INTO {$table_data}
+         (alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment)
+         VALUES
+         (:alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment)
+        ";
+
+
+
+
+
+    }
+
 
 }

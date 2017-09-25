@@ -9,10 +9,11 @@ define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 require_once (__ROOT__ . '/engine/units/unit.MapRender.php');
 
-$lme_alias_map = $_GET['alias'] ?? NULL;
+$alias_map  = $_GET['alias'] ?? NULL;
+$viewmode = filter_array_for_allowed($_GET, 'viewmode', array('colorbox', 'folio', 'iframe'), 'colorbox');
 
-$map = new MapRender( $lme_alias_map );
-$map_found = $map->run('colorbox');
+$map = new MapRender( $alias_map );
+$map_found = $map->run( $viewmode );
 $content = $map->content();
 echo $content;
 

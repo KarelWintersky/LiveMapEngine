@@ -53,63 +53,17 @@
 <body>
 
 <div class="clear"></div>
-
-<table class="info-wrapper">
-    <tr>
-        <td>
-            <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
-        </td>
-
-        <td>{?!*target*}
-            <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
-            <div class="tabs-container">
-                <ul class="tabs-menu">
-                    <li class="current"><a href="#tab-1">Места по алфавиту</a></li>
-                    <li><a href="#tab-2">Последние изменения</a></li>
-                </ul>
-                <div class="tab">
-                    <div id="tab-1" class="tab-content">
-                        <ul class="map-regions">
-                            {%*map_regions_order_by_title*}<li class="region-definition"><a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_title:id_region*}]" data-region-id="{*map_regions_order_by_title:id_region*}">{*map_regions_order_by_title:title*}</a></li>
-                            {*map_regions_order_by_title*%}
-                        </ul>
-                    </div>
-                    <div id="tab-2" class="tab-content">
-                        <ul class="map-regions">
-                            {%*map_regions_order_by_date*}<li class="region-definition">({*map_regions_order_by_date:edit_date*}) -- <a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_date:id_region*}]" data-region-id="{*map_regions_order_by_date:id_region*}">{*map_regions_order_by_date:title*}</a></li>
-                            {*map_regions_order_by_date*%}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            {*target*?!}
-        </td>
-    </tr>
-</table>
-<a href="{*html_callback*}">Назад...</a>
-
-<script type="text/javascript" id="tabs-managment">
-    $(".tabs-menu a").click(function(event) {
-        event.preventDefault();
-        $(this).parent().addClass("current");
-        $(this).parent().siblings().removeClass("current");
-        var tab = $(this).attr("href");
-        $(".tab-content").not(tab).css("display", "none");
-        $(tab).fadeIn();
-    });
-</script>
+<div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
 
 <script type="text/javascript" id="build-layout">
-    $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
+    $("#map").css('width', {*map_viewport_width*}).css('height', {*map_viewport_height*});
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
-    document.title = theMap['map']['title'];
 
     var colorbox_width  =   theMap.colorbox.width      || 800;
     var colorbox_height =   theMap.colorbox.height     || 600;
 
     var polymap = Object.create(null);
 
-    // build polygons
     // build polygons
     Object.keys( theMap.regions ).forEach(function( key ){
         var path = theMap.regions[ key ]['path'];
@@ -144,7 +98,6 @@
     var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
 
     // draw polygons on map, bind on-click function
-    // draw polygons on map, bind on-click function
     Object.keys( polymap ).forEach(function(id_region){
         polymap[ id_region ].addTo(map).on('click', function(){
             let t = theMap['regions'][ id_region ]['title'] || id_region;
@@ -175,18 +128,6 @@
         polymap[ key ].setStyle({fillColor: '#00ff00'});
     });
 
-</script>
-
-<script type="text/javascript" id="bind-auth">
-    /* Auth bind */
-    $('#actor-auth').on('click', function(){
-        $.colorbox({
-            href: '/auth/ajaxform',
-            width: '30%',
-            height: '30%',
-            title: 'Login form'
-        });
-    });
 </script>
 
 <script type="text/javascript" id="bind-actor-click-inside-colorbox">
@@ -220,68 +161,6 @@
 
 </script>
 
-<script type="text/javascript" id="bind-actor-edit">
-    $(document).on('click', '#actor-edit', function(){
-        let region_id = $(this).data('region-id');
-        document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
-    });
-</script>
-
-<script type="text/javascript" id="bind-action-focus-region">
-    $(document).ready(function(){
-        // при получении параметров на старте:
-        // view= - показываем попап
-        // focus= = делаем центровку на регионе
-
-        var wlh = window.location.hash;
-        if (wlh.length > 1) {
-            var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
-            var id_region = '';
-
-            if ((hashparams !== null) && (hashparams[1] == 'view')) {
-                id_region = hashparams[2];
-                $.colorbox({
-                    href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
-                    width: colorbox_width,
-                    height: colorbox_height,
-                    onClosed: function(){
-                        history.pushState('', document.title, window.location.pathname);
-                    }
-                });
-            } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
-                id_region = hashparams[2];
-                // focus
-                var bound = polymap [ id_region ].getBounds();
-                map.panTo( bound.getCenter() );
-                var oldstyle = polymap[ id_region ].options['fillColor'];
-
-                polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-                var timeoutHandler = setInterval(function(){
-                    polymap[ id_region ].setStyle({fillColor: oldstyle});
-                    window.clearTimeout(timeoutHandler);
-                }, 1000);
-                // history.pushState('', document.title, window.location.pathname);
-            }
-        }
-    });
-
-    $(document).on('click', '.action-focus-at-region', function(){
-        var id_region = $(this).data('region-id');
-        var bound = polymap [ id_region ].getBounds();
-        map.panTo( bound.getCenter() );
-        var oldstyle = polymap[ id_region ].options['fillColor'];
-
-        polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-        var timeoutHandler = setInterval(function(){
-            polymap[ id_region ].setStyle({fillColor: oldstyle});
-            window.clearTimeout(timeoutHandler);
-            //@todo: когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-            //
-            // history.pushState('', document.title, window.location.pathname);
-        }, 500);
-
-    });
-</script>
 <div style="display:none">
     <div id="colorboxed-view" style="padding:10px; background:#fff;">
         <div id="colorboxed-view-content"></div>
