@@ -16,7 +16,6 @@
 
     <style type="text/css">
         html, body {
-            height: 99%;
         }
         table.info-wrapper {
             border: 0;
@@ -30,9 +29,6 @@
             margin-bottom: 0.4rem;
         }
         .tabs-container {
-            height: 70%;
-            max-height: 70%;
-            overflow-y: none scroll;
         }
         #map {
             margin: 2em;
@@ -41,8 +37,6 @@
             margin-top: 0;
         }
         .map-regions {
-            max-height: 90%;
-            overflow-y: scroll;
             border-color: transparent;
         }
         .region-definition {
@@ -148,7 +142,6 @@
     Object.keys( polymap ).forEach(function(id_region){
         polymap[ id_region ].addTo(map).on('click', function(){
             var t = theMap['regions'][ id_region ]['title'] || id_region;
-            // $("#selected_region").html(t);
             window.location.hash = 'view=[' + id_region + ']';
 
             $.colorbox({
