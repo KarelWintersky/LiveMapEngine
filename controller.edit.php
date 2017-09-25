@@ -38,9 +38,12 @@ switch ($edit_what) {
         $region_data = $lm_engine->getMapRegionData( $edit_map_alias, $edit_region_id );
 
         $template_data = array(
+            'id_region'         =>  $edit_region_id,
+            'id_map'            =>  0,
+
             'alias_map'         =>  $edit_map_alias,
 
-            'id_region'         =>  $edit_region_id,
+
 
             'html_callback'     =>  "/map/{$edit_map_alias}",
 
