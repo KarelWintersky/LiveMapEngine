@@ -100,7 +100,7 @@
     // draw polygons on map, bind on-click function
     Object.keys( polymap ).forEach(function(id_region){
         polymap[ id_region ].addTo(map).on('click', function(){
-            let t = theMap['regions'][ id_region ]['title'] || id_region;
+            var t = theMap['regions'][ id_region ]['title'] || id_region;
             // $("#selected_region").html(t);
             window.location.hash = 'view=[' + id_region + ']';
 

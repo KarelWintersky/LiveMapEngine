@@ -158,7 +158,7 @@ ORDER BY edit_date ;
      * @param $region_data
      * @return array
      */
-    public function storeMapRegionData($data)
+    public function storeMapRegionData($region_data)
     {
         $success = array(
             'state'     =>  FALSE,
@@ -168,16 +168,46 @@ ORDER BY edit_date ;
 
         $query = "
         INSERT INTO {$table_data}
-         (alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment)
+         (id_map, alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment)
          VALUES
-         (:alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment)
+         (:id_map, :alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment)
         ";
 
+        $data = array(
+            'id_map'        =>  $region_data['id_map'],
+            'alias_map'     =>  $region_data['alias_map'],
+            'edit_whois'    =>  $region_data['edit_whois'],
+            'edit_ipv4'     =>  $this->getIP(),
+            'id_region'     =>  $region_data['id_region'],
+            'title'         =>  $region_data['title'],
+            'content'       =>  $region_data['content'],
+            'edit_comment'  =>  $region_data['edit_comment']
+        );
 
-
-
+        try {
+            $sth = $this->dbi->getconnection()->prepare($query);
+            $success['state'] = $sth->execute($data);
+        } catch (\PDOException $e) {
+            $success['state'] = FALSE;
+            $success['message'] = $e->getMessage();
+        }
+        return $success;
 
     }
+
+    /**
+     * Полная копия приватного метода класса PHPAuth. Отдает айпишник.
+     * @return mixed
+     */
+    public function getIP()
+    {
+        if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+    }
+
 
 
 }

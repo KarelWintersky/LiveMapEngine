@@ -3,9 +3,6 @@
  * User: Arris
  * Date: 24.09.2017, time: 16:07
  */
-echo '<pre>';
-var_dump( $_GET );
-var_dump( $_POST );
 
 define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
@@ -18,6 +15,8 @@ if (!$is_logged) {
 
 switch ($_GET['target']) {
     case 'regiondata': {
+        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
         // вызвано из формы редактирования. Нужно попытаться сохранить контент (проверив права) и отдать json-ответ для исходной страницы.
         // на ней отобразиться "сохраняем, спиннер и либо будет редирект через 3 секунды, либо сообщение об ошибке
 
@@ -28,16 +27,18 @@ switch ($_GET['target']) {
         $id_region = $_POST['edit:id:region'];
 
         $data = array(
-            // данные по региону
-            'title'         =>  $_POST['edit:region:title'],
-            'content'       =>  $_POST['edit:region:content'],
-            'id_region'     =>  $id_region,
-            'edit_comment'  =>  $_POST['edit:region:comment'],
-
+            // получаем иначе
+            'id_map'        =>  0,
             'alias_map'     =>  $_POST['edit:alias:map'],
 
             // Кто редактировал (айди пользователя)
-            'edit_whois'    =>  $auth->getCurrentUID()
+            'edit_whois'    =>  $auth->getCurrentUID(),
+
+            // данные по региону
+            'id_region'     =>  $id_region,
+            'title'         =>  $_POST['edit:region:title'],
+            'content'       =>  $_POST['edit:region:content'],
+            'edit_comment'  =>  $_POST['edit:region:comment'],
         );
         $template_data = $lm_engine->storeMapRegionData($data);
 
@@ -47,6 +48,7 @@ switch ($_GET['target']) {
         }
 
         echo json_encode( $template_data );
+        die;
         break;
     }
 
