@@ -1,0 +1,45 @@
+.mceTmpl fieldset {
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.mceTmpl legend {
+    font-weight: bold;
+    font-size: large;
+    padding-left: 5px;
+    padding-right: 1em;
+}
+
+.mceTmpl fieldset.locations {
+}
+
+.mceTmpl fieldset.locations ul {
+    list-style: none;
+}
+
+.mceTmpl fieldset.locations ul li:before {
+    content: '⊕\0000a0';
+}
+
+.mceTmpl fieldset.locations ul li > ul {
+    list-style: none;
+}
+
+.mceTmpl fieldset.locations ul li > ul li:before{
+    content: '☾\0000a0';
+}
+
+.mceTmpl fieldset.locations ul li > ul li > ul {
+    list-style: none;
+}
+
+.mceTmpl fieldset.locations ul li > ul li > ul li:before{
+    content: '☄\0000a0';
+}
+
+.mceTmpl fieldset.financial-content ul {
+    list-style: none;
+
+}
+.mceTmpl fieldset.financial-content ul li:before {
+    content: '¤\0000a0';
+}

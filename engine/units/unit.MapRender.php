@@ -46,8 +46,8 @@ class MapRender extends UnitPrototype
             return ($value1['edit_date'] < $value2['edit_date']);
         });
 
-        // $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
-        // $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
+        $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
+        $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
 
         $this->template->set('/', array(
             // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),

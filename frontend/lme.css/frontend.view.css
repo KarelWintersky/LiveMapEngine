@@ -1,0 +1,109 @@
+.colorboxed-header {
+    background-color: #5ab500;
+    min-width: 40%;
+    width: 40%;
+}
+
+button {
+    font-size: large;
+}
+
+/* Leaflet */
+#leafletmap {
+    width: 800px;
+    height: 600px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+/* canvas container */
+.themap {
+    position:absolute;
+    z-index:1;
+    opacity: 0.8;
+}
+
+#map-container{
+    display:inline-block;
+    width:1048px;
+    height:827px;
+    margin: 0 auto;
+    position:relative;
+}
+#mapcanvas{
+    position:relative;
+    z-index:20;
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+h4.sandboxwarning {
+    color: #ff3922;
+}
+
+.clear {
+    clear: both;
+}
+
+/* region-content childs styles */
+.region-content {
+    margin: 5px;
+    padding: 5px;
+    font-family: 'Didact Gothic', sans-serif;
+}
+
+.region-content fieldset {
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.region-content legend {
+    font-weight: bold;
+    font-size: large;
+    padding-left: 5px;
+    padding-right: 1em;
+}
+
+/*
+    ☀ - star
+    ⊕ - planet
+    ☾ - moon
+    ☄ - orbital station
+    \0000a0 - unicode space
+*/
+
+.region-content fieldset.locations {
+}
+
+.region-content fieldset.locations ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li:before {
+    content: '⊕\0000a0';
+}
+
+.region-content fieldset.locations ul li > ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li > ul li:before{
+    content: '☾\0000a0';
+}
+
+.region-content fieldset.locations ul li > ul li > ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li > ul li > ul li:before{
+    content: '☄\0000a0';
+}
+
+.region-content fieldset.financial-content ul {
+
+}
+.region-content fieldset.financial-content ul li:before {
+    content: '¤\0000a0';
+}
