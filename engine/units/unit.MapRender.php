@@ -78,10 +78,6 @@ class MapRender extends UnitPrototype
 
     public function run( $skin = 'colorbox' )
     {
-        $this->template = new Template($this->template_file, $this->template_path);
-        $this->template->set('/map_alias', $this->map_alias);
-        $this->template->set('/html_callback', '/');
-
         if ($skin === 'iframe') {
 
             $this->makemap_iframe();
@@ -100,6 +96,7 @@ class MapRender extends UnitPrototype
             $this->template->set('error_message', "Unknown skin mode {$skin} for map {$this->map_alias}");
             die( $this->template->render() );
         }
+        $this->template->set('html_callback', '/');
 
         return true;
     }
