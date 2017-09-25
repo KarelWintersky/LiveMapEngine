@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Проект {*title_project*}, {*title_map*}, редактирование региона {*id_region*}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" type="text/css" href="/frontend/lme.css/frontend.edit.css" />
+
+    <script type="text/javascript" src="/frontend/html5shiv.js"></script>
+    <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
+    <script type="text/javascript" src="/frontend/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" id="define">
+        var tiny_config = {
+            theme               : "modern",
+            skin                : "lightgray",
+            language            : 'ru',
+
+            forced_root_block   : "",
+            force_br_newlines   : true,
+            force_p_newlines    : false,
+
+            height: 300,
+
+            plugins: [ "advlist lists autolink link image anchor responsivefilemanager charmap insertdatetime paste searchreplace contextmenu code textcolor template hr pagebreak table print preview wordcount visualblocks visualchars legacyoutput" ],
+            formats: {
+                strikethrough   : { inline : 'del' },
+                underline       : { inline : 'span', 'classes' : 'underline', exact : true}
+            },
+            insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
+            contextmenu         :  "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
+            toolbar1            :  "pastetext | undo redo | link unlink anchor | forecolor backcolor | styleselect formatselect fontsizeselect | template | print preview code | pastetext removeformat",
+            toolbar2            :  "responsivefilemanager image | bold italic underline subscript superscript strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table inserttime",
+            image_advtab        :  true,
+
+            // responsive filemanager
+            relative_urls       : false,
+            document_base_url   : "/",
+            external_filemanager_path:  "/frontend/filemanager/",
+            filemanager_title   : "Responsive Filemanager" ,
+            external_plugins    : {
+                "filemanager"   : "/frontend/filemanager/plugin.js"
+            }
+        };
+        function tinify(config, elem, mode)
+        {
+            m = (typeof mode != 'undefined') ? mode : true;
+            tinyMCE.settings = config;
+            m
+                    ? tinyMCE.execCommand('mceAddEditor', true, elem)
+                    : tinyMCE.execCommand('mceRemoveEditor', false, elem);
+        }
+    </script>
+    <script type="text/javascript" id="init">
+        var saving_in_progress = false;
+        $(document).ready(function(){
+            tinify(tiny_config, 'edit-textarea');
+
+            setTimeout(function(){
+                $('input#title').focus()
+            }, 300);
+
+            $("#actor-back").on('click', function(){
+                document.location.href = '{*html_callback*}';
+            });
+            // Аякс-обработчик сохранения, спиннер, вывод результата. Не забываем на время обработки дизейблить кнопки, а при ошибке - энэйблить.
+            $("#form-edit-region").on('submit', function(){
+                var url = $(this).attr('action');
+                if (saving_in_progress) return false;
+
+                $.ajax({
+                    async       : false,
+                    cache       : false,
+                    type        : 'POST',
+                    url         : url,
+                    dataType    : 'json',
+                    data        : $(this).serialize(),
+                    beforeSend  : function(){
+                        saving_in_progress = true;
+                        $("#ajax-spinner").show();
+                        $("#ajax-process").show();
+                        // disable buttons
+                        $("#actor-submit").prop('disabled', true);
+                        $("#actor-back").prop('disabled', true);
+                    },
+                    success     : function(result){
+                        if (result['state']) {
+                            // state = TRUE (saving successfull)
+                            $("#ajax-result").show();
+                            setTimeout(function(){
+                                window.location.replace("{*html_callback*}")
+                            }, 2000);
+                        } else {
+                            saving_in_progress = false;
+                            $("#ajax-result").show().html( result['message'] );
+                            // enable buttons
+                            $("#actor-submit").removeAttr('disabled');
+                            $("#actor-back").removeAttr('disabled');
+                        }
+                    }
+
+                });
+                return false;
+            });
+
+        });
+    </script>
+</head>
+<body>
+<h3>Регион: {?!*is_present*}`{*id_region*}`{*is_present*?!}{?*is_present*}{*region_title*}{*is_present*?}</h3>
+
+<form action="/action/storecontent" method="post" id="form-edit-region">
+    <input type="hidden" name="edit:id:project" value="{*id_project*}">
+    <input type="hidden" name="edit:id:map"     value="{*id_map*}">
+    <input type="hidden" name="edit:id:region"  value="{*id_region*}">
+    <input type="hidden" name="edit:html_callback" value="{*html_callback*}" />
+    <input type="hidden" name="edit:layout:type" value="svg">
+
+    <fieldset class="fields_area">
+        <div class="field">
+            <label for="title">Название региона:</label>
+            <input type="text" name="edit:region:title" id="title" size="90" value="{*region_title*}" tabindex="1" required />
+            <span class="mark-required">*</span>
+        </div>
+    </fieldset>
+
+    <label for="edit-textarea" class="label_textarea label_fullwidth">
+        <textarea name="edit:region:content" id="edit-textarea" cols="10" tabindex="2">{*region_text*}</textarea>
+    </label>
+    <fieldset class="fields_area">
+        <div class="field">
+            <label for="edit-reason">Комментарий редактора: </label>
+            <input type="text" name="edit:region:comment" size="90" value="" id="edit-reason" tabindex="3" autocomplete="off"/>
+        </div>
+    </fieldset>
+    <div class="clear"></div>
+
+    <fieldset>
+        <div class="label_fullwidth">
+            <button type="submit" id="actor-submit" tabindex="4">Сохранить</button>
+            <span id="ajax-process" style="display: none">Сохраняю... &nbsp;</span>
+            <img id="ajax-spinner" style="display: none" src="/frontend/spinners/21.svg" height="18"/>
+            <span id="ajax-result" style="display: none;">Сохранение успешно! Через несколько секунд возвращаемся на карту.</span>
+            <button type="button" id="actor-back" style="float:right" tabindex="5">Назад на карту</button>
+        </div>
+    </fieldset>
+</form>
+{?*region_revisions*}
+<fieldset id="revisions_fieldset">
+    <legend>Revision history</legend>
+    <ul>
+        {%*region_revisions*}
+        <li>
+            {*region_revisions:edit_name*} edited `{*region_revisions:title*}` at {*region_revisions:edit_date*} from IP {*region_revisions:ipv4*}
+        </li>
+        {*region_revisions*%}
+    </ul>
+</fieldset>
+{*region_revisions*?}
+<div class="clear"></div>
+<hr>
+<small style="float: left">Logged as <strong>{*is_logged_user*}</strong> from <strong>{*is_logged_user_ip*}</strong></small>
+<small style="float: right"><em>{*copyright*}</em></small>
+</body>
+
+
+</html>

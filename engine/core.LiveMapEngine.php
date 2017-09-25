@@ -104,5 +104,53 @@ class LiveMapEngine
         return $info;
     }
 
+    /**
+     * Получает массив ревизий региона для leaflet-карты
+     * @param $map_alias
+     * @param $id_region
+     * @return array|bool
+     */
+    public function getRegionRevisions($map_alias, $id_region)
+    {
+        $table_data     = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
+        $table_users    = LMEConfig::get_authconfig()->table_users;
+        $query = "
+SELECT
+  table_data.id_region AS id_region,
+  table_data.edit_date AS edit_date,
+  table_users.username AS edit_name,
+  INET_NTOA(`edit_ipv4`) AS ipv4,
+  title
+FROM
+  {$table_data} AS table_data,
+  {$table_users} AS table_users
+WHERE
+    alias_map = :alias_map
+AND id_region = :id_region
+AND table_data.edit_whois = table_users.id
+ORDER BY edit_date ;
+        ";
+        $all_revisions = array();
+        try {
+            $sth = $this->dbi->getconnection()->prepare($query);
+            $sth->execute(array(
+                'alias_map'     =>  $map_alias,
+                'id_region'     =>  $id_region
+            ));
+
+            $all_revisions = $sth->fetchAll();
+        } catch (\PDOException $e) {
+            $all_revisions = FALSE;
+        }
+        return $all_revisions;
+
+    }
+
+
+    public function getTileRevisions( $alias_map, $id_region )
+    {
+
+    }
+
 
 }
