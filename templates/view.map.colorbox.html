@@ -104,7 +104,6 @@
     var polymap = Object.create(null);
 
     // build polygons
-    // build polygons
     Object.keys( theMap.regions ).forEach(function( key ){
         var path = theMap.regions[ key ]['path'];
         var polygon_color   =   theMap.regions[ key ]['color']      ||  theMap.defaults.polygon_color;
@@ -138,16 +137,19 @@
     var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
 
     // draw polygons on map, bind on-click function
-    // draw polygons on map, bind on-click function
     Object.keys( polymap ).forEach(function(id_region){
         polymap[ id_region ].addTo(map).on('click', function(){
-            var t = theMap['regions'][ id_region ]['title'] || id_region;
+            // var t = theMap['regions'][ id_region ]['title'] || id_region;
             window.location.hash = 'view=[' + id_region + ']';
+            var t = (theMap['regions'][ id_region ]['title'] != '')
+                    ? theMap['regions'][ id_region ]['title']
+                    : '';
 
             $.colorbox({
                 href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
                 width: colorbox_width,
                 height: colorbox_height,
+                title: t,
                 onClosed: function(){
                     history.pushState('', document.title, window.location.pathname);
                 }
