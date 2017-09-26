@@ -36,6 +36,8 @@ switch ($_GET['source']) {
         $region_data = $lm_engine->getMapRegionData( $map_alias , $id_region );
         $is_logged = LMEConfig::get_auth()->isLogged();
 
+        // проверка прав на редактирование
+
         $TEMPLATE_DATA = array(
             'is_present'        =>  $region_data['is_present'],
 
