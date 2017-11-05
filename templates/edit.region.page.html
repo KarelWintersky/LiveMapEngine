@@ -26,11 +26,16 @@
                 strikethrough   : { inline : 'del' },
                 underline       : { inline : 'span', 'classes' : 'underline', exact : true}
             },
-            insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
+            /*insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
             contextmenu         :  "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
             toolbar1            :  "pastetext | undo redo | link unlink anchor | forecolor backcolor | styleselect formatselect fontsizeselect | template | print preview code | pastetext removeformat",
             toolbar2            :  "responsivefilemanager image | bold italic underline subscript superscript strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table inserttime",
-            image_advtab        :  true,
+            image_advtab        :  true,*/
+
+            insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
+            contextmenu     : "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
+            toolbar1        : "undo redo | bold italic underline subscript superscript strikethrough | fontsizeselect styleselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ",
+            toolbar2        : "responsivefilemanager image | template table charmap | link unlink anchor | pastetext removeformat | print preview code",
 
             // responsive filemanager
             relative_urls       : false,
@@ -39,8 +44,28 @@
             filemanager_title   : "Responsive Filemanager" ,
             external_plugins    : {
                 "filemanager"   : "/frontend/filemanager/plugin.js"
-            }
+            },
+            paste_as_text       : true,
+
+            // templates
+            templates           : [
+                {
+                    title       : 'Подробный шаблон',
+                    description : 'Подробный шаблон',
+                    url         : '/templates/tinymce.templates/tinymce.extended.html'
+                },
+                {
+                    title       : 'Краткий шаблон',
+                    description : 'Краткий шаблон',
+                    url         : '/templates/tinymce.templates//tinymce.planet.html'
+                },
+            ],
+            template_popup_height   : 400,
+            template_popup_width    : 800,
+            content_css         : '{*const_frontend_path*}/css.lme/templates.css'
         };
+        // add markdown and simple configs
+
         function tinify(config, elem, mode)
         {
             m = (typeof mode != 'undefined') ? mode : true;
