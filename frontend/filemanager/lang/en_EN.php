@@ -75,4 +75,3 @@ define('lang_Zip_Invalid', 'This extension is not supported. Valid: zip, gz, tar
 define('lang_Dir_No_Write', 'The directory you selected is not writable.');
 define('lang_Function_Disabled', 'The %s function has been disabled by the server.'); // %s = cut or copy
 
-?>

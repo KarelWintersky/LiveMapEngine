@@ -67,7 +67,7 @@ class Config
         return true;
     }
 
-    /**
+    /** @todo:
      * Deprecated ?
      * @param $name
      * @param $args

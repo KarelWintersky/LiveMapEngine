@@ -10,9 +10,9 @@ class Template {
 
     const ALLOWED_RENDERS = array('html', 'json', 'null');
 
-    private $template_file;
-    private $template_path;
-    private $template_data;
+    public $template_file;
+    public $template_path;
+    public $template_data;
     private $http_headers = array();
     private $http_status;
 
@@ -44,7 +44,11 @@ class Template {
     public function render()
     {
         if ($this->render_type === 'html') {
+
+            if ($this->template_path === '' && $this->template_file === '') return false;
+
             return websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path );
+
         } elseif ($this->render_type === 'json') {
             return json_encode( $this->template_data );
         } else return null;
@@ -61,7 +65,7 @@ class Template {
     /**
      * @param $file
      */
-    public function setTemplate( $file )
+    public function setTemplateFile( $file )
     {
         $this->template_file = $file;
     }
@@ -130,7 +134,7 @@ class Template {
     }
 
     /**
-     * @param $path
+     *
      */
     public function dump()
     {

@@ -183,6 +183,7 @@ class ParseSVG {
      */
     public static function convert_SVGPath_to_Polygon( $path )
     {
+        $xy = array();
         $is_debug = false;
 
         // пуст ли путь?
@@ -552,6 +553,10 @@ class ParseSVG {
     public function getImageDefinition( $image_num = 0 )
     {
         if (array_key_exists($image_num, $this->layer_images)) {
+
+            /**
+             * @var SimpleXMLElement $an_image
+             */
             $an_image = $this->layer_images[ $image_num ];
 
             return array(
@@ -577,6 +582,9 @@ class ParseSVG {
     {
         $all_paths = array();
 
+        /**
+         * @var SimpleXMLElement $path
+         */
         foreach ($this->layer_paths as $path) {
             $polygon_data = array();   // блок данных о пути
 

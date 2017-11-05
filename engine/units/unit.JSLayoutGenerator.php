@@ -27,9 +27,8 @@ class JSLayoutGenerator extends UnitPrototype {
     /**
      *
      */
-    public function run( $route = '' )
+    public function run()
     {
-        $is_correct = false;
         $image_data = array(
             'width'     =>  0,
             'height'    =>  0,

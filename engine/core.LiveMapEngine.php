@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * Class LiveMapEngine
+ */
 class LiveMapEngine
 {
     private $dbi;
     private $table_prefix;
 
+    /**
+     * @param DBConnectionLite $dbi
+     */
     public function __construct(\DBConnectionLite $dbi)
     {
         $this->dbi = $dbi;
@@ -63,7 +69,6 @@ class LiveMapEngine
      */
     public function getMapRegionData($map_alias, $id_region)
     {
-        $info = array();
         $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
 
         try {
@@ -130,7 +135,6 @@ AND id_region = :id_region
 AND table_data.edit_whois = table_users.id
 ORDER BY edit_date ;
         ";
-        $all_revisions = array();
         try {
             $sth = $this->dbi->getconnection()->prepare($query);
             $sth->execute(array(

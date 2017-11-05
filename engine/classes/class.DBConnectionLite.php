@@ -52,7 +52,7 @@ class DBConnectionLite extends \PDO
 
         } elseif (is_null($config_argv)) {
             // передан NULL, используется StaticConfig
-
+            //@todo: добавить проверку class_exists('StaticConfig');
             $section_name = empty($key_connection) ? '' : ':' . StaticConfig::key( "connection/{$key_connection}" );
             $database_settings_section_name = StaticConfig::key('host/server') . $section_name;
             $database_settings = StaticConfig::key( $database_settings_section_name );

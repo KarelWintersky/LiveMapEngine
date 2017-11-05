@@ -26,6 +26,7 @@ class MapsListRender extends UnitPrototype {
      */
     public function content()
     {
+        //@todo: 'classic' render check (as prototype)
         return $this->template->render();
     }
 }

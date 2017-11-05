@@ -5,6 +5,9 @@
  */
 class MapRender extends UnitPrototype
 {
+    /**
+     * @var Template $template
+     */
     private $template;
     private $map_alias;
 
@@ -22,15 +25,11 @@ class MapRender extends UnitPrototype
     private function makemap_folio()
     {
         $this->template_file = 'view.map.folio.html';
-        $this->template = new Template($this->template_file, $this->template_path);
-        $this->template->set('/map_alias', $this->map_alias);
     }
 
     private function makemap_colorbox()
     {
         $this->template_file = 'view.map.colorbox.html';
-        $this->template = new Template($this->template_file, $this->template_path);
-        $this->template->set('/map_alias', $this->map_alias);
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -51,18 +50,16 @@ class MapRender extends UnitPrototype
 
         $this->template->set('/', array(
             // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
-            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data),
+            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
             'map_regions_count'             =>  count($regions_with_data)
         ));
     }
 
-    private function makemap_iframe()
+    private function makemap_iframe( /* \Template $tpl */)
     {
         $this->template_file = 'view.map.iframe.html';
-        $this->template = new Template($this->template_file, $this->template_path);
-        $this->template->set('/map_alias', $this->map_alias);
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -78,6 +75,9 @@ class MapRender extends UnitPrototype
 
     public function run( $skin = 'colorbox' )
     {
+        $this->template = new Template('', $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
+
         if ($skin === 'iframe') {
 
             $this->makemap_iframe();
@@ -91,19 +91,31 @@ class MapRender extends UnitPrototype
             $this->makemap_folio();
 
         } else {
-            unset($this->template);
-            $this->template = new Template('404.html', '$/templates');
-            $this->template->set('error_message', "Unknown skin mode {$skin} for map {$this->map_alias}");
+            $this->makemap_404( $skin );
             die( $this->template->render() );
         }
-        $this->template->set('html_callback', '/');
 
+        $this->template->set('html_callback', '/');
         return true;
+    }
+
+    /**
+     * @param $skin
+     */
+    private function makemap_404( $skin )
+    {
+        $this->template_file = '404.html';
+        $this->template_path = '$/templates';
+        $this->template->set('error_message', "Unknown skin mode {$skin} for map {$this->map_alias}");
     }
 
     public function content()
     {
-        if (method_exists($this->template, 'render'))
+        if (method_exists($this->template, 'render')) {
+            $this->template->setTemplateFile( $this->template_file );
+            $this->template->setTemplatePath( $this->template_path );
             return $this->template->render();
+        }
+
     }
 }
