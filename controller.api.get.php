@@ -7,7 +7,7 @@ define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 
 $content = '';
-$render_type = 'raw';
+$render_type = 'raw'; // == text (сырые данные без обработки)
 
 switch ($_GET['source']) {
     case 'jslayout' : {
@@ -33,7 +33,7 @@ switch ($_GET['source']) {
 
         $map_alias = $_GET['map']   ?? NULL;
         $id_region = $_GET['id']    ?? NULL;
-        $template  = $_GET['template'] ?? 'fieldset';
+        $template  = $_GET['resultType'] ?? 'html';
 
         $region_data = $lm_engine->getMapRegionData( $map_alias , $id_region );
         $is_logged = LMEConfig::get_auth()->isLogged();
@@ -50,20 +50,26 @@ switch ($_GET['source']) {
         );
 
         switch ($template) {
-            case 'html' : {
+            case 'json' : {
                 $render_type = 'json';
-                $tpl_file = 'view.region.html.html';
+                $tpl_file = 'view.region.json.html';
 
                 $content = [
                     'content'   =>  websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES),
-                    'title'     =>  $region_data['title']
+                    'title'     =>  ($region_data['is_present']) ? $region_data['title'] : ''
                 ];
+                break;
+            }
+            case 'fieldset': {
+                $render_type = 'text';
+                $tpl_file = 'view.region.fieldset.html';
 
+                $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
                 break;
             }
             default     : {
-                $render_type = 'raw';
-                $tpl_file = 'view.region.fieldset.html';
+                $render_type = 'text';
+                $tpl_file = 'view.region.html.html';
 
                 $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
 
@@ -77,7 +83,7 @@ switch ($_GET['source']) {
 
 } // end switch
 
-if ($render_type == 'raw') {
+if ($render_type == 'text' || $render_type == 'raw') {
 
     echo $content;
 

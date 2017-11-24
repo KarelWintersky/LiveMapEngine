@@ -95,7 +95,7 @@
 
 <script type="text/javascript" id="global-functions">
     showContentColorbox = function(id_region , title) {
-        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region + '&template=fieldset';
+        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
         $.get( url, function() {
         }).done(function(data) {
             $.colorbox({

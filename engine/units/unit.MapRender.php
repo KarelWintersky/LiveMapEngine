@@ -122,7 +122,7 @@ class MapRender extends UnitPrototype
                 $this->makemap_folio();
                 break;
             }
-            case 'wideonmap': {
+            case 'wide': {
                 $this->makemap_widecolorbox();
                 break;
             }

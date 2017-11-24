@@ -1,0 +1,11 @@
+{?*is_present*}
+{?*islogged*}<button id="actor-edit" data-region-id="{*region_id*}">Редактировать</button>{*islogged*?}
+<h2>{*region_title*}</h2>
+<div>
+    {*region_text*}
+</div>
+{*is_present*?}
+{?!*is_present*}
+{?*islogged*}<button id="actor-edit" data-region-id="{*region_id*}">Добавить</button>{*islogged*?}
+<br/>По региону <strong>{*region_id*}</strong> нет информации.
+{*is_present*?!}

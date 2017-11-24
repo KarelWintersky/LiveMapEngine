@@ -10,7 +10,7 @@ require_once (__ROOT__ . '/engine/__required.php');
 require_once (__ROOT__ . '/engine/units/unit.MapRender.php');
 
 $alias_map  = $_GET['alias'] ?? NULL;
-$viewmode = filter_array_for_allowed($_GET, 'viewmode', array('colorbox', 'folio', 'iframe', 'wide'), 'colorbox');
+$viewmode = filter_array_for_allowed($_GET, 'viewmode', array('colorbox', 'folio', 'iframe', 'wide'), 'wide');
 
 $map = new MapRender( $alias_map );
 $map_found = $map->run( $viewmode );
