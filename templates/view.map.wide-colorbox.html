@@ -36,21 +36,17 @@
         }
         .region-tab-viewbox select {
             font-size: 160%;
-            width: 40%
+            width: 30%
         }
         .region-tab-viewbox h3 {
             font-size: 140%;
             color: #0088cc;
-
-
         }
         .region-tab-content {
             margin: 10px 0 0 0;
             font-size: 140%;
             text-align: left;
             color: #000000;
-
-            min-width: calc(100% / 2);
             max-height: 400px;
             overflow-y: scroll;
         }
@@ -58,10 +54,10 @@
             padding-left: 25px;
             padding-right: 10px;
         }
-
-        .map-regions li {
+        .region-tab-content ul li {
             list-style-type: square;
         }
+
 
         .invisible {
             display: none;
@@ -175,7 +171,7 @@
 
         // toggle div
         $('.action-toggle-div-visibility').on('click', function (e) {
-            let text = L.Control.RegionsTab.is_content_visible ? 'Показать' : 'Скрыть';
+            let text = L.Control.RegionsTab.is_content_visible ? 'Показать' : '&nbsp;Скрыть&nbsp;';
             $(this).html(text);
 
             let data = $(this).data('content');
@@ -249,8 +245,8 @@
     <div style="text-align: right">
         <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
         <select id="sort-select" class="invisible">
-            <option value="total" data-ul="data-ordered-alphabet">... Total</option>
-            <option value="latest" data-ul="data-ordered-latest">... Latest</option>
+            <option value="total" data-ul="data-ordered-alphabet">...всего</option>
+            <option value="latest" data-ul="data-ordered-latest">... новые</option>
         </select>&nbsp;&nbsp;
         <button class="action-toggle-div-visibility" data-content="tab-regions-content">Показать</button>
     </div>
