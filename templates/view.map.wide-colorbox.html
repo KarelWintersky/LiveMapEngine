@@ -27,22 +27,23 @@
             border: 1px solid black;
         }
 
-        .region-tab-viewbox {
+        /* === Section Regions */
+        .section-regions-viewbox {
             padding: 8px 8px;
             background: white;
             background: rgba(255,255,255,1);
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
         }
-        .region-tab-viewbox select {
+        .section-regions-viewbox select {
             font-size: 160%;
             width: 30%
         }
-        .region-tab-viewbox h3 {
+        .section-regions-viewbox h3 {
             font-size: 140%;
             color: #0088cc;
         }
-        .region-tab-content {
+        .section-regions-content {
             margin: 10px 0 0 0;
             font-size: 140%;
             text-align: left;
@@ -50,14 +51,31 @@
             max-height: 400px;
             overflow-y: scroll;
         }
-        .region-tab-content ul {
+        .section-regions-content ul {
             padding-left: 25px;
             padding-right: 10px;
         }
-        .region-tab-content ul li {
+        .section-regions-content ul li {
             list-style-type: square;
         }
 
+        /* === Section Viewbox === */
+        .section-info-viewbox {
+            padding: 8px 8px;
+            background: white;
+            background: rgba(255,255,255,1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .section-info-content {
+            margin: 10px 0 0 0;
+            font-size: 140%;
+            text-align: left;
+            color: #000000;
+            max-height: 400px;
+            max-width: 600px;
+            overflow-y: scroll;
+        }
 
         .invisible {
             display: none;
@@ -68,7 +86,6 @@
 <body>
 <form action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
-
 
 <script type="text/javascript" id="build-layout">
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
@@ -103,13 +120,43 @@
 </script>
 
 <script type="text/javascript" id="create-map-and-layout">
+    ShowContent = function(id_region , title) {
+        console.log( id_region );
+        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
+
+        $.colorbox({
+            href: url,
+            width: colorbox_width,
+            height: colorbox_height,
+            title: title,
+            onClosed: function(){
+                history.pushState('', document.title, window.location.pathname);
+            }
+        });
+    }
+
+    ShowContentBox = function(id_region, title) {
+        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
+        $("#section-info-content");
+
+        $.get( url, function() {
+
+        }).done(function(data) {
+            $("#section-info-content").html(data);
+
+        });
+    }
+
     var map = L.map('map', {
         crs: L.CRS.Simple,
         minZoom: -3,
         maxZoom: 2,
         preferCanvas: true,
         renderer: L.canvas(),
+        zoomControl: false,
     });
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
     let h = theMap['map']['height'];
     let w = theMap['map']['width'];
     let bounds = [ [0, 0], [h-1, w-1 ] ];
@@ -120,24 +167,16 @@
     map.setMaxBounds(max_bounds);
 
     // draw polygons on map, bind on-click function
-    Object.keys( polymap ).forEach(function(id_region){
+    Object.keys( polymap ).forEach(function( id_region ) {
+
         polymap[ id_region ].addTo(map).on('click', function(){
             // var t = theMap['regions'][ id_region ]['title'] || id_region;
             window.location.hash = 'view=[' + id_region + ']';
-            var t = (theMap['regions'][ id_region ]['title'] != '')
+            let t = (theMap['regions'][ id_region ]['title'] != '')
                     ? theMap['regions'][ id_region ]['title']
                     : '';
 
-            $.colorbox({
-                href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
-                width: colorbox_width,
-                height: colorbox_height,
-                title: t,
-                onClosed: function(){
-                    history.pushState('', document.title, window.location.pathname);
-                }
-            });
-
+            ShowContentBox(id_region, t);
         });
     });
 
@@ -148,42 +187,60 @@
         polymap[ key ].setStyle({fillColor: '#00ff00'});
     });
 
-    L.Control.RegionsTab = L.Control.extend({
+    L.Control.RegionsBox = L.Control.extend({
         is_content_visible: false,
         options: {
             position: 'topright'
         },
         onAdd: function(map) {
-            let div = L.DomUtil.get('tab-regions');
+            let div = L.DomUtil.get('section-regions');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomUtil.enableTextSelection();
-
             L.DomEvent.disableScrollPropagation(div);
             L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map) {}
+    });
 
+    L.Control.ContentBox = L.Control.extend({
+        is_content_visible: false,
+        options: {
+            position: 'topleft'
+        },
+        onAdd: function(map) {
+            let div = L.DomUtil.get('section-infobox');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomUtil.enableTextSelection();
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
             return div;
         },
         onRemove: function(map) {}
     });
 
     $(function() {
-        map.addControl( new L.Control.RegionsTab() );
+        map.addControl( new L.Control.RegionsBox() );
+        map.addControl( new L.Control.ContentBox() );
+
+
 
         // toggle div
         $('.action-toggle-div-visibility').on('click', function (e) {
-            let text = L.Control.RegionsTab.is_content_visible ? 'Показать' : '&nbsp;Скрыть&nbsp;';
+            let state = $(this).data('content-is-visible');
+            let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
             $(this).html(text);
 
             let data = $(this).data('content');
             $('#' + data).toggle();
-            $('#sort-select').toggle();
-
-            L.Control.RegionsTab.is_content_visible = !L.Control.RegionsTab.is_content_visible;
+            $(this).parent().find('select').toggle(); // hide/show select
+            $(this).data('content-is-visible', !state);
         });
+
         $("#sort-select").on('change', function(e){
-            $("#data-ordered-alphabet").hide();
-            $("#data-ordered-latest").hide();
             let must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+            let must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+            $(must_hide).hide();
             $(must_display).show();
         });
 
@@ -241,20 +298,27 @@
 
 </script>
 
-<div id="tab-regions" class="region-tab-viewbox invisible">
+<section id="section-infobox" class="section-info-viewbox invisible">
+    <div style="text-align: left">
+        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="false">Показать</button>
+    </div>
+    <div id="section-info-content" class="invisible section-info-content">
+    </div>
+</section>
+
+<section id="section-regions" class="section-regions-viewbox invisible">
     <div style="text-align: right">
         <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
         <select id="sort-select" class="invisible">
-            <option value="total" data-ul="data-ordered-alphabet">...всего</option>
+            <option value="total" data-ul="data-ordered-alphabet">... все</option>
             <option value="latest" data-ul="data-ordered-latest">... новые</option>
-        </select>&nbsp;&nbsp;
-        <button class="action-toggle-div-visibility" data-content="tab-regions-content">Показать</button>
+        </select>
+        &nbsp;&nbsp;
+        <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
     </div>
 
     {?!*target*}
-    <div id="tab-regions-content" class="invisible region-tab-content">
-
-
+    <div id="section-regions-content" class="invisible section-regions-content">
         <ul class="map-regions" id="data-ordered-alphabet">
             {%*map_regions_order_by_title*}<li><a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_title:id_region*}]" data-region-id="{*map_regions_order_by_title:id_region*}">{*map_regions_order_by_title:title*}</a></li>
             {*map_regions_order_by_title*%}
@@ -267,7 +331,7 @@
 
     </div>
     {*target*?!}
-</div>
+</section>
 
 <script type="text/javascript" id="bind-actor-click-inside-colorbox">
     // обрабатываем клик по ссылке внутри попап окна
