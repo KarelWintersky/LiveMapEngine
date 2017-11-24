@@ -22,14 +22,21 @@ class MapRender extends UnitPrototype
         $this->template_path = '$/templates';
     }
 
+    private function makemap_widecolorbox()
+    {
+        $this->template_file = 'view.map.wide-colorbox.html';
+    }
+
     private function makemap_folio()
     {
         $this->template_file = 'view.map.folio.html';
+
     }
 
     private function makemap_colorbox()
     {
-        $this->template_file = 'view.map.colorbox.html';
+        // $this->template_file = 'view.map.colorbox.html';
+        $this->template_file = 'view.map.wide-colorbox.html';
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
