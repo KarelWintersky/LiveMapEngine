@@ -2,7 +2,7 @@
 
 namespace PHPAuth;
 
-require_once (__ROOT__ . '/engine/external/PHPMailer/PHPMailerAutoload.php');
+require_once(__ROOT__ . '/engine/thirdparty/PHPMailer/PHPMailerAutoload.php');
 use \PHPMailer;
 
 /***

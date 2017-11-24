@@ -19,10 +19,10 @@ require_once (__ROOT__ . '/engine/core.functions.php');
 
 // WebSun Template Engine
 ini_set('pcre.backtrack_limit', 1024*1024);
-require_once (__ROOT__ . '/engine/external/websun.php');
+require_once(__ROOT__ . '/engine/thirdparty/websun.php');
 
 // Classes
-require_once(__ROOT__ . '/engine/core.LMEConfig.php');
+require_once (__ROOT__ . '/engine/core.LMEConfig.php');
 require_once (__ROOT__ . '/engine/classes/class.INI_Config.php');
 require_once (__ROOT__ . '/engine/classes/class.DBConnectionLite.php');
 require_once (__ROOT__ . '/engine/classes/class.ParseSVG.php');
@@ -40,8 +40,8 @@ LMEConfig::set_dbi( $dbi );
 
 // PHPAuth
 if ($main_config->get('auth/phpauth_enabled')) {
-    require_once (__ROOT__ . '/engine/external/phpauth/config.class.php');
-    require_once (__ROOT__ . '/engine/external/phpauth/auth.class.php');
+    require_once(__ROOT__ . '/engine/thirdparty/phpauth/config.class.php');
+    require_once(__ROOT__ . '/engine/thirdparty/phpauth/auth.class.php');
 
     LMEConfig::set_authconfig(
         new PHPAuth\Config( PATH_CONFIG . 'phpauth.ini' )

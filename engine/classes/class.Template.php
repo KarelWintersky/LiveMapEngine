@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('websun')) require_once (__ROOT__ . '/engine/external/websun.php');
+if (!class_exists('websun')) require_once(__ROOT__ . '/engine/thirdparty/websun.php');
 
 /**
  * Class Template
