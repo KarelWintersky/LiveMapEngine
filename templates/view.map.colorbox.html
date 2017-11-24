@@ -93,6 +93,34 @@
     });
 </script>
 
+<script type="text/javascript" id="global-functions">
+    showContentColorbox = function(id_region , title) {
+        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region + '&template=fieldset';
+        /*$.colorbox({
+            href: url,
+            width: colorbox_width,
+            height: colorbox_height,
+            title: title,
+            onClosed: function(){
+                history.pushState('', document.title, window.location.pathname);
+            }
+        });*/
+
+        $.get( url, function() {
+        }).done(function(data) {
+            $.colorbox({
+                html: data,
+                width: colorbox_width,
+                height: colorbox_height,
+                title: title,
+                onClosed: function(){
+                    history.pushState('', document.title, window.location.pathname);
+                }
+            });
+        });
+    }
+</script>
+
 <script type="text/javascript" id="build-layout">
     $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
@@ -145,16 +173,7 @@
                     ? theMap['regions'][ id_region ]['title']
                     : '';
 
-            $.colorbox({
-                href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
-                width: colorbox_width,
-                height: colorbox_height,
-                title: t,
-                onClosed: function(){
-                    history.pushState('', document.title, window.location.pathname);
-                }
-            });
-
+            showContentColorbox(id_region, t);
         });
     });
 

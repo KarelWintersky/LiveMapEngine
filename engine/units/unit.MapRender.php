@@ -35,8 +35,8 @@ class MapRender extends UnitPrototype
 
     private function makemap_colorbox()
     {
-        // $this->template_file = 'view.map.colorbox.html';
-        $this->template_file = 'view.map.wide-colorbox.html';
+        $this->template_file = 'view.map.colorbox.html';
+        // $this->template_file = 'view.map.wide-colorbox.html';
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 

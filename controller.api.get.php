@@ -7,6 +7,7 @@ define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 
 $content = '';
+$render_type = 'raw';
 
 switch ($_GET['source']) {
     case 'jslayout' : {
@@ -32,6 +33,7 @@ switch ($_GET['source']) {
 
         $map_alias = $_GET['map']   ?? NULL;
         $id_region = $_GET['id']    ?? NULL;
+        $template  = $_GET['template'] ?? 'fieldset';
 
         $region_data = $lm_engine->getMapRegionData( $map_alias , $id_region );
         $is_logged = LMEConfig::get_auth()->isLogged();
@@ -46,12 +48,41 @@ switch ($_GET['source']) {
             'region_text'       =>  $region_data['content'],
             'islogged'          =>  LMEConfig::get_auth()->isLogged()
         );
-        $tpl_file = 'view.region.ajax.html';
-        $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
+
+        switch ($template) {
+            case 'html' : {
+                $render_type = 'json';
+                $tpl_file = 'view.region.html.html';
+
+                $content = [
+                    'content'   =>  websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES),
+                    'title'     =>  $region_data['title']
+                ];
+
+                break;
+            }
+            default     : {
+                $render_type = 'raw';
+                $tpl_file = 'view.region.fieldset.html';
+
+                $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
+
+                break;
+            }
+        }; // switch ($template)
 
         break;
     }
 
 
 } // end switch
-echo $content;
+
+if ($render_type == 'raw') {
+
+    echo $content;
+
+} elseif ($render_type === 'json') {
+    echo json_encode( $content );
+} else echo null;
+
+// echo $content;
