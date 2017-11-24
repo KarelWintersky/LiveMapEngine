@@ -96,16 +96,6 @@
 <script type="text/javascript" id="global-functions">
     showContentColorbox = function(id_region , title) {
         let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region + '&template=fieldset';
-        /*$.colorbox({
-            href: url,
-            width: colorbox_width,
-            height: colorbox_height,
-            title: title,
-            onClosed: function(){
-                history.pushState('', document.title, window.location.pathname);
-            }
-        });*/
-
         $.get( url, function() {
         }).done(function(data) {
             $.colorbox({
@@ -214,15 +204,7 @@
             var href_params = href.match(/view=\[(.*)\]/);
             if (href_params != null) {
                 history.pushState('', document.title, window.location.pathname + href);
-
-                $.colorbox({
-                    href: '/api/get/regiondata?map={*map_alias*}&id=' + href_params[1],
-                    width: colorbox_width,
-                    height: colorbox_height,
-                    onClosed: function(){
-                        history.pushState('', document.title, window.location.pathname);
-                    }
-                });
+                showContentColorbox(href_params[1], '');
             }
         } else {
             window.location.assign(href);
@@ -254,14 +236,9 @@
 
             if ((hashparams !== null) && (hashparams[1] == 'view')) {
                 id_region = hashparams[2];
-                $.colorbox({
-                    href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
-                    width: colorbox_width,
-                    height: colorbox_height,
-                    onClosed: function(){
-                        history.pushState('', document.title, window.location.pathname);
-                    }
-                });
+
+                showContentColorbox(id_region, '');
+
             } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
                 id_region = hashparams[2];
                 // focus

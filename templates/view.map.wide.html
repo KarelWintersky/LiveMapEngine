@@ -60,9 +60,11 @@
         }
 
         /* === Section Viewbox === */
+        #actor-viewbox-toggle {
+            width: 100%;
+        }
         .section-info-viewbox {
             padding: 8px 8px;
-            background: white;
             background: rgba(255,255,255,1);
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
@@ -72,8 +74,11 @@
             font-size: 140%;
             text-align: left;
             color: #000000;
-            max-height: 400px;
-            max-width: 600px;
+
+            min-width: 800px;
+            max-width: 800px;
+            max-height: 600px;
+
             overflow-y: scroll;
         }
 
@@ -120,30 +125,55 @@
 </script>
 
 <script type="text/javascript" id="create-map-and-layout">
-    ShowContent = function(id_region , title) {
-        console.log( id_region );
+    var current_infobox_region_id = '';
+
+    showContentColorbox = function(id_region , title) {
         let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
 
-        $.colorbox({
-            href: url,
-            width: colorbox_width,
-            height: colorbox_height,
-            title: title,
-            onClosed: function(){
-                history.pushState('', document.title, window.location.pathname);
-            }
+        $.get( url, function() {
+        }).done(function(data) {
+            $.colorbox({
+                html: data,
+                width: colorbox_width,
+                height: colorbox_height,
+                title: title,
+                onClosed: function(){
+                    history.pushState('', document.title, window.location.pathname);
+                },
+            });
         });
     }
 
-    ShowContentBox = function(id_region, title) {
+    toggleContentViewBox = function(id_region, title) {
         let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
-        $("#section-info-content");
+        if (current_infobox_region_id == id_region) {
+            toggleInfoBox('#actor-viewbox-toggle');
+            history.pushState('', document.title, window.location.pathname);
+        } else {
+            current_infobox_region_id = id_region;
+            $.get( url, function() {
+            }).done(function(data) {
 
+                let bound = polymap [ id_region ].getBounds();
+                map.panTo( bound.getCenter() );
+
+                $("#section-info-content").html(data).show();
+                $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
+            });
+        }
+    }
+
+    showContentViewBox = function(id_region, title) {
+        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
         $.get( url, function() {
 
         }).done(function(data) {
-            $("#section-info-content").html(data);
 
+            let bound = polymap [ id_region ].getBounds();
+            map.panTo( bound.getCenter() );
+
+            $("#section-info-content").html(data).show();
+            $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
         });
     }
 
@@ -157,12 +187,12 @@
     });
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    let h = theMap['map']['height'];
-    let w = theMap['map']['width'];
-    let bounds = [ [0, 0], [h-1, w-1 ] ];
-    let max_bounds = [ [-h*0.5, -w], [h*1.5 , w*2 ] ];
+    var h = theMap['map']['height'];
+    var w = theMap['map']['width'];
+    var bounds = [ [0, 0], [h-1, w-1 ] ];
+    var max_bounds = [ [-h*0.5, -w], [h*1.5 , w*2 ] ];
 
-    let image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
+    var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
 
     map.setMaxBounds(max_bounds);
 
@@ -172,11 +202,11 @@
         polymap[ id_region ].addTo(map).on('click', function(){
             // var t = theMap['regions'][ id_region ]['title'] || id_region;
             window.location.hash = 'view=[' + id_region + ']';
-            let t = (theMap['regions'][ id_region ]['title'] != '')
+            var t = (theMap['regions'][ id_region ]['title'] != '')
                     ? theMap['regions'][ id_region ]['title']
                     : '';
 
-            ShowContentBox(id_region, t);
+            toggleContentViewBox(id_region, t);
         });
     });
 
@@ -193,7 +223,7 @@
             position: 'topright'
         },
         onAdd: function(map) {
-            let div = L.DomUtil.get('section-regions');
+            var div = L.DomUtil.get('section-regions');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomUtil.enableTextSelection();
             L.DomEvent.disableScrollPropagation(div);
@@ -209,7 +239,7 @@
             position: 'topleft'
         },
         onAdd: function(map) {
-            let div = L.DomUtil.get('section-infobox');
+            var div = L.DomUtil.get('section-infobox');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomUtil.enableTextSelection();
             L.DomEvent.disableScrollPropagation(div);
@@ -219,27 +249,42 @@
         onRemove: function(map) {}
     });
 
+    var toggleRegionsBox = function(el) {
+        var state = $(el).data('content-is-visible');
+        var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
+        $(el).html(text);
+
+        var data = $(el).data('content');
+        $('#' + data).toggle();
+        $('#sort-select').toggle();
+        $(el).data('content-is-visible', !state);
+    };
+
+    var toggleInfoBox = function(el) {
+        var state = $(el).data('content-is-visible');
+        var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
+        $(el).html(text);
+
+        var data = $(el).data('content');
+        $('#' + data).toggle();
+        $(el).data('content-is-visible', !state);
+    }
+
     $(function() {
         map.addControl( new L.Control.RegionsBox() );
         map.addControl( new L.Control.ContentBox() );
 
-
-
         // toggle div
-        $('.action-toggle-div-visibility').on('click', function (e) {
-            let state = $(this).data('content-is-visible');
-            let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-            $(this).html(text);
-
-            let data = $(this).data('content');
-            $('#' + data).toggle();
-            $(this).parent().find('select').toggle(); // hide/show select
-            $(this).data('content-is-visible', !state);
+        $('#actor-regions-toggle').on('click', function (e) {
+            toggleRegionsBox(this);
+        });
+        $('#actor-viewbox-toggle').on('click', function (e) {
+            toggleInfoBox(this);
         });
 
         $("#sort-select").on('change', function(e){
-            let must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-            let must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+            var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+            var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
             $(must_hide).hide();
             $(must_display).show();
         });
@@ -248,27 +293,21 @@
         // при получении параметров на старте:
         // view= - показываем попап
         // focus= = делаем центровку на регионе
-        let wlh = window.location.hash;
+        var wlh = window.location.hash;
         if (wlh.length > 1) {
             var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
             var id_region = '';
 
             if ((hashparams !== null) && (hashparams[1] == 'view')) {
                 id_region = hashparams[2];
-                $.colorbox({
-                    href: '/api/get/regiondata?map={*map_alias*}&id=' + id_region,
-                    width: colorbox_width,
-                    height: colorbox_height,
-                    onClosed: function(){
-                        history.pushState('', document.title, window.location.pathname);
-                    }
-                });
+                showContentViewBox(id_region, '');
+
             } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
                 id_region = hashparams[2];
                 // focus
-                let bound = polymap [ id_region ].getBounds();
+                var bound = polymap [ id_region ].getBounds();
                 map.panTo( bound.getCenter() );
-                let oldstyle = polymap[ id_region ].options['fillColor'];
+                var oldstyle = polymap[ id_region ].options['fillColor'];
 
                 polymap[ id_region ].setStyle({fillColor: '#ff0000'});
                 var timeoutHandler = setInterval(function(){
@@ -281,10 +320,10 @@
 
     });
     $(document).on('click', '.action-focus-at-region', function(){
-        let id_region = $(this).data('region-id');
-        let bound = polymap [ id_region ].getBounds();
+        var id_region = $(this).data('region-id');
+        var bound = polymap [ id_region ].getBounds();
         map.panTo( bound.getCenter() );
-        let oldstyle = polymap[ id_region ].options['fillColor'];
+        var oldstyle = polymap[ id_region ].options['fillColor'];
 
         polymap[ id_region ].setStyle({fillColor: '#ff0000'});
         var timeoutHandler = setInterval(function(){
@@ -299,7 +338,7 @@
 </script>
 
 <section id="section-infobox" class="section-info-viewbox invisible">
-    <div style="text-align: left">
+    <div style="text-align: right">
         <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="false">Показать</button>
     </div>
     <div id="section-info-content" class="invisible section-info-content">
@@ -340,19 +379,13 @@
         var href = $(this).attr('href');
         var wlh = window.location.href;
 
-        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на popup с информацией...
+        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
             var href_params = href.match(/view=\[(.*)\]/);
             if (href_params != null) {
                 history.pushState('', document.title, window.location.pathname + href);
 
-                $.colorbox({
-                    href: '/api/get/regiondata?map={*map_alias*}&id=' + href_params[1],
-                    width: colorbox_width,
-                    height: colorbox_height,
-                    onClosed: function(){
-                        history.pushState('', document.title, window.location.pathname);
-                    }
-                });
+                showContentBox(href_params[1], '');
+                // showContentColorbox(href_params[1], '');
             }
         } else {
             window.location.assign(href);
@@ -366,7 +399,7 @@
 
 <script type="text/javascript" id="bind-actor-edit">
     $(document).on('click', '#actor-edit', function(){
-        let region_id = $(this).data('region-id');
+        var region_id = $(this).data('region-id');
         document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
     });
 </script>

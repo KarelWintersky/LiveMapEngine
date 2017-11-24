@@ -24,7 +24,32 @@ class MapRender extends UnitPrototype
 
     private function makemap_widecolorbox()
     {
-        $this->template_file = 'view.map.wide-colorbox.html';
+        $this->template_file = 'view.map.wide.html';
+
+
+        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
+        $regions_with_data = $lm_engine->getRegionsWithInfo( $this->map_alias );
+
+        $regions_with_data_order_by_title = $regions_with_data;
+        usort($regions_with_data_order_by_title, function($value1, $value2){
+            return ($value1['title'] > $value2['title']);
+        });
+
+        $regions_with_data_order_by_date = $regions_with_data;
+        usort($regions_with_data_order_by_date, function($value1, $value2){
+            return ($value1['edit_date'] < $value2['edit_date']);
+        });
+
+        $this->template->set('/', array(
+            // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
+            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
+            'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
+            'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
+            'map_regions_count'             =>  count($regions_with_data)
+        ));
+
+
     }
 
     private function makemap_folio()
@@ -36,7 +61,6 @@ class MapRender extends UnitPrototype
     private function makemap_colorbox()
     {
         $this->template_file = 'view.map.colorbox.html';
-        // $this->template_file = 'view.map.wide-colorbox.html';
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -85,21 +109,27 @@ class MapRender extends UnitPrototype
         $this->template = new Template('', $this->template_path);
         $this->template->set('/map_alias', $this->map_alias);
 
-        if ($skin === 'iframe') {
-
-            $this->makemap_iframe();
-
-        } elseif ($skin === 'colorbox') {
-
-            $this->makemap_colorbox();
-
-        } elseif ($skin === 'folio') {
-
-            $this->makemap_folio();
-
-        } else {
-            $this->makemap_404( $skin );
-            die( $this->template->render() );
+        switch ($skin) {
+            case 'iframe': {
+                $this->makemap_iframe();
+                break;
+            }
+            case 'colorbox' : {
+                $this->makemap_colorbox();
+                break;
+            }
+            case 'folio': {
+                $this->makemap_folio();
+                break;
+            }
+            case 'wideonmap': {
+                $this->makemap_widecolorbox();
+                break;
+            }
+            default: {
+                $this->makemap_404( $skin );
+                die( $this->template->render() );
+            }
         }
 
         $this->template->set('html_callback', '/');
