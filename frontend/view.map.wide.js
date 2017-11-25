@@ -222,16 +222,20 @@ $(function(){
         polymap[ key ].setStyle({fillColor: '#00ff00'});  // theMap[]['filled_region_color'] или цветом из информации о регионе
     });
 
-    var __BackwardBox = new L.Control.Backward();
-    map.addControl( __BackwardBox );
+    // не показываем контрол "назад" если страница загружена в iframe
+    if (!(window != window.top || document != top.document || self.location != top.location)) {
+        var __BackwardBox = new L.Control.Backward();
+        map.addControl( __BackwardBox );
+    }
 
     if (regions_with_content.length) {
         var __RegionsBox = new L.Control.RegionsBox();
         map.addControl( __RegionsBox );
-
-        var __InfoBox = new L.Control.InfoBox();
-        map.addControl( __InfoBox );
     }
+
+    // его надо создавать только когда заявили показ информации!
+    var __InfoBox = new L.Control.InfoBox();
+    map.addControl( __InfoBox );
 
     // toggle блоков с информацией/регионами
     $('#actor-regions-toggle').on('click', function (el) {
