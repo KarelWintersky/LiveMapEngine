@@ -19,7 +19,7 @@ class MapRender extends UnitPrototype
         $this->map_alias = $map_alias;
 
         $this->template_file = '';
-        $this->template_path = '$/templates';
+        $this->template_path = '$/templates/view.map';
     }
 
     private function makemap_widemap( $orientation )
@@ -131,11 +131,14 @@ class MapRender extends UnitPrototype
                 $this->makemap_folio();
                 break;
             }
-            case 'wide:infobox>regionbox': { // infobox left, regionbox right
+
+            case 'wide:infobox>regionbox': {
+                // infobox left, regionbox right
                 $this->makemap_widemap('infobox>regionbox');
                 break;
             }
-            case 'wide:regionbox>infobox': { // regionbox left, infobox righr
+            case 'wide:regionbox>infobox': {
+                // regionbox left, infobox righr
                 $this->makemap_widemap('regionbox>infobox');
                 break;
             }

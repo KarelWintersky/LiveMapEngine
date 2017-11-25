@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Проект {*title_project*}, {*title_map*}, редактирование региона {*id_region*}</title>
+    <title>Карта {*title_map*}, редактирование региона {*id_region*}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
     <link rel="stylesheet" type="text/css" href="/frontend/edit.region.css" />
@@ -126,7 +126,7 @@
     </script>
 </head>
 <body>
-<h3>Регион: {?!*is_present*}`{*id_region*}`{*is_present*?!}{?*is_present*}{*region_title*}{*is_present*?}</h3>
+<h3>Регион: {?!*is_present*}`{*id_region*}`{*is_present*?!}{?*is_present*}{*region_title*} ({*id_region*}){*is_present*?}</h3>
 
 <form action="/api/put/regiondata?map={*alias_map*}&id={*id_region*}" method="post" id="form-edit-region">
     <input type="hidden" name="edit:id:map"     value="{*id_map*}">

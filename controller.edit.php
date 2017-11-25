@@ -3,9 +3,6 @@
  * User: Arris
  * Date: 25.09.2017, time: 1:58
  */
-/*echo '<pre>';
-var_dump($_GET);*/
-
 define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 
@@ -32,8 +29,6 @@ switch ($edit_what) {
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
         // $map_data    = $lm_engine->getMapData( $edit_map_alias );
-        // 'title_project'     =>  'Уинтерленд',
-        // 'title_map'         =>  'Карта Норрастадена (Северного города)',
 
         $region_data = $lm_engine->getMapRegionData( $edit_map_alias, $edit_region_id );
 
@@ -41,9 +36,9 @@ switch ($edit_what) {
             'id_region'         =>  $edit_region_id,
             'id_map'            =>  0,
 
+            'title_map'         =>  $edit_map_alias,    // загружаем из БД
+
             'alias_map'         =>  $edit_map_alias,
-
-
 
             'html_callback'     =>  "/map/{$edit_map_alias}",
 
@@ -64,8 +59,9 @@ switch ($edit_what) {
         );
 
         $template_file = 'edit.region.page.html';
+        $template_path = PATH_TEMPLATES . 'edit.region/';
 
-        $html = websun_parse_template_path($template_data, $template_file, PATH_TEMPLATES);
+        $html = websun_parse_template_path($template_data, $template_file, $template_path);
 
         echo $html;
 

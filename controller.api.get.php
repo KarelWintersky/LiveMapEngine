@@ -48,30 +48,31 @@ switch ($_GET['source']) {
             'region_text'       =>  $region_data['content'],
             'islogged'          =>  LMEConfig::get_auth()->isLogged()
         );
+        $TEMPLATE_PATH = PATH_TEMPLATES . 'view.region/';
 
         switch ($template) {
             case 'json' : {
                 $render_type = 'json';
-                $tpl_file = 'view.region.json.html';
+                $template_file = 'view.region.json.html';
 
                 $content = [
-                    'content'   =>  websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES),
+                    'content'   =>  websun_parse_template_path($TEMPLATE_DATA, $template_file, $TEMPLATE_PATH),
                     'title'     =>  ($region_data['is_present']) ? $region_data['title'] : ''
                 ];
                 break;
             }
             case 'fieldset': {
                 $render_type = 'text';
-                $tpl_file = 'view.region.fieldset.html';
+                $template_file = 'view.region.fieldset.html';
 
-                $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
+                $content = websun_parse_template_path($TEMPLATE_DATA, $template_file, $TEMPLATE_PATH);
                 break;
             }
             default     : {
                 $render_type = 'text';
-                $tpl_file = 'view.region.html.html';
+                $template_file = 'view.region.html.html';
 
-                $content = websun_parse_template_path($TEMPLATE_DATA, $tpl_file, PATH_TEMPLATES);
+                $content = websun_parse_template_path($TEMPLATE_DATA, $template_file, $TEMPLATE_PATH);
 
                 break;
             }
