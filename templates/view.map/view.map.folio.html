@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="/frontend/leaflet.css">
-    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.css">
-    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.tabs.css">
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/jquery.colorbox-min.js"></script>
@@ -13,11 +11,18 @@
 
     <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
 
-    <style>
+    <style type="text/css">
+        html, body {
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            background: white;
+            margin: 5px;
+            padding: 0;
+        }
         #map {
+            height: 90%;
+            border: 1px solid navy;
             margin: 2em;
-            border: 2px solid navy;
-            margin-top: 0;
         }
     </style>
 </head>
@@ -26,9 +31,8 @@
 <span style="float: right"><a href="/">К СПИСКУ КАРТ</a></span>
 <hr/>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
-<a href="{*html_callback*}">Назад...</a>
 <script type="text/javascript" id="build-layout">
-    $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
+    var map_alias = '{*map_alias*}';
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
 
     document.title = theMap['map']['title'];
@@ -52,20 +56,21 @@
             fillOpacity: polygon_fillopacity
         });
     } );
-</script>
-<script type="text/javascript" id="create-map-and-layout">
+
     var map = L.map('map', {
         crs: L.CRS.Simple,
         minZoom: -3,
         maxZoom: 2,
         preferCanvas: true
     });
-    var bounds = [
-        [0, 0],
-        [theMap['map']['height']-1 , theMap['map']['width']-1 ]
-    ];
+    var h = theMap['map']['height'];
+    var w = theMap['map']['width'];
+    var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
+    var max_bounds      = [ [-h*0.5, -w*0.5], [h*1.5 , w*1.5 ] ];
 
-    var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
+    var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
+
+    map.setMaxBounds(max_bounds);
 
     // draw polygons on map, bind on-click function
     Object.keys( polymap ).forEach(function(id_region){
@@ -75,8 +80,10 @@
         });
     });
 
-    map.fitBounds(bounds);
+    map.fitBounds(current_bounds);
     map.setZoom( theMap['map']['zoom']);
+
+
 </script>
 </body>
 </html>

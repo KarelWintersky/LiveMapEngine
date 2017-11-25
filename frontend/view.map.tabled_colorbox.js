@@ -40,13 +40,16 @@ var map = L.map('map', {
     maxZoom: 2,
     preferCanvas: true
 });
-var bounds = [
-    [0, 0],
-    [theMap['map']['height']-1 , theMap['map']['width']-1 ]
-];
+map.attributionControl.setPrefix('');
 
-var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
+var h = theMap['map']['height'];
+var w = theMap['map']['width'];
+var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
+var max_bounds      = [ [-h*0.5, -w*0.5], [h*1.5 , w*1.5 ] ];
 
+var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
+
+map.setMaxBounds(max_bounds);
 
 // draw polygons on map, bind on-click function
 Object.keys( polymap ).forEach(function(id_region){
@@ -61,7 +64,7 @@ Object.keys( polymap ).forEach(function(id_region){
     });
 });
 
-map.fitBounds(bounds);
+map.fitBounds(current_bounds);
 map.setZoom( theMap['map']['zoom']);
 
 regions_with_content.forEach(function(key){

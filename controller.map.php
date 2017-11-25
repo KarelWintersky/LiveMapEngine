@@ -14,7 +14,7 @@ $valid_view_modes = array(
 );
 
 $alias_map  = $_GET['alias'] ?? NULL;
-$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, 'tabled+colorbox');
+$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, 'folio');
 
 $map = new MapRender( $alias_map );
 $map_found = $map->run( $viewmode );
