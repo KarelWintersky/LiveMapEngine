@@ -9,29 +9,39 @@
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet.js"></script>
     <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
-    <script type="text/javascript" src="/frontend/view.map.js"></script>
 </head>
 <body>
-<form style="text-align: left" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
+<script type="text/javascript" id="init">
+    var map_alias = '{*map_alias*}';
+    var leaflet_background_color = theMap['viewport']['background_color'];
+        document.title = theMap['map']['title'];
+    var current_infobox_region_id = '';
 
+    // Highlight filled regions
+    var regions_with_content = [
+        {*map_regions_with_info_jsarray*}
+    ];
+</script>
+
+<form style="text-align: left" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
 
-<section id="section-infobox" class="section-info-viewbox invisible">
+<section id="section-infobox" class="section-info-viewbox invisible" data-leaflet-control-position="topleft">
     <div style="text-align: right">
-        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="false">Показать</button>
+        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="null">?</button>
     </div>
     <div id="section-info-content" class="invisible section-info-content"></div>
 </section>
 
-<section id="section-regions" class="section-regions-viewbox invisible">
+<section id="section-regions" class="section-regions-viewbox invisible" data-leaflet-control-position="topright">
     <div style="text-align: right">
+        <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
         <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
         <select id="sort-select" class="invisible">
             <option value="total" data-ul="data-ordered-alphabet">... все</option>
             <option value="latest" data-ul="data-ordered-latest">... новые</option>
         </select>
         &nbsp;&nbsp;
-        <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
     </div>
 
     {?!*target*}
@@ -50,291 +60,7 @@
     {*target*?!}
 </section>
 
-<script type="text/javascript" id="build-layout">
-    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
-    document.title = theMap['map']['title'];
-    var map_alias = '{*map_alias*}';
+<script type="text/javascript" src="/frontend/view.map.js"></script>
 
-    var colorbox_width  =   theMap.colorbox.width      || 800;
-    var colorbox_height =   theMap.colorbox.height     || 600;
-
-    var polymap = Object.create(null);
-
-    // build polygons
-    Object.keys( theMap.regions ).forEach(function( key ){
-        var path = theMap.regions[ key ]['path'];
-        var polygon_color   =   theMap.regions[ key ]['color']      ||  theMap.defaults.polygon_color;
-        var polygon_width   =   theMap.regions[ key ]['width']      ||  theMap.defaults.polygon_width;
-        var polygon_opacity =   theMap.regions[ key ]['opacity']    ||  theMap.defaults.polygon_opacity;
-        var polygon_fillcolor = theMap.regions[ key ]['fillColor']  ||  theMap.defaults.polygon_fillColor;
-        var polygon_fillopacity = theMap.regions[ key ]['fillOpacity'] || theMap.defaults.polygon_fillOpacity;
-
-        polymap[ key ] = L.polygon( path, {
-            color: polygon_color,
-            width: polygon_width,
-            opacity: polygon_opacity,
-            fillColor: polygon_fillcolor,
-            fillOpacity: polygon_fillopacity
-        });
-    } );
-    // Highlight filled regions
-    var regions_with_content = [
-        {*map_regions_with_info_jsarray*}
-    ];
-</script>
-
-<script type="text/javascript" id="create-map-and-layout">
-    var current_infobox_region_id = '';
-
-    toggleContentViewBox = function(id_region, title) {
-        let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
-        if (current_infobox_region_id == id_region) {
-            toggleInfoBox('#actor-viewbox-toggle');
-
-            if ( $('#actor-viewbox-toggle').data('content-is-visible') == false ) {
-                history.pushState('', document.title, window.location.pathname);
-            } else {
-                window.location.hash = "#view=[" + id_region + "]";
-            }
-
-        } else {
-            current_infobox_region_id = id_region;
-            $("#section-info-content").html('');
-
-            $.ajax({
-                url: url,
-                type: 'GET',
-                async: false
-            }).done(function(data){
-                let region_center = polymap [ id_region ].getBounds().getCenter();
-
-                // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-                if (region_center.lng <= map.getBounds().getCenter().lng ) {
-                    region_center.lng -= 70; // move center to right
-                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-                }
-
-                $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
-                $("#section-info-content").html(data).show();
-
-            });
-        }
-    }
-
-    showContentViewBox = function(id_region, title) {
-        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
-
-        $.get(url, function(){}).done(function(data){
-            let region_center = polymap [ id_region ].getBounds().getCenter();
-            region_center.lng -= 50; // move center to right (50px)
-            map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-            $("#section-info-content").html(data).show();
-            $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
-        });
-    }
-
-    var map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom: -3,
-        maxZoom: 2,
-        preferCanvas: true,
-        renderer: L.canvas(),
-        zoomControl: false,
-    });
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-    var h = theMap['map']['height'];
-    var w = theMap['map']['width'];
-    var bounds = [ [0, 0], [h-1, w-1 ] ];
-    var max_bounds = [ [-h*0.5, -w], [h*1.5 , w*2 ] ];
-
-    var image = L.imageOverlay( theMap['map']['imagefile'], bounds).addTo(map);
-
-    map.setMaxBounds(max_bounds);
-
-    // draw polygons on map, bind on-click function
-    Object.keys( polymap ).forEach(function( id_region ) {
-
-        polymap[ id_region ].addTo(map).on('click', function(){
-            // var t = theMap['regions'][ id_region ]['title'] || id_region;
-            window.location.hash = 'view=[' + id_region + ']';
-            var t = (theMap['regions'][ id_region ]['title'] != '')
-                    ? theMap['regions'][ id_region ]['title']
-                    : '';
-
-            toggleContentViewBox(id_region, t);
-        });
-    });
-
-    // bind-action-focus-region
-    // при получении параметров на старте:
-    // view= - показываем попап
-    // focus= = делаем центровку на регионе
-    var wlh = window.location.hash;
-    if (wlh.length > 1) {
-        var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
-        var id_region = '';
-
-        if ((hashparams !== null) && (hashparams[1] == 'view')) {
-            id_region = hashparams[2];
-            showContentViewBox(id_region, '');
-
-        } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
-            id_region = hashparams[2];
-            // focus
-            var bound = polymap [ id_region ].getBounds();
-            map.panTo( bound.getCenter() );
-            var oldstyle = polymap[ id_region ].options['fillColor'];
-
-            polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-            var timeoutHandler = setInterval(function(){
-                polymap[ id_region ].setStyle({fillColor: oldstyle});
-                window.clearTimeout(timeoutHandler);
-            }, 1000);
-            // history.pushState('', document.title, window.location.pathname);
-        }
-    } else {
-        map.fitBounds(bounds);
-    }
-    //
-
-    map.setZoom( theMap['map']['zoom']);
-
-    regions_with_content.forEach(function(key){
-        polymap[ key ].setStyle({fillColor: '#00ff00'});
-    });
-
-    L.Control.RegionsBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: 'topright'
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-regions');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-
-    L.Control.ContentBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: 'topleft'
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-infobox');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-
-    toggleRegionsBox = function(el) {
-        var state = $(el).data('content-is-visible');
-        var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-        $(el).html(text);
-
-        var data = $(el).data('content');
-        $('#' + data).toggle();
-        $('#sort-select').toggle();
-        $(el).data('content-is-visible', !state);
-    };
-
-    toggleInfoBox = function(el) {
-        var state = $(el).data('content-is-visible');
-        var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-        $(el).html(text);
-
-        var data = $(el).data('content');
-        $('#' + data).toggle();
-        $(el).data('content-is-visible', !state);
-    }
-
-    $(function() {
-        var __RegionsBox = new L.Control.RegionsBox();
-        var __ContentBox = new L.Control.ContentBox();
-
-        map.addControl( __RegionsBox );
-        map.addControl( __ContentBox  );
-
-        // toggle div
-        $('#actor-regions-toggle').on('click', function (e) {
-            toggleRegionsBox(this);
-        });
-        $('#actor-viewbox-toggle').on('click', function (e) {
-            toggleInfoBox(this);
-        });
-
-        $("#sort-select").on('change', function(e){
-            var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-            var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
-            $(must_hide).hide();
-            $(must_display).show();
-        });
-    });
-
-    // клик по региону в списке "интересных мест"
-    $(document).on('click', '.action-focus-at-region', function(){
-        var id_region = $(this).data('region-id');
-        var bound = polymap [ id_region ].getBounds();
-        map.panTo( bound.getCenter() );
-        var oldstyle = polymap[ id_region ].options['fillColor'];
-
-        polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-        var timeoutHandler = setInterval(function(){
-            polymap[ id_region ].setStyle({fillColor: oldstyle});
-            window.clearTimeout(timeoutHandler);
-            //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-            // history.pushState('', document.title, window.location.pathname);
-        }, 500);
-    });
-
-</script>
-
-<script type="text/javascript" id="bind-actor-click-inside-colorbox">
-    // обрабатываем клик по ссылке внутри попап окна
-    // (на самом деле надо проверять, это ссылка на ту же карту или нет?)
-    //@todo: протестировать, отладить!
-    $(document).on('click', '#cboxLoadedContent a', function(){
-        var href = $(this).attr('href');
-        var wlh = window.location.href;
-
-        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
-            var href_params = href.match(/view=\[(.*)\]/);
-            if (href_params != null) {
-                history.pushState('', document.title, window.location.pathname + href);
-
-                showContentBox(href_params[1], '');
-            }
-        } else {
-            window.location.assign(href);
-            window.location.reload(true);
-        }
-
-        return false;
-    });
-
-</script>
-
-<script type="text/javascript" id="bind-actor-edit">
-    $(document).on('click', '#actor-edit', function(){
-        var region_id = $(this).data('region-id');
-        document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
-    });
-</script>
-
-
-<div style="display:none">
-    <div id="colorboxed-view" style="padding:10px; background:#fff;">
-        <div id="colorboxed-view-content"></div>
-    </div>
-</div>
 </body>
 </html>

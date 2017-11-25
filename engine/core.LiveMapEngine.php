@@ -212,6 +212,12 @@ ORDER BY edit_date ;
         }
     }
 
+    //@todo: тайтл карты и настройки мы должны брать из таблицы settings_map
+    // но сейчас она не заполняется никак и все данные берутся из json-файла настроек или SVG-файла разметки
+    public function getMapInfo($map_alias)
+    {
+        return null;
+    }
 
 
 }

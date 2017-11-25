@@ -44,12 +44,18 @@ class MapRender extends UnitPrototype
             return ($value1['edit_date'] < $value2['edit_date']);
         });
 
+        $map_info = $lm_engine->getMapInfo( $this->map_alias );
+
         $this->template->set('/', array(
             // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
             'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
             'map_regions_count'             =>  count($regions_with_data)
+
+            // map
+            // тайтл карты и настройки мы должны брать из таблицы settings_map
+            // но сейчас она не заполняется никак и все данные берутся из json-файла настроек или SVG-файла разметки
         ));
 
 
