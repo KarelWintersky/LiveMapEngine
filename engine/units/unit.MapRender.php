@@ -99,7 +99,7 @@ class MapRender extends UnitPrototype
 
     private function makemap_iframe()
     {
-        $this->template_file = 'view.map.iframe.html';
+        $this->template_file = 'view.map.iframe_colorbox.html';
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -123,7 +123,12 @@ class MapRender extends UnitPrototype
                 $this->makemap_iframe();
                 break;
             }
-            case 'tabled+colorbox' : {
+            case 'iframe:colorbox': {
+                $this->makemap_iframe();
+                break;
+            }
+
+            case 'tabled:colorbox' : {
                 $this->makemap_tabled_colorbox();
                 break;
             }

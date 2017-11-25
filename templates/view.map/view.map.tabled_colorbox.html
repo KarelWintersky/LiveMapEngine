@@ -29,6 +29,7 @@
     <tr>
         <td>
             <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+            <a href="{*html_callback*}">...к списку карт</a>
         </td>
 
         <td>{?!*target*}
@@ -57,7 +58,7 @@
         </td>
     </tr>
 </table>
-<a href="{*html_callback*}">Назад...</a>
+
 
 <div style="display:none">
     <div id="colorboxed-view" style="padding:10px; background:#fff;">
@@ -68,6 +69,7 @@
 
 <script type="text/javascript" id="init">
     var map_alias = '{*map_alias*}';
+    var leaflet_background_color = theMap['viewport']['background_color'];
     var regions_with_content = [
         {*map_regions_with_info_jsarray*}
     ];

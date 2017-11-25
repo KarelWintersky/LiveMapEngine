@@ -38,7 +38,8 @@ var map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -3,
     maxZoom: 2,
-    preferCanvas: true
+    preferCanvas: true,
+    renderer: L.canvas(),
 });
 map.attributionControl.setPrefix('');
 
@@ -67,8 +68,89 @@ Object.keys( polymap ).forEach(function(id_region){
 map.fitBounds(current_bounds);
 map.setZoom( theMap['map']['zoom']);
 
-regions_with_content.forEach(function(key){
-    polymap[ key ].setStyle({fillColor: '#00ff00'});
+// bind-action-focus-region
+// при получении параметров на старте:
+// view= - показываем попап
+// focus= = делаем центровку на регионе
+var wlh = window.location.hash;
+if (wlh.length > 1) {
+    var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
+    var id_region = '';
+
+    if ((hashparams !== null) && (hashparams[1] == 'view')) {
+        id_region = hashparams[2];
+        showContentViewBox(id_region, '');
+
+    } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
+        id_region = hashparams[2];
+        // focus
+        var hash_region_bounds = polymap [ id_region ].getBounds();
+        map.panTo( hash_region_bounds.getCenter(), { animate: true, duration: 0.5, noMoveStart: true} );
+        var oldstyle = polymap[ id_region ].options['fillColor'];
+
+        polymap[ id_region ].setStyle({fillColor: '#ff0000'});
+        var timeoutHandler = setInterval(function(){
+            polymap[ id_region ].setStyle({fillColor: oldstyle});
+            window.clearTimeout(timeoutHandler);
+        }, 1000);
+        // history.pushState('', document.title, window.location.pathname);
+    }
+} else {
+    map.fitBounds(current_bounds);
+}
+
+map.setZoom( theMap['map']['zoom'] );
+
+$(function(){
+    $(".leaflet-container").css('background-color', leaflet_background_color);
+
+    // закрашиваем регионы с информацией другим цветом
+    regions_with_content.forEach(function(key){
+        polymap[ key ].setStyle({fillColor: '#00ff00'});
+    });
+
+    // toggle блоков с информацией/регионами
+    $('#actor-regions-toggle').on('click', function (el) {
+        toggleRegionsBox(this);
+    });
+
+    $("#actor-backward-toggle").on('click', function (el){
+        var state = $(this).data('content-is-visible');
+        var text = (state == false) ? '&lt;' : '&gt;';
+        $(this).html(text);
+
+        var data = $(this).data('content');
+        $('#' + data).toggle();
+        $(this).data('content-is-visible', !state);
+    });
+
+    // изменение контента блока с регионами на основе типа сортировки
+    $("#sort-select").on('change', function(e){
+        var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+        var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+        $(must_hide).hide();
+        $(must_display).show();
+    });
+
+});
+
+// клик по региону в списке "интересных мест"
+$(document).on('click', '.action-focus-at-region', function(){
+    var id_region = $(this).data('region-id');
+
+    var bound = polymap [ id_region ].getBounds();
+    map.panTo( bound.getCenter(), { animate: true, duration: 0.7, noMoveStart: true});
+
+    var oldstyle = polymap[ id_region ].options['fillColor'];
+
+    polymap[ id_region ].setStyle({fillColor: '#ff0000'});
+
+    setTimeout(function(){
+        polymap[ id_region ].setStyle({fillColor: oldstyle});
+        //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
+        // history.pushState('', document.title, window.location.pathname);
+    }, 1200);
+
 });
 
 // обрабатываем клик по ссылке внутри попап окна
@@ -94,54 +176,6 @@ $(document).on('click', '#cboxLoadedContent a', function(){
 $(document).on('click', '#actor-edit', function(){
     let region_id = $(this).data('region-id');
     document.location.href = '/edit/region?map='+ map_alias + '&id=' + region_id;
-});
-
-$(document).ready(function(){
-    // при получении параметров на старте:
-    // view= - показываем попап
-    // focus= = делаем центровку на регионе
-
-    var wlh = window.location.hash;
-    if (wlh.length > 1) {
-        var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
-        var id_region = '';
-
-        if ((hashparams !== null) && (hashparams[1] == 'view')) {
-            id_region = hashparams[2];
-
-            showContentColorbox(id_region, '');
-
-        } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
-            id_region = hashparams[2];
-            // focus
-            var bound = polymap [ id_region ].getBounds();
-            map.panTo( bound.getCenter() );
-            var oldstyle = polymap[ id_region ].options['fillColor'];
-
-            polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-            setTimeout(function(){
-                polymap[ id_region ].setStyle({fillColor: oldstyle});
-                // history.pushState('', document.title, window.location.pathname);
-            }, 1000);
-        }
-    }
-});
-
-$(document).on('click', '.action-focus-at-region', function(){
-    var id_region = $(this).data('region-id');
-    var bound = polymap [ id_region ].getBounds();
-
-    map.panTo( bound.getCenter() );
-
-    var oldstyle = polymap[ id_region ].options['fillColor'];
-
-    polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-
-    setTimeout(function(){
-        polymap[ id_region ].setStyle({fillColor: oldstyle});
-        //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-        // history.pushState('', document.title, window.location.pathname);
-    }, 500);
 });
 
 $(".tabs-menu a").click(function(event) {
