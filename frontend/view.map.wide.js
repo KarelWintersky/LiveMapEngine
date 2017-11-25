@@ -1,3 +1,19 @@
+showContentColorbox = function(id_region , title) {
+    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    $.get( url, function() {
+    }).done(function(data) {
+        $.colorbox({
+            html: data,
+            width: colorbox_width,
+            height: colorbox_height,
+            title: title,
+            onClosed: function(){
+                history.pushState('', document.title, window.location.pathname);
+            }
+        });
+    });
+}
+
 toggleContentViewBox = function(id_region, title) {
     let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     if (current_infobox_region_id == id_region) {

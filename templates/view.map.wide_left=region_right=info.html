@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="/frontend/leaflet.css">
-    <link rel="stylesheet" href="/frontend/view.map.wide_il_rr.css" />
+    <link rel="stylesheet" href="/frontend/view.map.wide.css" />
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet.js"></script>
@@ -16,8 +16,10 @@
     var leaflet_background_color = theMap['viewport']['background_color'];
         document.title = theMap['map']['title'];
     var current_infobox_region_id = '';
-    var map_centring_panning_step = +70; // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
-                                         // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
+
+    // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
+    // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
+    var map_centring_panning_step = +70;
 
     // Highlight filled regions
     var regions_with_content = [
@@ -62,7 +64,7 @@
     <div id="section-info-content" class="invisible section-info-content"></div>
 </section>
 
-<script type="text/javascript" src="/frontend/view.map.js"></script>
+<script type="text/javascript" src="/frontend/view.map.wide.js"></script>
 
 </body>
 </html>
