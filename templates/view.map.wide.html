@@ -22,6 +22,8 @@
             margin: 5px;
             padding: 0;
         }
+        html {
+        }
         #map {
             height: 90%;
             border: 1px solid black;
@@ -75,7 +77,7 @@
             text-align: left;
             color: #000000;
 
-            min-width: 800px;
+            min-width: 600px;
             max-width: 800px;
             max-height: 600px;
 
@@ -92,6 +94,40 @@
 <form style="text-align: left" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
 
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+
+<section id="section-infobox" class="section-info-viewbox invisible">
+    <div style="text-align: right">
+        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="false">Показать</button>
+    </div>
+    <div id="section-info-content" class="invisible section-info-content"></div>
+</section>
+
+<section id="section-regions" class="section-regions-viewbox invisible">
+    <div style="text-align: right">
+        <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
+        <select id="sort-select" class="invisible">
+            <option value="total" data-ul="data-ordered-alphabet">... все</option>
+            <option value="latest" data-ul="data-ordered-latest">... новые</option>
+        </select>
+        &nbsp;&nbsp;
+        <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
+    </div>
+
+    {?!*target*}
+    <div id="section-regions-content" class="invisible section-regions-content">
+        <ul class="map-regions" id="data-ordered-alphabet">
+            {%*map_regions_order_by_title*}<li><a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_title:id_region*}]" data-region-id="{*map_regions_order_by_title:id_region*}">{*map_regions_order_by_title:title*}</a></li>
+            {*map_regions_order_by_title*%}
+        </ul>
+
+        <ul class="map-regions invisible" id="data-ordered-latest">
+            {%*map_regions_order_by_date*}<li><small>({*map_regions_order_by_date:edit_date*})</small><br/> <a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_date:id_region*}]" data-region-id="{*map_regions_order_by_date:id_region*}">{*map_regions_order_by_date:title*}</a></li>
+            {*map_regions_order_by_date*%}
+        </ul>
+
+    </div>
+    {*target*?!}
+</section>
 
 <script type="text/javascript" id="build-layout">
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
@@ -128,29 +164,18 @@
 <script type="text/javascript" id="create-map-and-layout">
     var current_infobox_region_id = '';
 
-    showContentColorbox = function(id_region , title) {
-        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
-
-        $.get( url, function() {
-        }).done(function(data) {
-            $.colorbox({
-                html: data,
-                width: colorbox_width,
-                height: colorbox_height,
-                title: title,
-                onClosed: function(){
-                    history.pushState('', document.title, window.location.pathname);
-                },
-            });
-        });
-    }
-
     toggleContentViewBox = function(id_region, title) {
         let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
         if (current_infobox_region_id == id_region) {
             // close viewbox and clear histrory
             toggleInfoBox('#actor-viewbox-toggle');
-            history.pushState('', document.title, window.location.pathname);
+
+            if ( $('#actor-viewbox-toggle').data('content-is-visible') == false ) {
+                history.pushState('', document.title, window.location.pathname);
+            } else {
+                window.location.hash = "#view=[" + id_region + "]";
+            }
+
         } else {
             current_infobox_region_id = id_region;
             $("#section-info-content").html('');
@@ -161,9 +186,12 @@
                 async: false
             }).done(function(data){
                 let region_center = polymap [ id_region ].getBounds().getCenter();
-                region_center.lng -= 70; // move center to right
 
-                map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+                // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
+                if (region_center.lng - map.getBounds().getCenter().lng <= 70) {
+                    region_center.lng -= 70; // move center to right
+                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+                }
 
                 $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
                 $("#section-info-content").html(data).show();
@@ -329,9 +357,6 @@
             $(must_hide).hide();
             $(must_display).show();
         });
-
-
-
     });
     $(document).on('click', '.action-focus-at-region', function(){
         var id_region = $(this).data('region-id');
@@ -350,40 +375,6 @@
     });
 
 </script>
-
-<section id="section-infobox" class="section-info-viewbox invisible">
-    <div style="text-align: right">
-        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="false">Показать</button>
-    </div>
-    <div id="section-info-content" class="invisible section-info-content"></div>
-</section>
-
-<section id="section-regions" class="section-regions-viewbox invisible">
-    <div style="text-align: right">
-        <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
-        <select id="sort-select" class="invisible">
-            <option value="total" data-ul="data-ordered-alphabet">... все</option>
-            <option value="latest" data-ul="data-ordered-latest">... новые</option>
-        </select>
-        &nbsp;&nbsp;
-        <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
-    </div>
-
-    {?!*target*}
-    <div id="section-regions-content" class="invisible section-regions-content">
-        <ul class="map-regions" id="data-ordered-alphabet">
-            {%*map_regions_order_by_title*}<li><a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_title:id_region*}]" data-region-id="{*map_regions_order_by_title:id_region*}">{*map_regions_order_by_title:title*}</a></li>
-            {*map_regions_order_by_title*%}
-        </ul>
-
-        <ul class="map-regions invisible" id="data-ordered-latest">
-            {%*map_regions_order_by_date*}<li><small>({*map_regions_order_by_date:edit_date*})</small><br/> <a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_date:id_region*}]" data-region-id="{*map_regions_order_by_date:id_region*}">{*map_regions_order_by_date:title*}</a></li>
-            {*map_regions_order_by_date*%}
-        </ul>
-
-    </div>
-    {*target*?!}
-</section>
 
 <script type="text/javascript" id="bind-actor-click-inside-colorbox">
     // обрабатываем клик по ссылке внутри попап окна
@@ -416,6 +407,7 @@
         document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
     });
 </script>
+
 
 <div style="display:none">
     <div id="colorboxed-view" style="padding:10px; background:#fff;">
