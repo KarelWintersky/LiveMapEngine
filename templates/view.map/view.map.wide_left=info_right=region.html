@@ -27,7 +27,6 @@
     ];
 </script>
 
-<form style="text-align: left" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
 
 <section id="section-infobox" class="section-info-viewbox invisible" data-leaflet-control-position="topleft">
@@ -62,6 +61,13 @@
 
     </div>
     {*target*?!}
+</section>
+
+<section id="section-backward" class="invisible section-backward-viewbox">
+    <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&gt;</button>
+    <span id="section-backward-content" class="invisible section-backward-content">
+        <form style="display: inline-block" class="invisible" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
+    </span>
 </section>
 
 <script type="text/javascript" src="/frontend/view.map.wide.js"></script>

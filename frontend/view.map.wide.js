@@ -113,7 +113,7 @@ var map = L.map('map', {
     renderer: L.canvas(),
     zoomControl: false,
 });
-L.control.zoom({ position: 'bottomleft' }).addTo(map);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
 
 var h = theMap['map']['height'];
 var w = theMap['map']['width'];
@@ -200,6 +200,19 @@ L.Control.InfoBox = L.Control.extend({
     },
     onRemove: function(map) {}
 });
+L.Control.Backward = L.Control.extend({
+    options: {
+        position: 'bottomleft'
+    },
+    onAdd: function(map) {
+        var div = L.DomUtil.get('section-backward');
+        L.DomUtil.removeClass(div, 'invisible');
+        L.DomEvent.disableScrollPropagation(div);
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+    },
+    onRemove: function(map){}
+});
 
 
 $(function(){
@@ -209,18 +222,34 @@ $(function(){
         polymap[ key ].setStyle({fillColor: '#00ff00'});  // theMap[]['filled_region_color'] или цветом из информации о регионе
     });
 
-    var __RegionsBox = new L.Control.RegionsBox();
-    var __InfoBox = new L.Control.InfoBox();
+    var __BackwardBox = new L.Control.Backward();
+    map.addControl( __BackwardBox );
 
-    map.addControl( __RegionsBox );
-    map.addControl( __InfoBox );
+    if (regions_with_content.length) {
+        var __RegionsBox = new L.Control.RegionsBox();
+        map.addControl( __RegionsBox );
+
+        var __InfoBox = new L.Control.InfoBox();
+        map.addControl( __InfoBox );
+    }
 
     // toggle блоков с информацией/регионами
-    $('#actor-regions-toggle').on('click', function (e) {
+    $('#actor-regions-toggle').on('click', function (el) {
         toggleRegionsBox(this);
     });
-    $('#actor-viewbox-toggle').on('click', function (e) {
+
+    $('#actor-viewbox-toggle').on('click', function (el) {
         toggleInfoBox(this);
+    });
+
+    $("#actor-backward-toggle").on('click', function (el){
+        var state = $(this).data('content-is-visible');
+        var text = (state == false) ? '&lt;' : '&gt;';
+        $(this).html(text);
+
+        var data = $(this).data('content');
+        $('#' + data).toggle();
+        $(this).data('content-is-visible', !state);
     });
 
     // изменение контента блока с регионами на основе типа сортировки
