@@ -95,7 +95,7 @@
 
 <script type="text/javascript" id="global-functions">
     showContentColorbox = function(id_region , title) {
-        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
+        let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
         $.get( url, function() {
         }).done(function(data) {
             $.colorbox({
@@ -112,6 +112,12 @@
 </script>
 
 <script type="text/javascript" id="build-layout">
+    var map_alias = '{*map_alias*}';
+
+    var regions_with_content = [
+        {*map_regions_with_info_jsarray*}
+    ];
+
     $("#map").css('width', theMap.viewport.width).css('height', theMap.viewport.height);
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
     document.title = theMap['map']['title'];
@@ -170,11 +176,6 @@
     map.fitBounds(bounds);
     map.setZoom( theMap['map']['zoom']);
 
-    // Highlight filled regions
-    var regions_with_content = [
-        {*map_regions_with_info_jsarray*}
-    ];
-
     regions_with_content.forEach(function(key){
         polymap[ key ].setStyle({fillColor: '#00ff00'});
     });
@@ -219,7 +220,7 @@
 <script type="text/javascript" id="bind-actor-edit">
     $(document).on('click', '#actor-edit', function(){
         let region_id = $(this).data('region-id');
-        document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
+        document.location.href = '/edit/region?map='+ map_alias + '&id=' + region_id;
     });
 </script>
 
@@ -247,11 +248,10 @@
                 var oldstyle = polymap[ id_region ].options['fillColor'];
 
                 polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-                var timeoutHandler = setInterval(function(){
+                setTimeout(function(){
                     polymap[ id_region ].setStyle({fillColor: oldstyle});
-                    window.clearTimeout(timeoutHandler);
+                    // history.pushState('', document.title, window.location.pathname);
                 }, 1000);
-                // history.pushState('', document.title, window.location.pathname);
             }
         }
     });
@@ -259,18 +259,19 @@
     $(document).on('click', '.action-focus-at-region', function(){
         var id_region = $(this).data('region-id');
         var bound = polymap [ id_region ].getBounds();
+
         map.panTo( bound.getCenter() );
+
         var oldstyle = polymap[ id_region ].options['fillColor'];
 
         polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-        var timeoutHandler = setInterval(function(){
+
+        setTimeout(function(){
             polymap[ id_region ].setStyle({fillColor: oldstyle});
-            window.clearTimeout(timeoutHandler);
             //@todo: когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
             //
             // history.pushState('', document.title, window.location.pathname);
         }, 500);
-
     });
 </script>
 <div style="display:none">

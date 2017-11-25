@@ -22,7 +22,7 @@ class MapRender extends UnitPrototype
         $this->template_path = '$/templates';
     }
 
-    private function makemap_widecolorbox( $orientation )
+    private function makemap_widemap( $orientation )
     {
         if ($orientation === 'infobox>regionbox') {
             $this->template_file = 'view.map.wide_left=info_right=region.html';
@@ -67,9 +67,9 @@ class MapRender extends UnitPrototype
 
     }
 
-    private function makemap_colorbox()
+    private function makemap_tabled_colorbox()
     {
-        $this->template_file = 'view.map.colorbox.html';
+        $this->template_file = 'view.map.tabled_colorbox.html';
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
@@ -97,7 +97,7 @@ class MapRender extends UnitPrototype
         ));
     }
 
-    private function makemap_iframe( /* \Template $tpl */)
+    private function makemap_iframe()
     {
         $this->template_file = 'view.map.iframe.html';
 
@@ -123,8 +123,8 @@ class MapRender extends UnitPrototype
                 $this->makemap_iframe();
                 break;
             }
-            case 'colorbox' : {
-                $this->makemap_colorbox();
+            case 'tabled+colorbox' : {
+                $this->makemap_tabled_colorbox();
                 break;
             }
             case 'folio': {
@@ -132,11 +132,11 @@ class MapRender extends UnitPrototype
                 break;
             }
             case 'wide:infobox>regionbox': { // infobox left, regionbox right
-                $this->makemap_widecolorbox('infobox>regionbox');
+                $this->makemap_widemap('infobox>regionbox');
                 break;
             }
             case 'wide:regionbox>infobox': { // regionbox left, infobox righr
-                $this->makemap_widecolorbox('regionbox>infobox');
+                $this->makemap_widemap('regionbox>infobox');
                 break;
             }
             default: {
