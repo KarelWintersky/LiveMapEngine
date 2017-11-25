@@ -4,7 +4,7 @@
     <title>Проект {*title_project*}, {*title_map*}, редактирование региона {*id_region*}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-    <link rel="stylesheet" type="text/css" href="/frontend/lme.css/frontend.edit.css" />
+    <link rel="stylesheet" type="text/css" href="/frontend/edit.region.css" />
 
     <script type="text/javascript" src="/frontend/html5shiv.js"></script>
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
@@ -26,11 +26,6 @@
                 strikethrough   : { inline : 'del' },
                 underline       : { inline : 'span', 'classes' : 'underline', exact : true}
             },
-            /*insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
-            contextmenu         :  "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
-            toolbar1            :  "pastetext | undo redo | link unlink anchor | forecolor backcolor | styleselect formatselect fontsizeselect | template | print preview code | pastetext removeformat",
-            toolbar2            :  "responsivefilemanager image | bold italic underline subscript superscript strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table inserttime",
-            image_advtab        :  true,*/
 
             insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
             contextmenu     : "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
@@ -62,7 +57,7 @@
             ],
             template_popup_height   : 400,
             template_popup_width    : 800,
-            content_css         : '{*const_frontend_path*}/css.lme/templates.css'
+            content_css         : '/frontend/edit.region.tinymce_templates.css'
         };
         // add markdown and simple configs
 
