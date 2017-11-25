@@ -21,9 +21,16 @@ toggleContentViewBox = function(id_region, title) {
             let region_center = polymap [ id_region ].getBounds().getCenter();
 
             // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-            if (region_center.lng <= map.getBounds().getCenter().lng ) {
-                region_center.lng -= 70; // move center to right
-                map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+            if (map_centring_panning_step > 0) {
+                if (region_center.lng > map.getBounds().getCenter().lng ) {
+                    region_center.lng += map_centring_panning_step;
+                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+                }
+            } else {
+                if (region_center.lng <= map.getBounds().getCenter().lng ) {
+                    region_center.lng += map_centring_panning_step;
+                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+                }
             }
 
             $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
@@ -33,7 +40,7 @@ toggleContentViewBox = function(id_region, title) {
     }
 }
 showContentViewBox = function(id_region, title) {
-    let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
+    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
 
     $.get(url, function(){}).done(function(data){
         let region_center = polymap [ id_region ].getBounds().getCenter();
@@ -256,5 +263,5 @@ $(document).on('click', '#cboxLoadedContent a', function(){ // здесь дру
 // id="bind-actor-edit"
 $(document).on('click', '#actor-edit', function(){
     var region_id = $(this).data('region-id');
-    document.location.href = '/edit/region?map={*map_alias*}&id=' + region_id;
+    document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
 });

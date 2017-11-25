@@ -25,9 +25,9 @@ class MapRender extends UnitPrototype
     private function makemap_widecolorbox( $orientation )
     {
         if ($orientation === 'infobox>regionbox') {
-            $this->template_file = 'view.map.wide_il_rr.html';
+            $this->template_file = 'view.map.wide_left=info_right=region.html';
         } else {
-            $this->template_file = 'view.map.wide_rl_ir.html';
+            $this->template_file = 'view.map.wide_left=region_right=info.html';
         }
 
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
@@ -131,11 +131,11 @@ class MapRender extends UnitPrototype
                 $this->makemap_folio();
                 break;
             }
-            case 'wide_il_rr': { // infobox left, regionbox right
+            case 'wide:infobox>regionbox': { // infobox left, regionbox right
                 $this->makemap_widecolorbox('infobox>regionbox');
                 break;
             }
-            case 'wide_rl_ir': { // regionbox left, infobox righr
+            case 'wide:regionbox>infobox': { // regionbox left, infobox righr
                 $this->makemap_widecolorbox('regionbox>infobox');
                 break;
             }
