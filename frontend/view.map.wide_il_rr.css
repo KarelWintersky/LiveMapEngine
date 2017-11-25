@@ -1,0 +1,140 @@
+html, body {
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    background: white;
+    margin: 5px;
+    padding: 0;
+}
+#map {
+    height: 90%;
+    border: 1px solid black;
+}
+/* === buttons === */
+button {
+    font-size: large;
+}
+
+
+/* === the map container === */
+
+
+/* === Section Regions */
+.section-regions-viewbox {
+    padding: 8px 8px;
+    background: white;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.section-regions-viewbox select {
+    font-size: 160%;
+    width: 30%
+}
+.section-regions-viewbox h3 {
+    font-size: 140%;
+    color: #0088cc;
+}
+.section-regions-content {
+    margin: 10px 0 0 0;
+    font-size: 140%;
+    text-align: left;
+    color: #000000;
+    max-height: 400px;
+    overflow-y: scroll;
+}
+.section-regions-content ul {
+    padding-left: 25px;
+    padding-right: 10px;
+}
+.section-regions-content ul li {
+    list-style-type: square;
+}
+
+/* === Section Viewbox === */
+#actor-viewbox-toggle {
+    width: 100%;
+}
+.section-info-viewbox {
+    padding: 8px 8px;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.section-info-content {
+    margin: 10px 5px 10px 5px;
+    font-size: 140%;
+    text-align: left;
+    color: #000000;
+
+    min-width: 600px;
+    max-width: 800px;
+    max-height: 600px;
+
+    overflow-y: scroll;
+}
+
+.invisible {
+    display: none;
+}
+
+
+/* === region-content childs styles === */
+.region-content {
+    margin: 5px;
+    padding: 5px;
+    font-family: 'Didact Gothic', sans-serif;
+}
+
+.region-content fieldset {
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.region-content legend {
+    font-weight: bold;
+    font-size: large;
+    padding-left: 5px;
+    padding-right: 1em;
+}
+
+/*
+    ☀ - star
+    ⊕ - planet
+    ☾ - moon
+    ☄ - orbital station
+    \0000a0 - unicode space
+*/
+
+.region-content fieldset.locations {
+}
+
+.region-content fieldset.locations ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li:before {
+    content: '⊕\0000a0';
+}
+
+.region-content fieldset.locations ul li > ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li > ul li:before{
+    content: '☾\0000a0';
+}
+
+.region-content fieldset.locations ul li > ul li > ul {
+    list-style: none;
+}
+
+.region-content fieldset.locations ul li > ul li > ul li:before{
+    content: '☄\0000a0';
+}
+
+.region-content fieldset.financial-content ul {
+
+}
+.region-content fieldset.financial-content ul li:before {
+    content: '¤\0000a0';
+}
+

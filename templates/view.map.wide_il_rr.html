@@ -3,92 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <link rel="stylesheet" href="/frontend/colorbox.css">
     <link rel="stylesheet" href="/frontend/leaflet.css">
-    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.css">
-    <link rel="stylesheet" href="/frontend/lme.css/frontend.view.tabs.css">
+    <link rel="stylesheet" href="/frontend/view.map.wide_il_rr.css" />
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
-    <script type="text/javascript" src="/frontend/jquery.tiny-draggable.js"></script>
-    <script type="text/javascript" src="/frontend/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet.js"></script>
     <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
-
-    <style type="text/css">
-        html, body {
-            width: calc(100% - 10px);
-            height: calc(100% - 10px);
-            background: white;
-            margin: 5px;
-            padding: 0;
-        }
-        html {
-        }
-        #map {
-            height: 90%;
-            border: 1px solid black;
-        }
-
-        /* === Section Regions */
-        .section-regions-viewbox {
-            padding: 8px 8px;
-            background: white;
-            background: rgba(255,255,255,1);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-        .section-regions-viewbox select {
-            font-size: 160%;
-            width: 30%
-        }
-        .section-regions-viewbox h3 {
-            font-size: 140%;
-            color: #0088cc;
-        }
-        .section-regions-content {
-            margin: 10px 0 0 0;
-            font-size: 140%;
-            text-align: left;
-            color: #000000;
-            max-height: 400px;
-            overflow-y: scroll;
-        }
-        .section-regions-content ul {
-            padding-left: 25px;
-            padding-right: 10px;
-        }
-        .section-regions-content ul li {
-            list-style-type: square;
-        }
-
-        /* === Section Viewbox === */
-        #actor-viewbox-toggle {
-            width: 100%;
-        }
-        .section-info-viewbox {
-            padding: 8px 8px;
-            background: rgba(255,255,255,1);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-        .section-info-content {
-            margin: 10px 5px 10px 5px;
-            font-size: 140%;
-            text-align: left;
-            color: #000000;
-
-            min-width: 600px;
-            max-width: 800px;
-            max-height: 600px;
-
-            overflow-y: scroll;
-        }
-
-        .invisible {
-            display: none;
-        }
-
-    </style>
+    <script type="text/javascript" src="/frontend/view.map.js"></script>
 </head>
 <body>
 <form style="text-align: left" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
@@ -132,6 +53,7 @@
 <script type="text/javascript" id="build-layout">
     $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
     document.title = theMap['map']['title'];
+    var map_alias = '{*map_alias*}';
 
     var colorbox_width  =   theMap.colorbox.width      || 800;
     var colorbox_height =   theMap.colorbox.height     || 600;
@@ -165,9 +87,8 @@
     var current_infobox_region_id = '';
 
     toggleContentViewBox = function(id_region, title) {
-        let url = '/api/get/regiondata?map={*map_alias*}&id=' + id_region;
+        let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
         if (current_infobox_region_id == id_region) {
-            // close viewbox and clear histrory
             toggleInfoBox('#actor-viewbox-toggle');
 
             if ( $('#actor-viewbox-toggle').data('content-is-visible') == false ) {
@@ -188,7 +109,7 @@
                 let region_center = polymap [ id_region ].getBounds().getCenter();
 
                 // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-                if (region_center.lng - map.getBounds().getCenter().lng <= 70) {
+                if (region_center.lng <= map.getBounds().getCenter().lng ) {
                     region_center.lng -= 70; // move center to right
                     map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
                 }
@@ -358,6 +279,8 @@
             $(must_display).show();
         });
     });
+
+    // клик по региону в списке "интересных мест"
     $(document).on('click', '.action-focus-at-region', function(){
         var id_region = $(this).data('region-id');
         var bound = polymap [ id_region ].getBounds();
@@ -368,8 +291,7 @@
         var timeoutHandler = setInterval(function(){
             polymap[ id_region ].setStyle({fillColor: oldstyle});
             window.clearTimeout(timeoutHandler);
-            //@todo: когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-            //
+            //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
             // history.pushState('', document.title, window.location.pathname);
         }, 500);
     });
