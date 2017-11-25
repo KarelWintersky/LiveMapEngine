@@ -55,7 +55,6 @@ map.setMaxBounds(max_bounds);
 // draw polygons on map, bind on-click function
 Object.keys( polymap ).forEach(function(id_region){
     polymap[ id_region ].addTo(map).on('click', function(){
-        // var t = theMap['regions'][ id_region ]['title'] || id_region;
         window.location.hash = 'view=[' + id_region + ']';
         var t = (theMap['regions'][ id_region ]['title'] != '')
             ? theMap['regions'][ id_region ]['title']
@@ -79,7 +78,7 @@ if (wlh.length > 1) {
 
     if ((hashparams !== null) && (hashparams[1] == 'view')) {
         id_region = hashparams[2];
-        showContentViewBox(id_region, '');
+        showContentColorbox(id_region, '');
 
     } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
         id_region = hashparams[2];
@@ -101,6 +100,22 @@ if (wlh.length > 1) {
 
 map.setZoom( theMap['map']['zoom'] );
 
+
+// создаем контролы
+L.Control.Backward = L.Control.extend({
+    options: {
+        position: 'bottomleft'
+    },
+    onAdd: function(map) {
+        var div = L.DomUtil.get('section-backward');
+        L.DomUtil.removeClass(div, 'invisible');
+        L.DomEvent.disableScrollPropagation(div);
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+    },
+    onRemove: function(map){}
+});
+
 $(function(){
     $(".leaflet-container").css('background-color', leaflet_background_color);
 
@@ -109,24 +124,21 @@ $(function(){
         polymap[ key ].setStyle({fillColor: '#00ff00'});
     });
 
-});
+    // не показываем контрол "назад" если страница загружена в iframe
+    if (!(window != window.top || document != top.document || self.location != top.location)) {
+        var __BackwardBox = new L.Control.Backward();
+        map.addControl( __BackwardBox );
+    }
 
-// клик по региону в списке "интересных мест"
-$(document).on('click', '.action-focus-at-region', function(){
-    var id_region = $(this).data('region-id');
+    $("#actor-backward-toggle").on('click', function (el){
+        var state = $(this).data('content-is-visible');
+        var text = (state == false) ? '&lt;' : '&gt;';
+        $(this).html(text);
 
-    var bound = polymap [ id_region ].getBounds();
-    map.panTo( bound.getCenter(), { animate: true, duration: 0.7, noMoveStart: true});
-
-    var oldstyle = polymap[ id_region ].options['fillColor'];
-
-    polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-
-    setTimeout(function(){
-        polymap[ id_region ].setStyle({fillColor: oldstyle});
-        //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-        // history.pushState('', document.title, window.location.pathname);
-    }, 1200);
+        var data = $(this).data('content');
+        $('#' + data).toggle();
+        $(this).data('content-is-visible', !state);
+    });
 
 });
 
@@ -153,14 +165,5 @@ $(document).on('click', '#cboxLoadedContent a', function(){
 $(document).on('click', '#actor-edit', function(){
     let region_id = $(this).data('region-id');
     document.location.href = '/edit/region?map='+ map_alias + '&id=' + region_id;
-});
-
-$(".tabs-menu a").click(function(event) {
-    event.preventDefault();
-    $(this).parent().addClass("current");
-    $(this).parent().siblings().removeClass("current");
-    var tab = $(this).attr("href");
-    $(".tab-content").not(tab).css("display", "none");
-    $(tab).fadeIn();
 });
 

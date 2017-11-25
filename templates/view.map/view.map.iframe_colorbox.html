@@ -5,28 +5,13 @@
     <title></title>
     <link rel="stylesheet" href="/frontend/colorbox.css">
     <link rel="stylesheet" href="/frontend/leaflet.css">
-    <link rel="stylesheet" href="/frontend/view.map.tabled_colorbox.css">
+    <link rel="stylesheet" href="/frontend/view.map.iframe_colorbox.css">
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/jquery.tiny-draggable.js"></script>
     <script type="text/javascript" src="/frontend/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet.js"></script>
     <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
-
-    <style type="text/css">
-        html, body {
-            width: calc(100% - 10px);
-            height: calc(100% - 10px);
-            background: white;
-            margin: 5px;
-            padding: 0;
-        }
-        #map {
-            height: 90%;
-            border: 1px solid navy;
-            margin: 2em;
-        }
-    </style>
 </head>
 <body>
 
@@ -38,8 +23,16 @@
     </div>
 </div>
 
+<section id="section-backward" class="invisible section-backward-viewbox">
+    <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&gt;</button>
+    <span id="section-backward-content" class="invisible section-backward-content">
+        <form style="display: inline-block" class="invisible" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
+    </span>
+</section>
+
 <script type="text/javascript" id="init">
     var map_alias = '{*map_alias*}';
+    var leaflet_background_color = theMap['viewport']['background_color'];
     var regions_with_content = [
         {*map_regions_with_info_jsarray*}
     ];
@@ -51,7 +44,7 @@
     var colorbox_height =   theMap.colorbox.height     || 600;
 </script>
 
-<script type="text/javascript" src="/frontend/view.map.tabled_colorbox.js"></script>
+<script type="text/javascript" src="/frontend/view.map.iframe_colorbox.js"></script>
 
 </body>
 </html>

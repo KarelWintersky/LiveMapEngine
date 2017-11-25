@@ -97,7 +97,7 @@ class MapRender extends UnitPrototype
         ));
     }
 
-    private function makemap_iframe()
+    private function makemap_iframe_colorbox()
     {
         $this->template_file = 'view.map.iframe_colorbox.html';
 
@@ -120,11 +120,16 @@ class MapRender extends UnitPrototype
 
         switch ($skin) {
             case 'iframe': {
-                $this->makemap_iframe();
+                $this->makemap_iframe_colorbox();
                 break;
             }
             case 'iframe:colorbox': {
-                $this->makemap_iframe();
+                $this->makemap_iframe_colorbox();
+                break;
+            }
+
+            case 'colorbox' : {
+                $this->makemap_tabled_colorbox();
                 break;
             }
 
