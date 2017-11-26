@@ -14,7 +14,7 @@ $valid_view_modes = array(
 );
 
 $alias_map  = $_GET['alias'] ?? NULL;
-$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, 'iframe');
+$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, 'wide:infobox>regionbox');
 
 $map = new MapRender( $alias_map );
 $map_found = $map->run( $viewmode );

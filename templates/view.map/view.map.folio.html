@@ -12,7 +12,14 @@
     <script type="text/javascript" src="/api/get/jslayout?map={*map_alias*}" id="the-map-outer"></script>
 
     <style type="text/css">
-        html, body {
+        html, body, #map {
+            height:100%;
+            width:100%;
+            padding:0px;
+            margin:0px;
+        }
+
+        /*html, body {
             width: calc(100% - 10px);
             height: calc(100% - 10px);
             background: white;
@@ -23,17 +30,58 @@
             height: 90%;
             border: 1px solid navy;
             margin: 2em;
+        }*/
+
+        /* === Section Backward === */
+        .section-backward-viewbox {
+            padding: 8px 8px;
+            background: white;
+            background: rgba(255,255,255,1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .section-backward-content {
+            margin: 0;
+            font-size: 140%;
+            text-align: left;
+            color: #000000;
+        }
+        /* === Section Region Title === */
+        .section-region-title-viewbox {
+            padding: 8px 8px;
+            background: white;
+            background: rgba(255,255,255,1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            font-size: 140%;
+        }
+        .section-region-title-content {
+            margin: 0;
+            color: #000000;
+        }
+
+        .invisible {
+            display: none;
         }
     </style>
 </head>
 <body>
-<span>Selected region: <strong id="selected_region"></strong></span>
-<span style="float: right"><a href="/">К СПИСКУ КАРТ</a></span>
-<hr/>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+<section id="section-backward" class="invisible section-backward-viewbox">
+    <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&gt;</button>
+    <span id="section-backward-content" class="invisible section-backward-content">
+        <form style="display: inline-block" class="invisible" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
+    </span>
+</section>
+
+<section id="section-region-title" class="invisible section-region-title-viewbox">
+    <span>Selected region:</span> <strong id="section-region-title-content" class="section-region-title-content"></strong>
+</section>
+
 <script type="text/javascript" id="build-layout">
     var map_alias = '{*map_alias*}';
-    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
+    var leaflet_background_color = theMap['viewport']['background_color'];
+    $(".leaflet-container").css('background-color', leaflet_background_color);
 
     document.title = theMap['map']['title'];
 
@@ -61,8 +109,11 @@
         crs: L.CRS.Simple,
         minZoom: -3,
         maxZoom: 2,
-        preferCanvas: true
+        preferCanvas: true,
+        zoomControl: false,
     });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
     var h = theMap['map']['height'];
     var w = theMap['map']['width'];
     var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
@@ -76,12 +127,62 @@
     Object.keys( polymap ).forEach(function(id_region){
         polymap[ id_region ].addTo(map).on('click', function(){
             var t = theMap['regions'][ id_region ]['title'] || id_region;
-            $("#selected_region").html(t);
+            $("#section-region-title-content").html(t);
         });
     });
 
     map.fitBounds(current_bounds);
     map.setZoom( theMap['map']['zoom']);
+
+    L.Control.Backward = L.Control.extend({
+        options: {
+            position: 'bottomleft'
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-backward');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map){}
+    });
+
+    // не показываем контрол "назад" если страница загружена в iframe
+    if (!(window != window.top || document != top.document || self.location != top.location)) {
+        var __BackwardBox = new L.Control.Backward();
+        map.addControl( __BackwardBox );
+    }
+
+    L.Control.Title = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-region-title');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map){}
+    });
+    var __RegionTitleBox = new L.Control.Title();
+    map.addControl( __RegionTitleBox );
+
+    $(function(){
+        $("#actor-backward-toggle").on('click', function (el){
+            var state = $(this).data('content-is-visible');
+            var text = (state == false) ? '&lt;' : '&gt;';
+            $(this).html(text);
+
+            var data = $(this).data('content');
+            $('#' + data).toggle();
+            $(this).data('content-is-visible', !state);
+        });
+    });
+
+
 
 
 </script>
