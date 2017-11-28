@@ -49,11 +49,12 @@
                     "url"           :   "{*$edit_templates:url*}"
                 },{*$edit_templates*%}{*$edit_templates*?}
             ],
-            template_popup_height   : 400,
-            template_popup_width    : 800,
-{?*edit_templates_styles*}
-            content_css         : "{*edit_templates_styles*}"
-{*edit_templates_styles*?}
+
+        {?*edit_templates_options*}
+            template_popup_width    : {*edit_templates_options.template_popup_width*},
+            template_popup_height   : {*edit_templates_options.template_popup_height*},
+            content_css             : "{*edit_templates_options.content_css*}"
+        {*edit_templates_options*?}
         };
         // add markdown and simple configs
 

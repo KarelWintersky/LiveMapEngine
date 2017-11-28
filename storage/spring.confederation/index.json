@@ -38,6 +38,8 @@
         "url"         : "tinymce.plaintext.html"
       }
     ],
-    "styles" : "template-styles.css"
+    "content_css" : "template-styles.css",
+    "template_popup_width"  : 800,
+    "template_popup_height" : 400
   }
 }

@@ -35,7 +35,6 @@ switch ($edit_what) {
         $region_data = $lm_engine->getMapRegionData( $edit_map_alias, $edit_region_id );
 
         // читаем шаблоны из json-файла конфигурации карты (а должны из БД, таблица settings_project_edit_templates с наследованием settings_project_edit_templates)
-
         // и это должно быть в модели!
         $filename = PATH_STORAGE . $edit_map_alias . '/index.json';
         if (!is_file($filename)) {
@@ -45,10 +44,11 @@ switch ($edit_what) {
         $json = json_decode( file_get_contents( $filename ) );
 
         $edit_templates = [];
+        $edit_templates_options = [];
         $edit_templates_index = 1;
         $edit_templates_styles = '';
 
-        if ($json->edit_templates) {
+        if (!empty($json->edit_templates)) {
 
             foreach ($json->edit_templates->templates as $template_record) {
                 $template = [
@@ -61,10 +61,23 @@ switch ($edit_what) {
                 $edit_templates_index++;
             }
 
-            $edit_templates_styles = $json->edit_templates->styles ?? "";
-            if ($edit_templates_styles)
-                $edit_templates_styles = "/storage/{$edit_map_alias}/edit_templates/" . $edit_templates_styles;
+            if (!empty($json->edit_templates->content_css)) {
+                $edit_templates_options['content_css'] = "/storage/{$edit_map_alias}/edit_templates/" . $json->edit_templates->content_css;
+            }
+
+            $edit_templates_options['template_popup_width']
+                = (!empty($json->edit_templates->template_popup_width))
+                ? $json->edit_templates->template_popup_width
+                : 800;
+
+            $edit_templates_options['template_popup_height']
+                = (!empty($json->edit_templates->template_popup_height))
+                ? $json->edit_templates->template_popup_height
+                : 400;
+
+
         }
+        // конец блока заполнения template
 
 
         // конец анализа json-конфига
@@ -89,8 +102,9 @@ switch ($edit_what) {
             'is_logged_user'    =>  $userinfo['email'],
             'is_logged_user_ip' =>  $userinfo['ip'],
 
-            // 'edit_templates'   =>  $edit_templates,
-            'edit_templates_styles' => $edit_templates_styles,
+            'edit_templates'   =>  $edit_templates, // странно, если эту строку закомментировать - все равно все работает,
+                                                    // смотри https://github.com/1234ru/websun/issues/2
+            'edit_templates_options' => $edit_templates_options,
 
             // copyright
             'copyright'         =>  LMEConfig::get_mainconfig()->get('copyright/title'),
