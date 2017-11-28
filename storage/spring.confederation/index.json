@@ -1,0 +1,43 @@
+{
+  "title"         : "Map of Confederation",
+  "type"          : "vector",
+  "files" : {
+    "image"       : "image.svg",
+    "layout"      : "layout.svg",
+    "jslayout"    : "confmap.js"
+  },
+  "image" : {
+    "width" : 2104,
+    "height": 1488,
+    "ox"    : 0,
+    "oy"    : 0
+  },
+  "regiondefaults" : {
+    "color"       : "#ffffff",
+    "width"       : 0,
+    "opacity"     : 0,
+    "fillcolor"   : "#0000ff",
+    "fillopacity" : 0.3
+  },
+  "viewport": {
+    "width" : "800px",
+    "height": "600px",
+    "zoom"  : "0",
+    "background_color"  : "transparent"
+  },
+  "edit_templates": {
+    "templates": [
+      {
+        "title"     : "Подробный шаблон",
+        "description" : "Шаблон с филдсетами",
+        "url"         : "tinymce.fieldsets.html"
+      },
+      {
+        "title"       : "Краткий шаблон",
+        "description" : "Шаблон plain/text",
+        "url"         : "tinymce.plaintext.html"
+      }
+    ],
+    "styles" : "template-styles.css"
+  }
+}

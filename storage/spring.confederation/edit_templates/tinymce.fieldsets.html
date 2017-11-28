@@ -11,13 +11,14 @@
 
     <br/>
 
-    <table style="height: 125px;" border="1" width="90%">
+    <table style="height: 125px;" border="1" width="90%" id="summary">
         <tbody align="center" style="text-align: center; font-size: large">
         <tr>
             <td>Население</td>
-            <td colspan="2"  align="left"><span style="color: #00a1ff">???</span> млн. человек</td>
-            <td>КЖП</td>
-            <td>???</td>
+            <td colspan="2"  align="left"><span style="color: #00a1ff" id="summary-population">???</span> млн. человек</td>
+            <td>КЖП
+                <br/><small>Life Support Index</small></td>
+            <td><span id="summary-lsi">???</span></td>
         </tr>
         <tr>
             <td rowspan="2" align="center">&nbsp;</td>
@@ -31,10 +32,10 @@
         </tr>
         <tr>
             <td><font size="3">Доля</font></td>
-            <td><font size="3">0</font></td>
-            <td><font size="3">0</font></td>
-            <td><font size="3">0</font></td>
-            <td><font size="3">0</font></td>
+            <td><font size="3" id="summary-stock-ratio-nature">0</font></td>
+            <td><font size="3" id="summary-stock-ratio-financial">0</font></td>
+            <td><font size="3" id="summary-stock-ratio-real">0</font></td>
+            <td><font size="3" id="summary-stock-ratio-social">0</font></td>
         </tr>
         <tr>
             <td><font size="3">Процент</font></td>
@@ -48,21 +49,22 @@
 
     <br/>
 
-    <fieldset class="about">
+    <fieldset id="about">
         <legend>Рассказ со слов мастера</legend>
         <div>
+            <br/>
             ...
+            <br/>
         </div>
     </fieldset>
 
     <br/>
 
-    <fieldset class="capital-assets">
+    <fieldset id="stock-assets">
         <legend>Представители капитала</legend>
         <div>
             ...
-
-            <fieldset>
+            <fieldset id="stock-assets-nature">
                 <legend>Природный капитал</legend>
                 <ul>
                     <li>...</li>
@@ -70,7 +72,9 @@
                 </ul>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="stock-assets-financial">
                 <legend>Финансовый капитал</legend>
                 <ul>
                     <li>...</li>
@@ -78,7 +82,9 @@
                 </ul>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="stock-assets-real">
                 <legend>Реальный (промышленный) капитал</legend>
                 <ul>
                     <li>...</li>
@@ -86,7 +92,9 @@
                 </ul>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="stock-assets-social">
                 <legend>Социальный капитал (образование, медицина)</legend>
                 <ul>
                     <li>...</li>
@@ -94,79 +102,96 @@
                 </ul>
             </fieldset>
 
+            <br/>
+
         </div>
     </fieldset>
 
     <br/>
 
-    <fieldset class="export-and-import">
+    <fieldset class="external-commerce">
         <legend>Статьи экспорта и импорта</legend>
         <div>
-            <fieldset>
+            <br/>
+            <fieldset id="external-commerce-export">
                 <legend>Экспорт</legend>
+                <br/>
                 <ul>
                     <li>...</li>
                     <li>...</li>
                 </ul>
+                <br/>
             </fieldset>
-            <fieldset>
+            <fieldset id="external-commerce-import">
                 <legend>Импорт</legend>
+                <br/>
                 <ul>
                     <li>...</li>
                     <li>...</li>
                 </ul>
+                <br/>
             </fieldset>
         </div>
     </fieldset>
 
     <br/>
 
-    <fieldset class="departments">
+    <fieldset id="government">
         <legend>Органы государственной власти и местного управления</legend>
         <div>
-
-            <fieldset>
+            <br/>
+            <fieldset id="government-principium">
                 <legend>Принцип управления</legend>
                 <div>
                     ...
                 </div>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="government-homeguard">
                 <legend>Силы планетарной самообороны и территориальная гвардия</legend>
                 <div>
                     ...
                 </div>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="government-gsa">
                 <legend>Конфедеративная служба безопасности</legend>
                 <div>
                     ...
                 </div>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="government-inquisition">
                 <legend>Департамент религиозного контроля (ОРК при 1-ом упр. КСБ)</legend>
                 <div>
                     ...
                 </div>
             </fieldset>
 
-            <fieldset>
+            <br/>
+
+            <fieldset id="government-imp">
                 <legend>Институт ментальной безопасности</legend>
                 <div>
                     ...
                 </div>
             </fieldset>
+            <br/>
 
         </div>
     </fieldset>
 
     <br/>
 
-    <fieldset class="locations">
+    <fieldset id="locations">
         <legend>Системная лоция</legend>
+        <br/>
         <div>
             ...
         </div>
@@ -174,8 +199,9 @@
 
     <br/>
 
-    <fieldset class="old-content">
+    <fieldset id="old-content">
         <legend>Из старых документов</legend>
+        <br/>
         <div>
             ....
             ....

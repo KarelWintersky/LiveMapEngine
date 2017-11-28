@@ -20,6 +20,8 @@ switch ($edit_what) {
         $edit_map_alias = $_GET['map'] ?? NULL;
         $edit_region_id = $_GET['id'] ?? NULL;
 
+        if (! ($edit_map_alias && $edit_region_id)) break; // эта проверка должна делаться в роутере
+
         // проверяем права редактирования
         // LiveMapEngine->checkACL( $auth->getCurrentUID(),  $edit_map_alias) // должно быть editor или owner
 
@@ -31,6 +33,42 @@ switch ($edit_what) {
         // $map_data    = $lm_engine->getMapData( $edit_map_alias );
 
         $region_data = $lm_engine->getMapRegionData( $edit_map_alias, $edit_region_id );
+
+        // читаем шаблоны из json-файла конфигурации карты (а должны из БД, таблица settings_project_edit_templates с наследованием settings_project_edit_templates)
+
+        // и это должно быть в модели!
+        $filename = PATH_STORAGE . $edit_map_alias . '/index.json';
+        if (!is_file($filename)) {
+            die('Incorrect path: ' . PATH_STORAGE . $this->map_alias);
+        }
+
+        $json = json_decode( file_get_contents( $filename ) );
+
+        $edit_templates = [];
+        $edit_templates_index = 1;
+        $edit_templates_styles = '';
+
+        if ($json->edit_templates) {
+
+            foreach ($json->edit_templates->templates as $template_record) {
+                $template = [
+                    'title'     =>  $template_record->title ?? "#{$edit_templates_index}",
+                    'desc'      =>  $template_record->description ?? "#{$edit_templates_index}",
+                    'url'       =>  "/storage/{$edit_map_alias}/edit_templates/" . $template_record->url
+                ];
+
+                $edit_templates[] = $template;
+                $edit_templates_index++;
+            }
+
+            $edit_templates_styles = $json->edit_templates->styles ?? "";
+            if ($edit_templates_styles)
+                $edit_templates_styles = "/storage/{$edit_map_alias}/edit_templates/" . $edit_templates_styles;
+        }
+
+
+        // конец анализа json-конфига
+
 
         $template_data = array(
             'id_region'         =>  $edit_region_id,
@@ -50,6 +88,9 @@ switch ($edit_what) {
 
             'is_logged_user'    =>  $userinfo['email'],
             'is_logged_user_ip' =>  $userinfo['ip'],
+
+            // 'edit_templates'   =>  $edit_templates,
+            'edit_templates_styles' => $edit_templates_styles,
 
             // copyright
             'copyright'         =>  LMEConfig::get_mainconfig()->get('copyright/title'),

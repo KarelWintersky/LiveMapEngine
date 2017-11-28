@@ -42,22 +42,18 @@
             },
             paste_as_text       : true,
 
-            // templates
-            templates           : [
+            templates           : [{?*$edit_templates*}{%*$edit_templates*}
                 {
-                    title       : 'Подробный шаблон',
-                    description : 'Подробный шаблон',
-                    url         : '/templates/tinymce.templates/tinymce.extended.html'
-                },
-                {
-                    title       : 'Краткий шаблон',
-                    description : 'Краткий шаблон',
-                    url         : '/templates/tinymce.templates//tinymce.planet.html'
-                },
+                    "title"         :   "{*$edit_templates:title*}",
+                    "description"   :   "{*$edit_templates:desc*}",
+                    "url"           :   "{*$edit_templates:url*}"
+                },{*$edit_templates*%}{*$edit_templates*?}
             ],
             template_popup_height   : 400,
             template_popup_width    : 800,
-            content_css         : '/frontend/edit.region.tinymce_templates.css'
+{?*edit_templates_styles*}
+            content_css         : "{*edit_templates_styles*}"
+{*edit_templates_styles*?}
         };
         // add markdown and simple configs
 
