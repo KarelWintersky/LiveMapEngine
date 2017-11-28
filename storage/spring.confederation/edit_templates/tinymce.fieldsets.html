@@ -1,8 +1,5 @@
 <div class="mceTmpl">
-    <h2 style="color: #0000FF" title="Название">Название</h2>
-
-    <br/>
-    <fieldset class="">
+    <fieldset id="abstract">
         <legend>Краткая сводка</legend>
         <div>
             ...
@@ -15,10 +12,13 @@
         <tbody align="center" style="text-align: center; font-size: large">
         <tr>
             <td>Население</td>
-            <td colspan="2"  align="left"><span style="color: #00a1ff" id="summary-population">???</span> млн. человек</td>
+            <td colspan="2"  align="left">
+                <font size="3" style="color: #00a1ff" id="summary-population">??? млн. человек</font>
             <td>КЖП
                 <br/><small>Life Support Index</small></td>
-            <td><span id="summary-lsi">???</span></td>
+            <td>
+                <font size="4" id="summary-lsi"></font>
+            </td>
         </tr>
         <tr>
             <td rowspan="2" align="center">&nbsp;</td>
@@ -63,7 +63,8 @@
     <fieldset id="stock-assets">
         <legend>Представители капитала</legend>
         <div>
-            ...
+            <br/>
+
             <fieldset id="stock-assets-nature">
                 <legend>Природный капитал</legend>
                 <ul>
@@ -104,6 +105,16 @@
 
             <br/>
 
+            <fieldset id="stock-assets-founder">
+                <legend>Старые семьи (семьи-основатели)</legend>
+                <ul>
+                    <li>...</li>
+                    <li>...</li>
+                </ul>
+            </fieldset>
+
+            <br/>
+
         </div>
     </fieldset>
 
@@ -115,22 +126,19 @@
             <br/>
             <fieldset id="external-commerce-export">
                 <legend>Экспорт</legend>
-                <br/>
                 <ul>
                     <li>...</li>
                     <li>...</li>
                 </ul>
-                <br/>
             </fieldset>
             <fieldset id="external-commerce-import">
                 <legend>Импорт</legend>
-                <br/>
                 <ul>
                     <li>...</li>
                     <li>...</li>
                 </ul>
-                <br/>
             </fieldset>
+            <br/>
         </div>
     </fieldset>
 
@@ -199,11 +207,23 @@
 
     <br/>
 
+    <fieldset id="persons">
+        <legend>Известные личности</legend>
+        <br/>
+        <ul>
+            <li>...</li>
+            <li>...</li>
+        </ul>
+        <br/>
+    </fieldset>
+
+    <br/>
+
+
     <fieldset id="old-content">
         <legend>Из старых документов</legend>
         <br/>
         <div>
-            ....
             ....
         </div>
     </fieldset>
