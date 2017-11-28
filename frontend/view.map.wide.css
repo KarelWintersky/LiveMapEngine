@@ -48,7 +48,7 @@ button {
     text-align: left;
     color: #000000;
     max-height: 400px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .section-regions-content ul {
     padding-left: 25px;
@@ -78,7 +78,7 @@ button {
     max-width: 800px;
     max-height: 600px;
 
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .invisible {

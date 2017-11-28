@@ -14,7 +14,11 @@ $valid_view_modes = array(
 );
 
 $alias_map  = $_GET['alias'] ?? NULL;
-$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, 'wide:infobox>regionbox');
+
+$viewmode = 'wide:infobox>regionbox'; // default view mode
+
+$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
+$viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
 
 $map = new MapRender( $alias_map );
 $map_found = $map->run( $viewmode );

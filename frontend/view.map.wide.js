@@ -1,3 +1,5 @@
+var current_infobox_region_id = '';
+
 showContentColorbox = function(id_region , title) {
     let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     $.get( url, function() {
