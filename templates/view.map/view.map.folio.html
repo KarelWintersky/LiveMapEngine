@@ -19,10 +19,6 @@
             margin:0px;
         }
 
-        #map {
-            cursor: crosshair;
-        }
-
         /* === Section Backward === */
         .section-backward-viewbox {
             padding: 8px 8px;
@@ -57,7 +53,7 @@
     </style>
 </head>
 <body>
-<div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+<div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map" style="{*viewport_cursor*}"></div>
 
 <section id="section-backward" class="invisible section-backward-viewbox">
     <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&gt;</button>

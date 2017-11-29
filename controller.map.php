@@ -33,7 +33,7 @@ if (!empty($json->viewport->viewmode))
 $viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
 $viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
 
-$map = new MapRender( $alias_map );
+$map = new MapRender( $alias_map, $json );
 $map_found = $map->run( $viewmode );
 $content = $map->content();
 echo $content;

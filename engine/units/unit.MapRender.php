@@ -6,6 +6,17 @@
 class MapRender extends UnitPrototype
 {
     /**
+     * Возможные типы курсоров
+     * @var array
+     */
+    private $allowed_cursors = [
+        'auto', 'default', 'none', 'context-menu', 'help', 'pointer', 'progress', 'wait', 'cell', 'crosshair',
+        'text', 'vertical-text', 'alias', 'copy', 'move', 'no-drop', 'not-allowed', 'all-scroll', 'col-resize',
+        'row-resize', 'n-resize', 's-resize', 'e-resize', 'w-resize', 'ns-resize', 'ew-resize', 'ne-resize',
+        'nw-resize', 'se-resize', 'sw-resize', 'nesw-resize', 'nwse-resize'
+    ];
+
+    /**
      * @var Template $template
      */
     private $template;
@@ -164,8 +175,25 @@ class MapRender extends UnitPrototype
             }
         }
 
+        $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
+
         $this->template->set('html_callback', '/');
         return true;
+    }
+
+    private function viewport_get_map_cursor()
+    {
+        $cursor_style = '';
+        if (!empty($this->map_config->viewport->cursor)) {
+
+            $cursor_style
+                = in_array($this->map_config->viewport->cursor, $this->allowed_cursors)
+                ?  $this->map_config->viewport->cursor
+                : 'pointer';
+            $cursor_style = " cursor:{$cursor_style}; ";
+        }
+
+        return $cursor_style;
     }
 
     /**

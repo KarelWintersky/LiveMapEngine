@@ -50,8 +50,9 @@ function filter_array_for_allowed($input_array, $required_key, $allowed_values, 
     return
         array_key_exists($required_key, $input_array)
             ? (
-        in_array($input_array[ $required_key ], $allowed_values) ? $input_array[ $required_key ] : $default_value
-        ) : $default_value;
+                in_array($input_array[ $required_key ], $allowed_values) ? $input_array[ $required_key ] : $default_value
+              )
+            : $default_value;
 }
 
 
