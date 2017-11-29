@@ -14,9 +14,16 @@ class MapRender extends UnitPrototype
     private $template_file = '';
     private $template_path = '';
 
-    public function __construct($map_alias)
+    /**
+     * json map config
+     * @json null
+     */
+    private $map_config;
+
+    public function __construct($map_alias, $map_config = null)
     {
         $this->map_alias = $map_alias;
+        $this->map_config = $map_config;
 
         $this->template_file = '';
         $this->template_path = '$/templates/view.map';
@@ -64,7 +71,6 @@ class MapRender extends UnitPrototype
     private function makemap_folio()
     {
         $this->template_file = 'view.map.folio.html';
-
     }
 
     private function makemap_tabled_colorbox()

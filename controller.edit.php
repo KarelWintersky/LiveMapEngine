@@ -38,7 +38,7 @@ switch ($edit_what) {
         // и это должно быть в модели!
         $filename = PATH_STORAGE . $edit_map_alias . '/index.json';
         if (!is_file($filename)) {
-            die('Incorrect path: ' . PATH_STORAGE . $this->map_alias);
+            die('Incorrect path: ' . PATH_STORAGE . $edit_map_alias);
         }
 
         $json = json_decode( file_get_contents( $filename ) );

@@ -19,18 +19,9 @@
             margin:0px;
         }
 
-        /*html, body {
-            width: calc(100% - 10px);
-            height: calc(100% - 10px);
-            background: white;
-            margin: 5px;
-            padding: 0;
-        }
         #map {
-            height: 90%;
-            border: 1px solid navy;
-            margin: 2em;
-        }*/
+            cursor: crosshair;
+        }
 
         /* === Section Backward === */
         .section-backward-viewbox {
@@ -67,6 +58,7 @@
 </head>
 <body>
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+
 <section id="section-backward" class="invisible section-backward-viewbox">
     <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&gt;</button>
     <span id="section-backward-content" class="invisible section-backward-content">
@@ -180,6 +172,10 @@
             $('#' + data).toggle();
             $(this).data('content-is-visible', !state);
         });
+    });
+
+    map.on('click', function(ev) {
+        console.log(ev); // ev is an event object (MouseEvent in this case)
     });
 
 
