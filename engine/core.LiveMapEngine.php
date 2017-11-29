@@ -125,7 +125,8 @@ SELECT
   table_data.edit_date AS edit_date,
   table_users.username AS edit_name,
   INET_NTOA(`edit_ipv4`) AS ipv4,
-  title
+  title,
+  table_data.edit_comment AS edit_comment
 FROM
   {$table_data} AS table_data,
   {$table_users} AS table_users
@@ -147,6 +148,7 @@ ORDER BY edit_date ;
             $all_revisions = FALSE;
         }
         return $all_revisions;
+
 
     }
 

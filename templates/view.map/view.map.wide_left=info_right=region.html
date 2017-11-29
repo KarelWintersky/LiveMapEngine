@@ -54,7 +54,8 @@
         </ul>
 
         <ul class="map-regions invisible" id="data-ordered-latest">
-            {%*map_regions_order_by_date*}<li><small>({*map_regions_order_by_date:edit_date*})</small><br/> <a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_date:id_region*}]" data-region-id="{*map_regions_order_by_date:id_region*}">{*map_regions_order_by_date:title*}</a></li>
+            {%*map_regions_order_by_date*}<li><a class="action-focus-at-region" href="#focus=[{*map_regions_order_by_date:id_region*}]" data-region-id="{*map_regions_order_by_date:id_region*}">{*map_regions_order_by_date:title*}</a>
+            <br/><small>({*map_regions_order_by_date:edit_date*})</small></li>
             {*map_regions_order_by_date*%}
         </ul>
 
