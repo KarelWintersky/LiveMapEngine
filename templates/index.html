@@ -3,49 +3,71 @@
 <head>
     <title>Живые карты</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+        html, body { height:                 100% }
+        html, body {        margin:                 0 }
+        table {             margin:                 0 auto }
+    </style>
 </head>
 <body>
-{?*is_logged*}
-<h2>Статус</h2>
-Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}
-{*is_logged*?}
-<h2>Действия</h2>
+<table width="100%" border="0">
+    <tr>
+        <td colspan="2" align="center">
+            <h2>
+                Здравствуйте, вы попали на главную страницу проекта "Живые карты".
+            </h2>
+        </td>
+    </tr>
+    <tr valign="top">
+        <td width="70%" align="left">
+            <iframe src="http://livemap.wintersky.ru/map/livemap.sandbox?viewmode=iframe" width="100%" height="500px" scrolling="no" frameborder="1">
+            </iframe>
+        </td>
+        <td colspan="2" style="padding: 1em;">
+            <h2>Какие есть карты?</h2>
+            <div style="overflow-y: auto; max-height: 100%">
+                {*content_maps*}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <small style="float: left">{?*is_logged*}Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}{*is_logged*?}</small>
 
-<ul>
-    {?!*is_logged*}
-    <li>
-        <a href="/auth/login">Вход в систему</a>
-    </li>
-    <li>
-        <a href="/auth/register">Регистрация в системе</a>
-    </li>
-    <li>
-        <a href="/auth/recover">Напомнить пароль</a>
-    </li>
-    {?*autoactivation*}
-    <li>
-        <a href="/auth/activateaccount">Перейти к активации аккаунта</a>
-    </li>
-    {*autoactivation*?}
-    <li>
-        <a href="/auth/resetpassword">Перейти к вводу ключа восстановления аккаунта</a>
-    </li>
-    {*is_logged*?!}
+            <h3>Что тут можно сделать?</h3>
+            <ul>
+                {?!*is_logged*}
+                <li>
+                    <a href="/auth/login">Вход в систему</a>
+                </li>
+                <li>
+                    <a href="/auth/register">Регистрация в системе</a>
+                </li>
+                <li>
+                    <a href="/auth/recover">Напомнить пароль</a>
+                </li>
+                {?!*autoactivation*}
+                <li>
+                    <a href="/auth/activateaccount">Перейти к активации аккаунта</a>
+                </li>
+                {?}
+                <li>
+                    <a href="/auth/resetpassword">Перейти к вводу ключа восстановления аккаунта</a>
+                </li>
+                {?}
 
-    {?*is_logged*}
-    <li>
-        <a href="/auth/profile">Настройки аккаунта</a>
-    </li>
-    <li>
-        <a href="/auth/logout">Выход (логаут)</a>
-    </li>
-    {*is_logged*?}
-</ul>
-
-<h2>А это просто список карт... </h2>
-{*content_maps*}
-
-
+                {?*is_logged*}
+                <li>
+                    <a href="/auth/profile">Настройки аккаунта</a>
+                </li>
+                <li>
+                    <a href="/auth/logout">Выход (логаут)</a>
+                </li>
+                {?}
+            </ul>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>

@@ -47,7 +47,10 @@ button {
     font-size: 140%;
     text-align: left;
     color: #000000;
-    max-height: 400px;
+
+    max-height: 66vh;
+    max-width: 45vw;
+
     overflow-y: auto;
 }
 .section-regions-content ul {
@@ -74,10 +77,8 @@ button {
     text-align: left;
     color: #000000;
 
-    min-width: 600px;
-    max-width: 800px;
-    max-height: 600px;
-
+    max-height: 65vh;
+    max-width: 45vw;
     overflow-y: auto;
 }
 
