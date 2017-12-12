@@ -24,16 +24,16 @@ if (!is_file($filename)) {
     die('Incorrect path: ' . PATH_STORAGE . $alias_map);
 }
 
-$json = json_decode( file_get_contents( $filename ) );
+$json_config = json_decode( file_get_contents( $filename ) );
 
-if (!empty($json->viewport->viewmode))
-    $viewmode = $json->viewport->viewmode;
+if (!empty($json_config->viewport->viewmode))
+    $viewmode = $json_config->viewport->viewmode;
 
 // перекрываем его из $_GET
 $viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
 $viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
 
-$map = new MapRender( $alias_map, $json );
+$map = new MapRender( $alias_map, $json_config );
 $map_found = $map->run( $viewmode );
 $content = $map->content();
 echo $content;

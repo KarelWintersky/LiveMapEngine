@@ -93,7 +93,6 @@
                     data        : $(this).serialize(),
                     beforeSend  : function(){
                         saving_in_progress = true;
-                        $("#ajax-spinner").show();
                         $("#ajax-process").show();
                         // disable buttons
                         $("#actor-submit").prop('disabled', true);
@@ -154,8 +153,10 @@
     <fieldset>
         <div class="label_fullwidth">
             <button type="submit" id="actor-submit" tabindex="4">Сохранить</button>
-            <span id="ajax-process" style="display: none">Сохраняю... &nbsp;</span>
-            <img id="ajax-spinner" style="display: none" src="/frontend/spinners/21.svg" height="18"/>
+            <span id="ajax-process" style="display: none">
+                Сохраняю... &nbsp;
+                <img src="/frontend/spinners/21.svg" height="18"/>
+            </span>
             <span id="ajax-result" style="display: none;">Сохранение успешно! Через несколько секунд возвращаемся на карту.</span>
             <button type="button" id="actor-back" style="float:right" tabindex="5">Назад на карту</button>
         </div>
@@ -167,7 +168,10 @@
     <ul>
         {%*region_revisions*}
         <li>
-            {*region_revisions:edit_name*} edited `{*region_revisions:title*}` at {*region_revisions:edit_date*} from IP {*region_revisions:ipv4*} <small>{*region_revisions:edit_comment*}</small>
+            {*region_revisions:edit_name*} edited `{*region_revisions:title*}` at {*region_revisions:edit_date*} from IP {*region_revisions:ipv4*}
+            {?*region_revisions:edit_comment*}
+            <small>{*region_revisions:edit_comment*}</small>
+            {?}
         </li>
         {*region_revisions*%}
     </ul>

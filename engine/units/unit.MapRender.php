@@ -31,10 +31,10 @@ class MapRender extends UnitPrototype
      */
     private $map_config;
 
-    public function __construct($map_alias, $map_config = null)
+    public function __construct($map_alias, $json_config = null)
     {
         $this->map_alias = $map_alias;
-        $this->map_config = $map_config;
+        $this->map_config = $json_config;
 
         $this->template_file = '';
         $this->template_path = '$/templates/view.map';
@@ -65,7 +65,6 @@ class MapRender extends UnitPrototype
         $map_info = $lm_engine->getMapInfo( $this->map_alias );
 
         $this->template->set('/', array(
-            // 'target'                        =>  filter_array_for_allowed($_GET, 'target', array('iframe', 'tiddlywiki'), FALSE),
             'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
@@ -176,6 +175,10 @@ class MapRender extends UnitPrototype
         }
 
         $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
+
+        if (!empty($this->map_config->viewport->custom_css)) {
+            $this->template->set('custom_css_style', "/storage/{$this->map_alias}/styles/" . $this->map_config->viewport->custom_css);
+        }
 
         $this->template->set('html_callback', '/');
         return true;

@@ -266,6 +266,21 @@ $(function(){
         $(must_display).show();
     });
 
+    // zoom control (а если сектора нет?)
+    map.on('zoomend', function() {
+        var currentZoom = map.getZoom();
+        console.log("Current zoom: " + currentZoom);
+        /*if (sector == null) return;
+
+        if (currentZoom < sector_options.zoom_threshold) {
+            group.clearLayers();
+            // map.removeLayer(sector);
+        } else {
+            group.addLayer( sector );
+            // map.addLayer(sector);
+        }*/
+    });
+
 
 });
 
