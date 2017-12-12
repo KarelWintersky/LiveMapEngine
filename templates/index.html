@@ -10,6 +10,7 @@
     </style>
 </head>
 <body>
+<small style="float: right">{?*is_logged*}Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}{*is_logged*?}</small>
 <table width="100%" border="0">
     <tr>
         <td colspan="2" align="center">
@@ -32,8 +33,6 @@
     </tr>
     <tr>
         <td colspan="2">
-            <small style="float: left">{?*is_logged*}Logged as: <strong>{*is_logged_user*}</strong> from {*is_logged_user_ip*}{*is_logged*?}</small>
-
             <h3>Что тут можно сделать?</h3>
             <ul>
                 {?!*is_logged*}
