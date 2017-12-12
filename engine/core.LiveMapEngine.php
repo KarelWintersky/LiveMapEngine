@@ -11,10 +11,35 @@ class LiveMapEngine
     /**
      * @param DBConnectionLite $dbi
      */
-    public function __construct(\DBConnectionLite $dbi)
-    {
+    public function __construct(\DBConnectionLite $dbi) {
         $this->dbi = $dbi;
         $this->table_prefix = $dbi->get_table_prefix();
+    }
+
+
+    /**
+     * Простая проверка роли
+     * ВАЖНО: пользователь с идентификатором 1 может ВСЁ ВСЕГДА
+     *
+     * @param $user_id
+     * @param $map_alias
+     * @param string $role
+     * @return bool
+     */
+    public function checkACL_Role($user_id, $map_alias, $role = 'edit') {
+
+        if ($user_id == 1) return true; //@todo: HARDCODE, userid 1 can EVERYTHING
+
+        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/settings_acl');
+
+        $query = "
+        SELECT `{$role}` FROM {$table} WHERE `user_id` = {$user_id} AND `map_alias` = '{$map_alias}'
+        ";
+
+        return
+            ($this->dbi->getconnection()->query($query)->fetchColumn() == 'Y')
+            ? true
+            : false;
     }
 
     /**
@@ -24,8 +49,7 @@ class LiveMapEngine
      * @param $map_alias
      * @return array
      */
-    public function getRegionsWithInfo($map_alias)
-    {
+    public function getRegionsWithInfo($map_alias) {
         $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
         $query = "
     SELECT `id_region`, `title`, `edit_date` FROM
@@ -54,8 +78,7 @@ class LiveMapEngine
      * @param $regions_array
      * @return string
      */
-    public function convertRegionsWithInfo_to_IDs_String($regions_array)
-    {
+    public function convertRegionsWithInfo_to_IDs_String($regions_array) {
         return implode(", ", array_map(function($item){
             return "'" . $item['id_region'] . "'";
         }, $regions_array));
@@ -67,8 +90,7 @@ class LiveMapEngine
      * @param $id_region
      * @return array
      */
-    public function getMapRegionData($map_alias, $id_region)
-    {
+    public function getMapRegionData($map_alias, $id_region) {
         $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
 
         try {
@@ -115,8 +137,7 @@ class LiveMapEngine
      * @param $id_region
      * @return array|bool
      */
-    public function getRegionRevisions($map_alias, $id_region)
-    {
+    public function getRegionRevisions($map_alias, $id_region) {
         $table_data     = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
         $table_users    = LMEConfig::get_authconfig()->table_users;
         $query = "
@@ -153,8 +174,7 @@ ORDER BY edit_date ;
     }
 
 
-    public function getTileRevisions( $alias_map, $id_region )
-    {
+    public function getTileRevisions( $alias_map, $id_region ) {
 
     }
 
@@ -164,8 +184,7 @@ ORDER BY edit_date ;
      * @param $region_data
      * @return array
      */
-    public function storeMapRegionData($region_data)
-    {
+    public function storeMapRegionData($region_data) {
         $success = array(
             'state'     =>  FALSE,
             'message'   =>  ''
@@ -205,8 +224,7 @@ ORDER BY edit_date ;
      * Полная копия приватного метода класса PHPAuth. Отдает айпишник.
      * @return mixed
      */
-    public function getIP()
-    {
+    public function getIP() {
         if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
@@ -216,8 +234,7 @@ ORDER BY edit_date ;
 
     //@todo: тайтл карты и настройки мы должны брать из таблицы settings_map
     // но сейчас она не заполняется никак и все данные берутся из json-файла настроек или SVG-файла разметки
-    public function getMapInfo($map_alias)
-    {
+    public function getMapInfo($map_alias) {
         return null;
     }
 

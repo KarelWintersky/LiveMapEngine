@@ -1,5 +1,5 @@
 showContentColorbox = function(id_region , title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region + is_iframe;
     $.get( url, function() {
     }).done(function(data) {
         $.colorbox({
@@ -15,6 +15,7 @@ showContentColorbox = function(id_region , title) {
 }
 
 var polymap = Object.create(null);
+var is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
 
 // build polygons
 Object.keys( theMap.regions ).forEach(function( key ){

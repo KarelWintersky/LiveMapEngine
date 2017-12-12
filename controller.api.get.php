@@ -36,9 +36,16 @@ switch ($_GET['source']) {
         $template  = $_GET['resultType'] ?? 'html';
 
         $region_data = $lm_engine->getMapRegionData( $map_alias , $id_region );
+
         $is_logged = LMEConfig::get_auth()->isLogged();
 
-        // проверка прав на редактирование
+        $can_edit = false;
+        if ($is_logged) {
+            $user_id = LMEConfig::get_auth()->getCurrentUID();
+
+            $can_edit = $lm_engine->checkACL_Role($user_id, $map_alias, 'edit');
+        }
+        //
 
         $TEMPLATE_DATA = array(
             'is_present'        =>  $region_data['is_present'],
@@ -46,11 +53,19 @@ switch ($_GET['source']) {
             'region_id'         =>  $id_region,
             'region_title'      =>  $region_data['title'],
             'region_text'       =>  $region_data['content'],
-            'islogged'          =>  LMEConfig::get_auth()->isLogged()
+            'can_edit'          =>  $can_edit
         );
         $TEMPLATE_PATH = PATH_TEMPLATES . 'view.region/';
 
         switch ($template) {
+            case 'iframe': {
+                $render_type = 'text';
+                $template_file = 'view.region.iframe.html';
+
+                $content = websun_parse_template_path($TEMPLATE_DATA, $template_file, $TEMPLATE_PATH);
+                break;
+            }
+
             case 'json' : {
                 $render_type = 'json';
                 $template_file = 'view.region.json.html';

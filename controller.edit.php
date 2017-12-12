@@ -13,7 +13,6 @@ if (! $auth->isLogged() ) {
 }
 $userinfo = $auth->getCurrentSessionInfo();
 
-
 $edit_what = $_GET['editwhat'] ?? NULL;
 switch ($edit_what) {
     case 'region': {
@@ -23,12 +22,17 @@ switch ($edit_what) {
         if (! ($edit_map_alias && $edit_region_id)) break; // эта проверка должна делаться в роутере
 
         // проверяем права редактирования
-        // LiveMapEngine->checkACL( $auth->getCurrentUID(),  $edit_map_alias) // должно быть editor или owner
+        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
+        $user_id = $userinfo['uid'];
+        $can_edit = $lm_engine->checkACL_Role($user_id, $edit_map_alias, 'edit');
+
+        if (!$can_edit) {
+            die('Hacking attempt!');
+        }
 
         setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_filemanager_storage_path'), $edit_map_alias, 0, '/'); // see original livemap
         setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_filemanager_current_map'), $edit_map_alias, 0, '/');
-
-        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
         // $map_data    = $lm_engine->getMapData( $edit_map_alias );
 

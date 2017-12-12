@@ -30,6 +30,7 @@ toggleContentViewBox = function(id_region, title) {
     } else {
         current_infobox_region_id = id_region;
         $("#section-info-content").html('');
+        document.getElementById('section-info-content').scrollTop = 0; // scroll box to top
 
         $.ajax({
             url: url,
