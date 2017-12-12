@@ -8,7 +8,7 @@ if (version_compare(phpversion(), '7.0', '<')) {
 }
 
 // defines
-define('PATH_CONFIG',   __ROOT__ . '/engine/.config/');
+define('PATH_CONFIG',   __ROOT__ . '/.config/');
 define('PATH_ENGINE',   __ROOT__ . '/engine/');
 define('PATH_FRONTEND', __ROOT__ . '/frontend/');
 define('PATH_TEMPLATES',__ROOT__ . '/templates/');
