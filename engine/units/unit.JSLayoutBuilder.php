@@ -20,7 +20,7 @@ class JSLayoutBuilder extends UnitPrototype {
         $this->map_alias = $map_alias;
         $this->map_source = $mode;
 
-        $this->template_file = 'viewmap.new-jslayout.js';
+        $this->template_file = 'viewmap.jslayout.js';
         $this->template_path = '$/templates';
     }
 
@@ -57,34 +57,36 @@ class JSLayoutBuilder extends UnitPrototype {
                 if ($json->type == "vector") {
                     die('Declared vectorized image-layer, but image definition not found in file ' . $filename);
                 } else {
-                    $image_data = NULL;
+                    $image_info = NULL;
                 }
             }
 
             // имена слоёв мы тоже можем получить от пользователя
-            if (empty($json->layout->file)) return;
+            if (!empty($json->layout)) {
+                $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
 
-            $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
-            $svg_content  = file_get_contents( $svg_filename );
+                $svg_content  = file_get_contents( $svg_filename );
 
-            // создаем инсанс парсера, передаем SVG-контент файла
-            $sp = new SVGParser( $svg_content );
+                // создаем инсанс парсера, передаем SVG-контент файла
+                $sp = new SVGParser( $svg_content );
 
-            $layer_name = "Image";
-            $sp->parseImages( $layer_name );
+                $layer_name = "Image";
+                $sp->parseImages( $layer_name );
 
-            if ($json->type === "bitmap" && $sp->getImagesCount()) {
-                $image_info = $sp->getImageInfo();
-                $sp->setTranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
-            } else {
-                $sp->setTranslateOptions( 0, 0, $image_info['height'] );
-            }
+                if ($json->type === "bitmap" && $sp->getImagesCount()) {
+                    $image_info = $sp->getImageInfo();
+                    $sp->setTranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
+                } else {
+                    $sp->setTranslateOptions( 0, 0, $image_info['height'] );
+                }
 
-            $sp->parseLayer("Paths");
+                $sp->parseLayer("Paths");
 
-            $paths_data = $sp->getElementsAll();
+                $paths_data = $sp->getElementsAll();
 
-            $regions_for_js = $sp->exportSPaths( $paths_data );
+                $regions_for_js = $sp->exportSPaths( $paths_data );
+            };
+
 
             // теперь генерируем подстановочные значения для шаблона
             $this->template = new Template($this->template_file, $this->template_path);

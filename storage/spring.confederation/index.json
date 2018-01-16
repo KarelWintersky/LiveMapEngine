@@ -13,6 +13,10 @@
     "ox"    : 0,
     "oy"    : 0
   },
+  "layout": {
+    "file"   : "layout.svg",
+    "layers" : [ "Paths" ]
+  },
   "regiondefaults" : {
     "color"       : "#ffffff",
     "width"       : 0,

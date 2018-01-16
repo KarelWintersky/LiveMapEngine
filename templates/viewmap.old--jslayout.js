@@ -24,7 +24,7 @@ var theMap = {
         'width'                 :   '80%',
         'height'                :   '80%'
     },
-    "regions": {
-        {*map.regions_list*}
+    regions: {
+{*map.regions_list*}
     }
 };

@@ -51,7 +51,7 @@
                 <ul class="list-unstyled" id="pageActionsSubmenu">
                     {?!*is_logged*}
                     <li>
-                        <a old-href="/auth/login" id="actor-auth" href="#">Вход</a>
+                        <a id="actor-auth" href="#">Вход</a>
                     </li>
                     <li>
                         <a href="/auth/register">Регистрация</a>
@@ -74,7 +74,7 @@
                         <a href="/auth/profile">Настройки аккаунта</a>
                     </li>
                     <li>
-                        <a href="/auth/logout">Выход (логаут)</a>
+                        <a id="actor-auth" old-href="/auth/logout">Выход</a>
                     </li>
                     {?}
                 </ul>

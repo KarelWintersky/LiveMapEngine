@@ -1,0 +1,32 @@
+{
+  "maps": [
+    {
+      "alias" : "livemap.sandbox",
+      "title": "Песочница"
+    },
+    {
+      "alias" : "pattern.earth",
+      "title" : "Earth: Before Ascension"
+    },
+    {
+      "alias" : "studio101.deadland",
+      "title" : "Дикий Запад (Deadlands)"
+    },
+    {
+      "alias" : "spring.confederation",
+      "title" : "Мир Источника: Конфедерация"
+    },
+    {
+      "alias" : "winterland.norrastaden",
+      "title" : "Уинтерленд: Норрастаден"
+    },
+    {
+      "alias" : "winterland.westfjord",
+      "title" : "Уинтерленд: Вестфьорд"
+    },
+    {
+      "alias" : "pony",
+      "title" : "Поняши"
+    }
+  ]
+}

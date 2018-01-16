@@ -10,19 +10,6 @@ $content = '';
 $render_type = 'raw'; // == text (сырые данные без обработки)
 
 switch ($_GET['source']) {
-    case 'jslayout' : {
-        require_once (__ROOT__ . '/engine/units/unit.JSLayoutGenerator.php');
-
-        $map_alias = $_GET['map'] ?? NULL;
-        $map_source = $_GET['datasrc'] ?? 'file';
-
-        $js = new JSLayoutGenerator( $map_alias, $map_source );
-        $js->run();
-        $content = $js->content();
-
-        break;
-    }
-
     case 'regiondata': {
         // require_once(__ROOT__ . '/engine/units/unit.MapRegionsManage.php');
         // $mrm = new MapRegionsManage( $map_alias );

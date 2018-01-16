@@ -57,6 +57,29 @@ switch ($_GET['action']) {
         $template_file = '*json';
         break;
     }
+    case 'ajax:logout': {
+        if ($auth->isLogged()) {
+
+            $session_hash = $auth->getSessionHash();
+
+            $auth_result = $auth->logout($session_hash);
+
+            if ($auth_result) {
+                unsetcookie( LMEConfig::get_authconfig()->__get('cookie_name') );
+                setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_last_logged_user') , $userinfo['email']);
+                $template_data['error_messages'] = 'Мы успешно вышли из системы.';
+                $html_callback = '/';
+            } else {
+                $template_data['error_messages'] = 'UNKNOWN Error while logging out!';
+            }
+        } else {
+            // we are not logged!
+            $template_data['error_messages'] = 'We are not logged in!!!';
+        }
+        redirect('/');
+        $template_file = '*json';
+        break;
+    }
 
 
     //+ форма входа
