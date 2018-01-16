@@ -14,6 +14,49 @@ $template_file = '';
 $template_data = array();
 
 switch ($_GET['action']) {
+    case 'loginform': {
+        $template_file = 'auth/form.auth.ajax.html';
+
+        $is_logged = $auth->isLogged();
+        if ($is_logged) {
+            $userinfo = $auth->getCurrentSessionInfo();
+            $template_data = array_merge($template_data, array(
+                'is_logged'             =>  $is_logged,
+                'is_logged_user'        =>  $userinfo['email'],
+                'is_logged_user_ip'     =>  $userinfo['ip']
+            ));
+        }
+
+        break;
+    }
+    case 'ajax:login': {
+        $auth_result = $auth->login(
+            $_POST["auth:data:login"],
+            $_POST["auth:data:password"],
+            at($_POST, "auth:data:remember_me", 0) );
+
+        $template_data['error'] = $auth_result['error'];
+
+        if (!$auth_result['error']) {
+            setcookie(LMEConfig::get_authconfig()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
+            unsetcookie('kw_livemap_new_registred_username');
+            $html_callback = '/';
+        } else {
+            $html_callback = '/auth/login';
+        }
+
+        if (!$auth_result['error']) {
+            // no errors
+            $html_callback = '/';
+            $template_data['error_messages'] = "Login successful";
+        } else {
+            $template_data['error_messages'] = "Login error: " . $auth_result['message'];
+            $html_callback = '/login';
+        }
+
+        $template_file = '*json';
+        break;
+    }
 
 
     //+ форма входа
@@ -204,7 +247,15 @@ switch ($_GET['action']) {
 
 } // switch
 
-$html = websun_parse_template_path($template_data, $template_file, '$/templates');
+if ($template_file === '*json') {
+    $html = json_encode($template_data);
+} elseif ($template_file !== '') {
+    $html = websun_parse_template_path($template_data, $template_file, PATH_TEMPLATES);
+} else {
+    $html = '';
+}
+
+// $html = websun_parse_template_path($template_data, $template_file, '$/templates');
 
 echo $html;
  

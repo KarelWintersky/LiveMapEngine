@@ -43,6 +43,7 @@ var map = L.map('map', {
     renderer: L.canvas(),
 });
 map.attributionControl.setPrefix('');
+map.scrollWheelZoom.disable();
 
 var h = theMap['map']['height'];
 var w = theMap['map']['width'];

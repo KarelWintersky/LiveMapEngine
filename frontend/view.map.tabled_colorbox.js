@@ -41,6 +41,7 @@ var map = L.map('map', {
     preferCanvas: true,
     renderer: L.canvas(),
 });
+map.scrollWheelZoom.disable();
 map.attributionControl.setPrefix('');
 
 var h = theMap['map']['height'];

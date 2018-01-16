@@ -10,16 +10,6 @@ class MapsListRender extends UnitPrototype {
 
     public function run( )
     {
-        // читаем список каталогов в /storage и оформляем это как список
-        /*$dir = scandir(PATH_STORAGE);
-        unset($dir[ array_search('.', $dir)]);
-        unset($dir[ array_search('..', $dir)]);
-        unset($dir[ array_search('template.json', $dir)]);*/
-
-        // теперь обходим подкаталоги, в каждом ищем index.json
-
-        // ищем файл list.json, если не находим - обходим каталоги
-
         $maps_list = [];
 
         $filename = PATH_STORAGE . '/list.json';
@@ -63,8 +53,9 @@ class MapsListRender extends UnitPrototype {
             }
         }
 
-        $this->template = new Template('maps.list.html', '$/templates');
-        $this->template->set('/maps_list', $maps_list);
+        // $this->template = new Template('maps.list.html', '$/templates');
+        // $this->template->set('/maps_list', $maps_list);
+        return $maps_list;
     }
 
     /**
@@ -73,7 +64,5 @@ class MapsListRender extends UnitPrototype {
      */
     public function content()
     {
-        //@todo: 'classic' render check (as prototype)
-        return $this->template->render();
     }
 }
