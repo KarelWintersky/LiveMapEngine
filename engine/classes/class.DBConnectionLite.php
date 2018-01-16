@@ -87,8 +87,6 @@ class DBConnectionLite extends \PDO
 
             $this->pdo_connection = $dbh;
         } catch (\PDOException $e) {
-            echo "\r\nPDO CONNECTION ERROR: " . $e->getMessage() . "\r\n";
-
             $this->connect_error = "Database connection error!: " . $e->getMessage() . "<br/>";
             $this->pdo_connection = null;
             return false;
@@ -108,6 +106,16 @@ class DBConnectionLite extends \PDO
     public function getconnection()
     {
         return $this->pdo_connection;
+    }
+
+    public function connection()
+    {
+        return $this->pdo_connection;
+    }
+
+    public function status()
+    {
+        return $this->connect_error;
     }
 
     /**

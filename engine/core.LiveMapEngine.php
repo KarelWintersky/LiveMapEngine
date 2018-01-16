@@ -36,10 +36,9 @@ class LiveMapEngine
         SELECT `{$role}` FROM {$table} WHERE `user_id` = {$user_id} AND `map_alias` = '{$map_alias}'
         ";
 
-        return
-            ($this->dbi->getconnection()->query($query)->fetchColumn() == 'Y')
-            ? true
-            : false;
+        $sth = $this->dbi->getconnection()->query($query);
+
+        return ($sth && $sth->fetchColumn() == 'Y') ? true : false;
     }
 
     /**

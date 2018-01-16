@@ -62,16 +62,9 @@ class MapsListRender extends UnitPrototype {
                 }
             }
         }
-        // for template <li><a href="/map/{*maps_list:^KEY*}">{*maps_list:^KEY:*}</a></li>
-
-        // clear keys
-        $new_maps_list = [];
-        foreach ($maps_list as $map) {
-            $new_maps_list[] = $map;
-        }
 
         $this->template = new Template('maps.list.html', '$/templates');
-        $this->template->set('/maps_list', $new_maps_list);
+        $this->template->set('/maps_list', $maps_list);
     }
 
     /**

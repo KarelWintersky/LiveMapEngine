@@ -11,8 +11,9 @@
  * Class ParseSVG
  */
 class ParseSVG {
+    const VERSION = 1.1;
     /**
-     * Constants for convert_SVGPath_to_Polygon()
+     * Constants for convert_SVGElement_to_Polygon()
      * see : https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSeg
      */
     const PATHSEG_UNDEFINED             = 0;
@@ -136,7 +137,9 @@ class ParseSVG {
             }
 
             // это XPath-определение всех путей на слое
-            $xpath_paths    = '//svg:g[starts-with(@inkscape:label, "' . $name_layer_paths . '")]/svg:path';
+            $xpath_paths    = '//svg:g[starts-with(@inkscape:label, "' . $name_layer_paths . '")]/svg:path'; // только полигоны
+            // $xpath_paths    = '//svg:g[starts-with(@inkscape:label, "' . $name_layer_paths . '")]'; // все возможные объекты
+            // + '/*' - список объектов
         } else {
             $xpath_paths    = '//svg:path';
         }
@@ -596,8 +599,6 @@ class ParseSVG {
             $polygon_original = self::convert_SVGPath_to_Polygon( $path_d );
 
             // транслируем систему координат
-            // $polygon_translated = self::translate_XY_to_CRS_js( $polygon_original, $image_properties['ox'], $image_properties['oy'], $image_properties['height'] );
-
             $polygon_translated = self::translate_polygone_from_XY_to_CRSjs( $polygon_original, $image_properties['ox'], $image_properties['oy'], $image_properties['height'] );
 
             // преобразовываем в JS-строку

@@ -36,6 +36,11 @@ $main_config->append(PATH_CONFIG . 'db.ini');
 LMEConfig::set_mainconfig( $main_config );
 
 $dbi = new DBConnectionLite('livemap', $main_config);
+
+if (!$dbi->connection()) {
+    die($dbi->status());
+}
+
 LMEConfig::set_dbi( $dbi );
 
 // PHPAuth

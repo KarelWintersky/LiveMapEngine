@@ -127,16 +127,22 @@ var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(ma
 
 map.setMaxBounds(max_bounds);
 
+var poly_layer = new L.LayerGroup();
+    poly_layer.addTo(map);
+
 // draw polygons on map, bind on-click function
 Object.keys( polymap ).forEach(function( id_region ) {
-    polymap[ id_region ].addTo(map).on('click', function() {
+    poly_layer.addLayer(
+        polymap[ id_region ].on('click', function(){
 
-        window.location.hash = 'view=[' + id_region + ']';
-        var t = (theMap['regions'][ id_region ]['title'] != '')
-            ? theMap['regions'][ id_region ]['title']
-            : '';
-        toggleContentViewBox(id_region, t);
-    });
+            window.location.hash = 'view=[' + id_region + ']';
+            var t = (theMap['regions'][ id_region ]['title'] != '')
+                ? theMap['regions'][ id_region ]['title']
+                : '';
+
+            toggleContentViewBox(id_region, t);
+        })
+    );
 });
 
 // bind-action-focus-region
@@ -251,7 +257,7 @@ $(function(){
 
     $("#actor-backward-toggle").on('click', function (el){
         var state = $(this).data('content-is-visible');
-        var text = (state == false) ? '&lt;' : '&gt;';
+        var text = (state == false) ? '&lt;' : '&gt;'; //@todo: сообщения на активном/свернутом виде перенести в дата-атрибуты
         $(this).html(text);
 
         var data = $(this).data('content');
