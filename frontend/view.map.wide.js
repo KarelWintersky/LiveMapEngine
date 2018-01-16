@@ -101,7 +101,7 @@ Object.keys( theMap.regions ).forEach(function( key ){
         opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
         fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
         fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,
-        radius: region['radius'] || 0
+        radius: region['radius'] || 10
     };
 
     var entity;

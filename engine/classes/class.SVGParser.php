@@ -70,9 +70,14 @@ class SVGParser {
     public function __construct( $svg_file_content ) {
         libxml_use_internal_errors(true);
 
+        if (!$svg_file_content) {
+            $this->svg_parsing_error = TRUE;
+            return NULL;
+        }
+
         try {
             $this->svg = new \SimpleXMLElement( $svg_file_content );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->svg_parsing_error = array(
                 'state'     =>  NULL,
                 'code'      =>  $e->getCode(),
@@ -82,8 +87,8 @@ class SVGParser {
 
         foreach (self::NAMESPACES as $ns => $definition) {
             try {
-                $this->svg->registerXPathNamespace( $ns, $definition);
-            } catch (Exception $e) {
+                $this->svg->registerXPathNamespace( $ns, $definition );
+            } catch (\Exception $e) {
                 $this->svg_parsing_error = array(
                     'state'     =>  NULL,
                     'code'      =>  $e->getCode(),
@@ -192,16 +197,22 @@ class SVGParser {
     /**
      * Парсит объекты на определенном слое (или по всему файлу)
      * @param $layer_name
+     * @return bool
      */
     public function parseLayer($layer_name) {
         if ($layer_name !== '') {
             // анализируем атрибуты слоя разметки регионов
             $xpath_paths_layer_attrs = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]';
+
+            if (empty($this->svg->xpath($xpath_paths_layer_attrs))) return FALSE;
+
             $paths_layer_attrs = $this->svg->xpath($xpath_paths_layer_attrs)[0];
 
             // получаем сдвиг всех объектов этого слоя
             if (!empty($paths_layer_attrs->attributes()->{'transform'})) {
                 $this->layer_elements_translation = $this->parseTransform( $paths_layer_attrs->attributes()->{'transform'} );
+            } else {
+                $this->layer_elements_translation = NULL;
             }
 
             $xpath_paths    = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]'; // все возможные объекты
@@ -275,6 +286,7 @@ class SVGParser {
 
                 // SVG Path -> Polygon
                 $coords = self::convert_SVGElement_to_Polygon( $element );
+                if (!$coords) return FALSE;
 
                 // сдвиг координат и преобразрвание в CRS-модель
                 $coords = $this->translate_polygon_from_XY_to_CRS( $coords );
@@ -289,10 +301,11 @@ class SVGParser {
                 // кол-во путей 1
                 // кол-во узлов 1
                 $data['type'] = 'circle';
-                $data['radius'] = (float)$element->attributes()->{'r'}; //@todo: existance check
+                $data['radius'] = round((float)$element->attributes()->{'r'}, self::ROUND_PRECISION); //@todo: existance check
 
                 // SVG Path -> Polygon
                 $coords = $this->convert_SVGElement_to_Circle( $element );
+                if (!$coords) return FALSE;
 
                 // сдвиг координат и преобразрвание в CRS-модель
                 $coords = $this->translate_knot_from_XY_to_CRS( $coords );
@@ -308,6 +321,7 @@ class SVGParser {
                 // x, y
                 $data['type'] = 'rect';
                 $coords = $this->convert_SVGElement_to_Rect( $element );
+                if (!$coords) return FALSE;
 
                 $data['coords'][] = [
                     $this->translate_knot_from_XY_to_CRS( $coords[0] ),
@@ -374,17 +388,20 @@ class SVGParser {
 
         foreach ($this->layer_elements->{'path'} as $path) {
             $path_id    = (string)$path->attributes()->{'id'};
-            $all_paths[ $path_id ] = $this->parseAloneElement($path, 'path');
+            $element    = $this->parseAloneElement($path, 'path');
+            if ($element) $all_paths[ $path_id ] = $element;
         }
 
         foreach ($this->layer_elements->{'rect'} as $path) {
             $path_id    = (string)$path->attributes()->{'id'};
-            $all_paths[ $path_id ] = $this->parseAloneElement($path, 'rect');
+            $element    = $this->parseAloneElement($path, 'rect');
+            if ($element) $all_paths[ $path_id ] = $element;
         }
 
         foreach ($this->layer_elements->{'circle'} as $path) {
             $path_id    = (string)$path->attributes()->{'id'};
-            $all_paths[ $path_id ] = $this->parseAloneElement($path, 'circle');
+            $element    = $this->parseAloneElement($path, 'circle');
+            if ($element) $all_paths[ $path_id ] = $element;
         }
 
         return $all_paths;
@@ -943,6 +960,11 @@ PDT;
             if (array_key_exists('desc', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'desc' : '{$path_data['desc']}'";
             }
+
+            if (array_key_exists('radius', $path_data)) {
+                $path_data_text .= ', ' . PHP_EOL . "            'radius' : '{$path_data['radius']}'";
+            }
+
             $path_data_text .= PHP_EOL.'        }';
 
             $all_paths_text[] = $path_data_text;

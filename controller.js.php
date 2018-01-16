@@ -7,7 +7,7 @@ define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 
 $content = '';
-$render_type = 'raw'; // == text (сырые данные без обработки)
+$render_type = 'raw';
 
 require_once (__ROOT__ . '/engine/units/unit.JSLayoutBuilder.php');
 

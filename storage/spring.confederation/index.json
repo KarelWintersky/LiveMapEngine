@@ -3,8 +3,7 @@
   "type"          : "vector",
   "files" : {
     "image"       : "image.svg",
-    "layout"      : "layout.svg",
-    "jslayout"    : "confmap.js"
+    "layout"      : "layout.svg"
   },
   "image" : {
     "file"  : "image.svg",
@@ -14,8 +13,8 @@
     "oy"    : 0
   },
   "layout": {
-    "file"   : "layout.svg",
-    "layers" : [ "Paths" ]
+    "file"   : "temp.svg",
+    "layers" : [ "Path" ]
   },
   "regiondefaults" : {
     "color"       : "#ffffff",

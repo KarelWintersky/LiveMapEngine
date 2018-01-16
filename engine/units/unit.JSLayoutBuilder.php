@@ -36,6 +36,47 @@ class JSLayoutBuilder extends UnitPrototype {
             'oy'        =>  0
         );
 
+        /*try {
+            if ($this->map_alias == NULL)
+                throw new Exception("[JS Builder] Map alias not defined", 1);
+
+            $filename = PATH_STORAGE . $this->map_alias . '/index.json';
+
+            if (!is_file($filename))
+                throw new Exception("[JS Builder] {$filename} not found", 2);
+
+            $json = json_decode( file_get_contents( $filename ));
+
+            if ($json->type == "vector" && empty($json->image))
+                throw new Exception("[JS Builder] Declared vectorized image-layer, but image definition not found.");
+
+            $image_info = [];
+
+            if (!empty($json->image)) {
+                $image_info = [
+                    'width'     =>  $json->image->width,
+                    'height'    =>  $json->image->height,
+                    'ox'        =>  $json->image->ox,
+                    'oy'        =>  $json->image->oy
+                ];
+            }
+
+            if (empty($json->layout))
+                throw new Exception("[JS Builder] Layout data not found.");
+
+            $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
+
+            if (!is_file($svg_filename))
+                throw new Exception("[JS Builder] Layout file {$svg_filename} not found.");
+
+
+
+
+        } catch (\Exception $e) {
+
+        }*/
+
+
         // проверяем второй параметр роутинга - это имя карты.
         if ($this->map_alias != NULL) {
             $filename = PATH_STORAGE . $this->map_alias . '/index.json';
@@ -70,6 +111,8 @@ class JSLayoutBuilder extends UnitPrototype {
                 // создаем инсанс парсера, передаем SVG-контент файла
                 $sp = new SVGParser( $svg_content );
 
+                if ($sp->svg_parsing_error) return;
+
                 $layer_name = "Image";
                 $sp->parseImages( $layer_name );
 
@@ -80,9 +123,22 @@ class JSLayoutBuilder extends UnitPrototype {
                     $sp->setTranslateOptions( 0, 0, $image_info['height'] );
                 }
 
-                $sp->parseLayer("Paths");
+                $paths_data = [];
 
-                $paths_data = $sp->getElementsAll();
+                if (!empty($json->layout->layers)) {
+
+                    foreach($json->layout->layers as $layer) {
+                        $sp->parseLayer($layer);
+                        $paths_data += $sp->getElementsAll();
+                    }
+
+                } else {
+                    $sp->parseLayer("Paths");
+                    $paths_data += $sp->getElementsAll();
+                }
+
+                /*$sp->parseLayer("Paths");
+                $paths_data = $sp->getElementsAll();*/
 
                 $regions_for_js = $sp->exportSPaths( $paths_data );
             };
