@@ -25,7 +25,10 @@ require_once(__ROOT__ . '/engine/thirdparty/websun.php');
 require_once (__ROOT__ . '/engine/core.LMEConfig.php');
 require_once (__ROOT__ . '/engine/classes/class.INI_Config.php');
 require_once (__ROOT__ . '/engine/classes/class.DBConnectionLite.php');
+
 require_once (__ROOT__ . '/engine/classes/class.ParseSVG.php');
+require_once (__ROOT__ . '/engine/classes/class.SVGParser.php');
+
 require_once (__ROOT__ . '/engine/classes/class.CLIConsole.php');
 require_once (__ROOT__ . '/engine/classes/class.Template.php');
 require_once (__ROOT__ . '/engine/classes/proto.UnitPrototype.php');

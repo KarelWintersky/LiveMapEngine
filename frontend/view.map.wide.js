@@ -92,20 +92,28 @@ toggleInfoBox = function(el) {
 var polymap = Object.create(null);
 // build poligons
 Object.keys( theMap.regions ).forEach(function( key ){
-    var path = theMap.regions[ key ]['path'];
-    var polygon_color   =   theMap.regions[ key ]['color']      ||  theMap.defaults.polygon_color;
-    var polygon_width   =   theMap.regions[ key ]['width']      ||  theMap.defaults.polygon_width;
-    var polygon_opacity =   theMap.regions[ key ]['opacity']    ||  theMap.defaults.polygon_opacity;
-    var polygon_fillcolor = theMap.regions[ key ]['fillColor']  ||  theMap.defaults.polygon_fillColor;
-    var polygon_fillopacity = theMap.regions[ key ]['fillOpacity'] || theMap.defaults.polygon_fillOpacity;
+    var region = theMap.regions[ key ];
+    var type = region['type'];
+    var coords = region['coords'];
+    var options = {
+        color: region['color']      ||  theMap.defaults.polygon_color,
+        width: region['width']      ||  theMap.defaults.polygon_width,
+        opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
+        fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
+        fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,
+        radius: region['radius'] || 0
+    };
 
-    polymap[ key ] = L.polygon( path, {
-        color: polygon_color,
-        width: polygon_width,
-        opacity: polygon_opacity,
-        fillColor: polygon_fillcolor,
-        fillOpacity: polygon_fillopacity
-    });
+    var entity;
+    if (type == 'polygon') {
+        entity = L.polygon(coords, options);
+    } else if (type == 'rect') {
+        entity = L.rectangle(coords, options);
+    } else if (type == 'circle') {
+        entity = L.circle(coords, options)
+    }
+
+    polymap[ key ] = entity;
 } );
 
 var map = L.map('map', {
