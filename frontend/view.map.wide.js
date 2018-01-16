@@ -1,7 +1,7 @@
 var current_infobox_region_id = '';
 
 showContentColorbox = function(id_region , title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     $.get( url, function() {
     }).done(function(data) {
         $.colorbox({
@@ -17,7 +17,7 @@ showContentColorbox = function(id_region , title) {
 }
 
 toggleContentViewBox = function(id_region, title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     if (current_infobox_region_id == id_region) {
         toggleInfoBox('#actor-viewbox-toggle');
 
@@ -37,7 +37,7 @@ toggleContentViewBox = function(id_region, title) {
             type: 'GET',
             async: false
         }).done(function(data){
-            let region_center = polymap [ id_region ].getBounds().getCenter();
+            var region_center = polymap [ id_region ].getBounds().getCenter();
 
             // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
             if (map_centring_panning_step > 0) {
@@ -59,10 +59,10 @@ toggleContentViewBox = function(id_region, title) {
     }
 }
 showContentViewBox = function(id_region, title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
 
     $.get(url, function(){}).done(function(data){
-        let region_center = polymap [ id_region ].getBounds().getCenter();
+        var region_center = polymap [ id_region ].getBounds().getCenter();
         region_center.lng -= 50; // move center to right (50px)
         map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
         $("#section-info-content").html(data).show();

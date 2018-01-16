@@ -1,5 +1,5 @@
 showContentColorbox = function(id_region , title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     $.get( url, function() {
     }).done(function(data) {
         $.colorbox({
@@ -152,7 +152,7 @@ $(document).on('click', '#cboxLoadedContent a', function(){
 });
 
 $(document).on('click', '#actor-edit', function(){
-    let region_id = $(this).data('region-id');
+    var region_id = $(this).data('region-id');
     document.location.href = '/edit/region?map='+ map_alias + '&id=' + region_id;
 });
 

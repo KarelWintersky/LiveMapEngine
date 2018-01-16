@@ -1,5 +1,5 @@
 showContentColorbox = function(id_region , title) {
-    let url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region + is_iframe;
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region + is_iframe;
     $.get( url, function() {
     }).done(function(data) {
         $.colorbox({
@@ -165,7 +165,7 @@ $(document).on('click', '#cboxLoadedContent a', function(){
 });
 
 $(document).on('click', '#actor-edit', function(){
-    let region_id = $(this).data('region-id');
+    var region_id = $(this).data('region-id');
     document.location.href = '/edit/region?map='+ map_alias + '&id=' + region_id;
 });
 
