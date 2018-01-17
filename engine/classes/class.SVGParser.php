@@ -36,7 +36,7 @@ class SVGParser {
     );
 
     private $svg;
-    public  $svg_parsing_error = FALSE;
+    public  $svg_parsing_error = NULL;
 
     // слой/массив изображений
     // слой-контейнер с изображениями
@@ -70,31 +70,19 @@ class SVGParser {
     public function __construct( $svg_file_content ) {
         libxml_use_internal_errors(true);
 
-        if (!$svg_file_content) {
-            $this->svg_parsing_error = TRUE;
-            return NULL;
-        }
-
         try {
             $this->svg = new \SimpleXMLElement( $svg_file_content );
+
+            foreach (self::NAMESPACES as $ns => $definition) {
+                $this->svg->registerXPathNamespace( $ns, $definition );
+            }
+
         } catch (\Exception $e) {
             $this->svg_parsing_error = array(
-                'state'     =>  NULL,
+                'state'     =>  TRUE,
                 'code'      =>  $e->getCode(),
                 'message'   =>  $e->getMessage()
             );
-        }
-
-        foreach (self::NAMESPACES as $ns => $definition) {
-            try {
-                $this->svg->registerXPathNamespace( $ns, $definition );
-            } catch (\Exception $e) {
-                $this->svg_parsing_error = array(
-                    'state'     =>  NULL,
-                    'code'      =>  $e->getCode(),
-                    'message'   =>  $e->getMessage()
-                );
-            }
         }
     }
 
@@ -253,7 +241,6 @@ class SVGParser {
         }
     }
 
-
     /**
      *
      *
@@ -367,6 +354,11 @@ class SVGParser {
     }
 
 
+    /**
+     * Получаем элементы по типу (rect, circle, path)
+     * @param $type
+     * @return array
+     */
     public function getElementsByType( $type ) {
         /** @var SimpleXMLElement $path */
 
@@ -381,6 +373,11 @@ class SVGParser {
         return $all_paths;
     }
 
+    /**
+     * Получаем все элементы со слоя
+     *
+     * @return array
+     */
     public function getElementsAll() {
         $all_paths = [];
 
@@ -408,22 +405,36 @@ class SVGParser {
     }
 
 
+    /**
+     * Получаем все элементы типа PATH
+     * @return array
+     */
     public function getPaths() {
         return $this->getElementsByType('path');
     }
 
+
+    /**
+     * Получаем все элементы типа RECTANGLE
+     * @return array
+     */
     public function getRects() {
         return $this->getElementsByType('rect');
     }
 
+    /**
+     * Получаем все элементы типа CIRCLE
+     * @return array
+     */
     public function getCircles() {
         return $this->getElementsByType('circle');
     }
 
 
     // ====================================================================================================
-    // выполняет трансляцию узла в CRS-модель
+
     /**
+     * выполняет трансляцию узла в CRS-модель
      *
      * @todo: @warning: ГРЯЗНЫЙ ХАК: Тут мы сделали важное упрощение - сдвиг объектов на слое и трансляция данных в модель CRS делаются в одной функции, которая (если судить просто по имени) должна только транслировать вершину в CRS-модель. Это сделано для упрощения, но потенциально здесь может крыться ошибка!
      *
@@ -453,7 +464,11 @@ class SVGParser {
         ];
     }
 
-    // преобразует суб-путь в CRS-модель
+    /**
+     * Преобразует субполигон из XY-модели в CRS-модель
+     * @param $subpolyline
+     * @return array
+     */
     public function translate_subpolygon_from_XY_to_CRS( $subpolyline ) {
         return array_map( function($knot) {
             return $this->translate_knot_from_XY_to_CRS( $knot );
@@ -461,11 +476,15 @@ class SVGParser {
     }
 
     // преобразует полигон в CRS-модель
+    /**
+     * Преобразует полигон
+     * [0] => массив вершин (XY) (даже если полигон один и нет субполигонов)
+     * [1] => массив вершин (XY)
+     *
+     * @param $polygone
+     * @return array
+     */
     public function translate_polygon_from_XY_to_CRS( $polygone ) {
-        /*
-         [0] => массив вершин (XY)
-         [1] => массив вершин (XY)
-         */
         if ( empty($polygone) ) return array();
 
         return
@@ -891,6 +910,11 @@ class SVGParser {
 
     /* ======================    CONVERSION ================== */
 
+    /**
+     * Преобразует массив с данными мультиполигона в JS-строку ( [ [ [][] ], [ [][][] ] ])
+     * @param $multicoords
+     * @return array|string
+     */
     public function convert_CRS_to_JSString( $multicoords )
     {
         if (empty($multicoords)) return '[]';
@@ -911,6 +935,11 @@ class SVGParser {
 
     }
 
+    /**
+     * Преобразует информацию об узле в JS-строку
+     * @param $knot
+     * @return string
+     */
     public function convert_knotCRS_to_JSstring ( $knot ) {
         return '[' . implode(',', array(
             $knot['x'],
@@ -918,6 +947,11 @@ class SVGParser {
         )) . ']';
     }
 
+    /**
+     * Преобразует информацию о субполигоне (одиночном полигоне) в JS-строку
+     * @param $coords
+     * @return string
+     */
     public function convert_subCRS_to_JSstring( $coords )
     {
         $js_coords_string = array();
@@ -930,6 +964,15 @@ class SVGParser {
     }
 
     /* =================== EXPORT ==================== */
+
+    /**
+     * Подготавливает данные для экспорта в шаблон
+     *
+     * Возможно более корректный метод - работать сразу с шаблоном. Эта функция просто генерит строку данных.
+     *
+     * @param $all_paths
+     * @return string
+     */
     public function exportSPaths( $all_paths )
     {
         $all_paths_text = array();

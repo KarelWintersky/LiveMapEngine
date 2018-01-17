@@ -13,7 +13,7 @@
     "oy"    : 0
   },
   "layout": {
-    "file"   : "temp.svg",
+    "file"   : "layout.svg",
     "layers" : [ "Path" ]
   },
   "regiondefaults" : {

@@ -20,8 +20,9 @@ class JSLayoutBuilder extends UnitPrototype {
         $this->map_alias = $map_alias;
         $this->map_source = $mode;
 
-        $this->template_file = 'viewmap.jslayout.js';
-        $this->template_path = '$/templates';
+        // $this->template_file = 'viewmap.jslayout-plain.js'; // шаблон, в который вставляются данные при помощи exportSPaths()
+        $this->template_file = 'viewmap.jslayout-struct.tpl';  // шаблон, куда вставляются данные из массива и генератор используется websun (но появляются пустые строки)
+        $this->template_path = '$/templates/view.map';
     }
 
     /**
@@ -35,8 +36,11 @@ class JSLayoutBuilder extends UnitPrototype {
             'ox'        =>  0,
             'oy'        =>  0
         );
+        $regions_for_js = '';
+        $json = '';
+        $paths_data = [];
 
-        /*try {
+        try {
             if ($this->map_alias == NULL)
                 throw new Exception("[JS Builder] Map alias not defined", 1);
 
@@ -69,108 +73,76 @@ class JSLayoutBuilder extends UnitPrototype {
             if (!is_file($svg_filename))
                 throw new Exception("[JS Builder] Layout file {$svg_filename} not found.");
 
+            $svg_content = file_get_contents( $svg_filename );
 
+            if (strlen($svg_content) == 0)
+                throw new Exception("[JS Builder] Layout file is empty");
+
+            // создаем инсанс парсера, передаем SVG-контент файла
+            $sp = new SVGParser( $svg_content );
+
+            if ($sp->svg_parsing_error)
+                throw new Exception("[JS Builder] SVG Parsing error " . $sp->svg_parsing_error['message']);
+
+            // image layer from file
+            // надо проверить наличие слоёв в массиве определений
+            $layer_name = "Image";
+            $sp->parseImages( $layer_name );
+
+            if ($json->type === "bitmap" && $sp->getImagesCount()) {
+                $image_info = $sp->getImageInfo();
+                $sp->setTranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
+            } else {
+                $sp->setTranslateOptions( 0, 0, $image_info['height'] );
+            }
+
+            if (!empty($json->layout->layers)) {
+
+                foreach($json->layout->layers as $layer) {
+                    $sp->parseLayer($layer);
+                    $paths_data += $sp->getElementsAll();
+                }
+
+            } else {
+                $sp->parseLayer("Paths");
+                $paths_data += $sp->getElementsAll();
+            }
+
+            // $regions_for_js = $sp->exportSPaths( $paths_data );
 
 
         } catch (\Exception $e) {
 
-        }*/
-
-
-        // проверяем второй параметр роутинга - это имя карты.
-        if ($this->map_alias != NULL) {
-            $filename = PATH_STORAGE . $this->map_alias . '/index.json';
-
-            if (!is_file($filename)) {
-                die('Incorrect path: ' . PATH_STORAGE . $this->map_alias);
-            }
-
-            $json = json_decode( file_get_contents( $filename ) );
-
-            if (!empty($json->image)) {
-                $image_info = array(
-                    'width'     =>  $json->image->width,
-                    'height'    =>  $json->image->height,
-                    'ox'        =>  $json->image->ox,
-                    'oy'        =>  $json->image->oy
-                );
-            } else {
-                if ($json->type == "vector") {
-                    die('Declared vectorized image-layer, but image definition not found in file ' . $filename);
-                } else {
-                    $image_info = NULL;
-                }
-            }
-
-            // имена слоёв мы тоже можем получить от пользователя
-            if (!empty($json->layout)) {
-                $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
-
-                $svg_content  = file_get_contents( $svg_filename );
-
-                // создаем инсанс парсера, передаем SVG-контент файла
-                $sp = new SVGParser( $svg_content );
-
-                if ($sp->svg_parsing_error) return;
-
-                $layer_name = "Image";
-                $sp->parseImages( $layer_name );
-
-                if ($json->type === "bitmap" && $sp->getImagesCount()) {
-                    $image_info = $sp->getImageInfo();
-                    $sp->setTranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
-                } else {
-                    $sp->setTranslateOptions( 0, 0, $image_info['height'] );
-                }
-
-                $paths_data = [];
-
-                if (!empty($json->layout->layers)) {
-
-                    foreach($json->layout->layers as $layer) {
-                        $sp->parseLayer($layer);
-                        $paths_data += $sp->getElementsAll();
-                    }
-
-                } else {
-                    $sp->parseLayer("Paths");
-                    $paths_data += $sp->getElementsAll();
-                }
-
-                /*$sp->parseLayer("Paths");
-                $paths_data = $sp->getElementsAll();*/
-
-                $regions_for_js = $sp->exportSPaths( $paths_data );
-            };
-
-
-            // теперь генерируем подстановочные значения для шаблона
-            $this->template = new Template($this->template_file, $this->template_path);
-            $this->template->set('/map', array(
-                'title'         =>  $json->title,
-                'alias'         =>  $this->map_alias,
-                'imagefile'     =>  $json->image->file,
-                'width'         =>  $image_info['width'],
-                'height'        =>  $image_info['height'],
-                'ox'            =>  $image_info['ox'],
-                'oy'            =>  $image_info['oy'],
-                'default_zoom'  =>  $json->viewport->zoom,
-            ));
-            $this->template->set('/defaults', array(
-                'color'         =>  $json->regiondefaults->color,
-                'width'         =>  $json->regiondefaults->width,
-                'opacity'       =>  $json->regiondefaults->opacity,
-                'fillcolor'     =>  $json->regiondefaults->fillcolor,
-                'fillopacity'   =>  $json->regiondefaults->fillopacity
-            ));
-            $this->template->set('/viewport', array(
-                'width'         =>  $json->viewport->width,
-                'height'        =>  $json->viewport->height,
-                'background_color'  =>  $json->viewport->background_color
-            ));
-            $this->template->set('/map/regions_list', $regions_for_js);
-        } else {
         }
+
+        // теперь генерируем подстановочные значения для шаблона
+        $this->template = new Template($this->template_file, $this->template_path);
+        $this->template->set('/map', array(
+            'title'         =>  $json->title,
+            'alias'         =>  $this->map_alias,
+            'imagefile'     =>  $json->image->file,
+            'width'         =>  $image_info['width'],
+            'height'        =>  $image_info['height'],
+            'ox'            =>  $image_info['ox'],
+            'oy'            =>  $image_info['oy'],
+            'default_zoom'  =>  $json->viewport->zoom,
+        ));
+        $this->template->set('/defaults', array(
+            'color'         =>  $json->regiondefaults->color,
+            'width'         =>  $json->regiondefaults->width,
+            'opacity'       =>  $json->regiondefaults->opacity,
+            'fillcolor'     =>  $json->regiondefaults->fillcolor,
+            'fillopacity'   =>  $json->regiondefaults->fillopacity
+        ));
+        $this->template->set('/viewport', array(
+            'width'         =>  $json->viewport->width,
+            'height'        =>  $json->viewport->height,
+            'background_color'  =>  $json->viewport->background_color
+        ));
+        // $this->template->set('/map/regions_list', $regions_for_js);
+
+        $this->template->set('/regions', $paths_data);
+
     }
 
     /**
