@@ -112,7 +112,7 @@
 
     var h = theMap['map']['height'];
     var w = theMap['map']['width'];
-    var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
+    var current_bounds  = [ [0, 0], [h, w ] ];
 
     var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
 
