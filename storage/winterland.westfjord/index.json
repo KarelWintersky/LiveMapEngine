@@ -28,6 +28,7 @@
     "width" : "800px",
     "height": "600px",
     "zoom"  : -2,
-    "background_color"  : "transparent"
+    "background_color"  : "transparent",
+    "maxbounds": [[-0.5, -1], [1.5, 2]]
   }
 }

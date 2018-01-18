@@ -20,7 +20,7 @@ $content = $js->content();
 
 // remove empty lines from file?
 // $content = implode("\n", array_filter(explode("\n", $content))); // быстрее, но оставляет часть строк
-// $content = preg_replace('/^\h*\v+/m', '', $content); // медленнее, но чистит все строки
+$content = preg_replace('/^\h*\v+/m', '', $content); // медленнее, но чистит все строки
 
 echo $content;
 

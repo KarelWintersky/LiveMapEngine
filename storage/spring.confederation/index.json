@@ -6,28 +6,29 @@
     "layout"      : "layout.svg"
   },
   "image" : {
-    "file"  : "image.svg",
-    "width" : 2104,
-    "height": 1488,
+    "file"  : "temp.svg",
+    "width" : 2104.7244,
+    "height": 1488.189,
     "ox"    : 0,
     "oy"    : 0
   },
   "layout": {
-    "file"   : "layout.svg",
-    "layers" : [ "Path" ]
+    "file"   : "temp.svg",
+    "layers" : [ "Stars&Channels", "CLOutline", "Paths" ]
   },
   "regiondefaults" : {
     "color"       : "#ffffff",
     "width"       : 0,
     "opacity"     : 0,
-    "fillcolor"   : "#0000ff",
-    "fillopacity" : 0.3
+    "fillcolor"   : "#ff0000",
+    "fillopacity" : 0.7
   },
   "viewport": {
     "width" : "800px",
     "height": "600px",
     "zoom"  : "0",
-    "background_color"  : "transparent"
+    "background_color"  : "transparent",
+    "maxbounds": [[-0.5, -1], [1.5, 2]]
   },
   "edit_templates": {
     "templates": [

@@ -129,11 +129,13 @@ L.control.zoom({ position: 'bottomright' }).addTo(map);
 var h = theMap['map']['height'];
 var w = theMap['map']['width'];
 var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
-var max_bounds      = [ [-h*0.5, -w], [h*1.5 , w*2 ] ];
 
 var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
 
-map.setMaxBounds(max_bounds);
+if (theMap['maxbounds']) {
+    var mb = theMap['maxbounds'];
+    map.setMaxBounds([ [ mb['topleft_h'] * h, mb['topleft_w'] * w ]  , [ mb['bottomright_h'] * h, mb['bottomright_w'] * w ] ]);
+}
 
 var poly_layer = new L.LayerGroup();
     poly_layer.addTo(map);

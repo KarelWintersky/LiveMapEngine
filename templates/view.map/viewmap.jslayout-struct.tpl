@@ -24,6 +24,15 @@ var theMap = {
         "width"                 :   "80%",
         "height"                :   "80%"
     },
+
+    {?*maxbounds*}
+    "maxbounds" : {
+    {%*maxbounds*}
+        "{*maxbounds:^KEY*}" : {*maxbounds:*},
+    {%}
+    },
+    {?}
+
     "regions": {
     {%*regions*}
         "{*regions:id*}" : {
@@ -38,6 +47,6 @@ var theMap = {
 {?*regions:radius*}            "radius": {*regions:radius*},{?}
         },
     {%}
-    }
+    },
 
 };

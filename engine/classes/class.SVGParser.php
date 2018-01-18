@@ -6,7 +6,7 @@
  */
 class SVGParser {
     const VERSION                       = 2.0;
-    const ROUND_PRECISION               = 2;
+    const ROUND_PRECISION               = 4;
     /**
      * Constants for convert_SVGElement_to_Polygon()
      * see : https://www.w3.org/TR/SVG11/paths.html#InterfaceSVGPathSeg
@@ -141,20 +141,18 @@ class SVGParser {
      * @return array [ ox, oy ]
      */
     private function parseTransform($transform_definition) {
-        $result = [
-            'ox'    =>  0,
-            'oy'    =>  0
-        ];
 
         if (1 == preg_match('/translate\(\s*([^\s,)]+)[\s,]([^\s,)]+)/', $transform_definition, $translate_matches)) {
-            $result = [
-                'ox'    =>  $translate_matches[1],
-                'oy'    =>  $translate_matches[2]
+            return [
+                'ox'    =>  (float)$translate_matches[1],
+                'oy'    =>  (float)$translate_matches[2]
             ];
-        };
-
-        return $result;
-
+        } else {
+            return [
+                'ox'    =>  0,
+                'oy'    =>  0
+            ];
+        }
     }
 
     /**
@@ -429,6 +427,49 @@ class SVGParser {
     public function getCircles() {
         return $this->getElementsByType('circle');
     }
+    // ====================================================================================================
+
+    // применяет трансформацию к узлу. Если не заданы опции трансформации - используются данные для трансформации слоя
+    public function apply_transform_to_knot( $knot , $options = NULL) {
+
+        if ($options === NULL) {
+            $ox = $this->layer_elements_translation['ox'];
+            $oy = $this->layer_elements_translation['oy'];
+        } else {
+            $ox = $options['ox'];
+            $oy = $options['oy'];
+        }
+
+        return [
+            'x' =>  $knot['x'] + $ox,
+            'y' =>  $knot['y'] + $oy
+        ];
+    }
+
+    // применяет трансформацию к субполигону
+    public function apply_transform_to_subpolygon( $subpolyline, $options = NULL) {
+        return array_map( function($knot) use ($options) {
+            return $this->apply_transform_to_knot( $knot );
+        }, $subpolyline);
+    }
+
+    // применяет трансформацию к мультиполигону
+    public function apply_transform_to_polygon( $polygon, $options ) {
+        if (empty($polygon)) return array();
+
+        return
+            ( count($polygon) > 1 )
+            ?
+                array_map( function($subpoly) use ($options) {
+                    return $this->apply_transform_to_subpolygon($subpoly, $options);
+                }, $polygon )
+            :
+                array(
+                    $this->apply_transform_to_subpolygon( array_shift($polygon), $options)
+                );
+    }
+
+    
 
 
     // ====================================================================================================
@@ -528,6 +569,18 @@ class SVGParser {
         if ( 'z' !== strtolower(substr($path, -1)) ) {
             return array();
         }
+
+        // выясняем наличие атрибута transform:translate (другие варианты трансформации не обрабатываются)
+        $translate = [
+            'x' =>  0,
+            'y' =>  0
+        ];
+        $transform = (string)$element->attributes()->{'transform'};
+
+        $translate = self::parseTransform($transform);
+
+
+
 
         // есть ли в пути управляющие последовательности кривых Безье любых видов?
         $charlist_unsupported_knots = 'CcSsQqTtAa'; // так быстрее, чем регулярка по '#(C|c|S|s|Q|q|T|t|A|a)#'

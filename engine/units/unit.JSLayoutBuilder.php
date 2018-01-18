@@ -36,6 +36,8 @@ class JSLayoutBuilder extends UnitPrototype {
             'ox'        =>  0,
             'oy'        =>  0
         );
+        $max_bounds = NULL;
+
         $regions_for_js = '';
         $json = '';
         $paths_data = [];
@@ -108,6 +110,17 @@ class JSLayoutBuilder extends UnitPrototype {
                 $paths_data += $sp->getElementsAll();
             }
 
+            // maxbounds
+            if (!empty($json->viewport->maxbounds)) {
+                $max_bounds = [
+                    'present'   =>  1,
+                    'topleft_h'     =>  $json->viewport->maxbounds[0][0],
+                    'topleft_w'     =>  $json->viewport->maxbounds[0][1],
+                    'bottomright_h' =>  $json->viewport->maxbounds[1][0],
+                    'bottomright_w' =>  $json->viewport->maxbounds[1][1]
+                ];
+            }
+
             // $regions_for_js = $sp->exportSPaths( $paths_data );
 
 
@@ -139,6 +152,8 @@ class JSLayoutBuilder extends UnitPrototype {
             'height'        =>  $json->viewport->height,
             'background_color'  =>  $json->viewport->background_color
         ));
+        $this->template->set('/maxbounds', $max_bounds);
+
         // $this->template->set('/map/regions_list', $regions_for_js);
 
         $this->template->set('/regions', $paths_data);

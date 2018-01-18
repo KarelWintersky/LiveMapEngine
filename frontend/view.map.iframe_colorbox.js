@@ -55,12 +55,13 @@ map.scrollWheelZoom.disable();
 
 var h = theMap['map']['height'];
 var w = theMap['map']['width'];
-var current_bounds  = [ [0, 0], [h-1, w-1 ] ];
-var max_bounds      = [ [-h*0.5, -w*0.5], [h*1.5 , w*1.5 ] ];
-
+var current_bounds  = [ [0, 0], [h, w ] ];
 var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
 
-map.setMaxBounds(max_bounds);
+if (theMap['maxbounds']) {
+    var mb = theMap['maxbounds'];
+    map.setMaxBounds([ [ mb['topleft_h'] * h, mb['topleft_w'] * w ]  , [ mb['bottomright_h'] * h, mb['bottomright_w'] * w ] ]);
+}
 
 // draw polygons on map, bind on-click function
 Object.keys( polymap ).forEach(function(id_region){
