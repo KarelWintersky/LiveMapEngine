@@ -14,6 +14,7 @@
   },
   "layers": {
     "Towns": {
+      "hint" : "Города и посёлки",
       "zoom_min" : 0,
       "zoom_max" : 0,
       "empty": {

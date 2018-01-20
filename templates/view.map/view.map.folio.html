@@ -1,10 +1,9 @@
-<!-- Неоптимизированный код -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title></title>
-    <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
+    <link rel="stylesheet" href="/frontend/leaflet/leaflet.css" />
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
@@ -12,6 +11,9 @@
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
 
     <script type="text/javascript" src="/js/map/{*map_alias*}.js" id="the-map-outer"></script>
+
+    <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
+    <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css" />
 
     <style type="text/css">
         html, body, #map {
@@ -81,7 +83,7 @@
         preferCanvas: true,
         zoomControl: false,
     });
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
 
     var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
     var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
@@ -127,11 +129,11 @@
     });
 
     map.on('click', function(ev) {
-        console.log(ev); // ev is an event object (MouseEvent in this case)
+        // console.log(ev); // ev is an event object (MouseEvent in this case)
     });
 
     map.on('zoomend', function(ev) {
-        console.log( map.getZoom() );
+        // console.log( map.getZoom() );
     });
 
 
