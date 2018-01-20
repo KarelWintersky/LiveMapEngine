@@ -15,12 +15,10 @@ $map_alias = $_GET['map'] ?? NULL;
 $map_source = $_GET['datasrc'] ?? 'file';
 
 $js = new JSLayoutBuilder( $map_alias, $map_source );
+$js->loadConfig();
 $js->run();
+
 $content = $js->content();
-
-// remove empty lines from file?
-// $content = implode("\n", array_filter(explode("\n", $content))); // быстрее, но оставляет часть строк
-$content = preg_replace('/^\h*\v+/m', '', $content); // медленнее, но чистит все строки
-
+$content = preg_replace('/^\h*\v+/m', '', $content);
 echo $content;
 

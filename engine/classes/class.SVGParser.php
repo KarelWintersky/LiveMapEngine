@@ -5,7 +5,7 @@
  * Date: 15.01.2018, time: 18:47
  */
 class SVGParser {
-    const VERSION                       = 2.0;
+    const VERSION                       = 2.1;
     const ROUND_PRECISION               = 4;
     /**
      * Constants for convert_SVGElement_to_Polygon()
@@ -187,7 +187,8 @@ class SVGParser {
      */
     public function parseLayer($layer_name) {
         if ($layer_name !== '') {
-            // анализируем атрибуты слоя разметки регионов
+
+            // xpath атрибутов слоя разметки
             $xpath_paths_layer_attrs = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]';
 
             if (empty($this->svg->xpath($xpath_paths_layer_attrs))) return FALSE;
@@ -221,14 +222,14 @@ class SVGParser {
     }
 
     /**
-     * Устанавливает опции трансляции данных слоя из модели XY в модель CRS
+     * Устанавливает опции трансляции данных слоя из модели CRS.XY в модель CRS.Simple
      *
      * Если не вызывали - трансляция не производится
      * @param $ox
      * @param $oy
      * @param $image_height
      */
-    public function setTranslateOptions($ox = NULL , $oy = NULL, $image_height = NULL) {
+    public function set_CRSSimple_TranslateOptions($ox = NULL , $oy = NULL, $image_height = NULL) {
         if (!( is_null($ox) || is_null($oy) || is_null($image_height))) {
             $this->crs_translation_options = [
                 'ox'    =>  $ox,
@@ -430,7 +431,7 @@ class SVGParser {
     // ====================================================================================================
 
     // применяет трансформацию к узлу. Если не заданы опции трансформации - используются данные для трансформации слоя
-    public function apply_transform_to_knot( $knot , $options = NULL) {
+    public function apply_transform_for_knot( $knot , $options = NULL) {
 
         if ($options === NULL) {
             $ox = $this->layer_elements_translation['ox'];
@@ -447,29 +448,64 @@ class SVGParser {
     }
 
     // применяет трансформацию к субполигону
-    public function apply_transform_to_subpolygon( $subpolyline, $options = NULL) {
+    public function apply_transform_for_subpolygon( $subpolyline, $options = NULL) {
         return array_map( function($knot) use ($options) {
-            return $this->apply_transform_to_knot( $knot );
+            return $this->apply_transform_for_knot( $knot );
         }, $subpolyline);
     }
 
     // применяет трансформацию к мультиполигону
-    public function apply_transform_to_polygon( $polygon, $options ) {
+    public function apply_transform_for_polygon( $polygon, $options ) {
         if (empty($polygon)) return array();
 
         return
             ( count($polygon) > 1 )
             ?
                 array_map( function($subpoly) use ($options) {
-                    return $this->apply_transform_to_subpolygon($subpoly, $options);
+                    return $this->apply_transform_for_subpolygon($subpoly, $options);
                 }, $polygon )
             :
                 array(
-                    $this->apply_transform_to_subpolygon( array_shift($polygon), $options)
+                    $this->apply_transform_for_subpolygon( array_shift($polygon), $options)
                 );
     }
 
-    
+
+    // convert CRS (SVG) to Simple
+    public function convert_to_SimpleCRS_polygon( $polygon ) {
+        if ( empty($polygon) ) return array();
+
+        return
+            ( count($polygon) > 1 )    // если суб-полигонов больше одного
+                ?
+                // проходим по всем
+                array_map( function($subpath) {
+                    return $this->convert_to_SimpleCRS_subpolygon( $subpath );
+                }, $polygon )
+                :
+                // иначе возвращаем первый элемент массива субполигонов, но как единственный элемент массива!
+                array(
+                    $this->convert_to_SimpleCRS_subpolygon( array_shift($polygon) )
+                );
+    }
+
+    public function convert_to_SimpleCRS_subpolygon( $subpolygon ) {
+        return array_map( function($knot) {
+            return $this->convert_to_SimpleCRS_knot( $knot );
+        }, $subpolygon);
+    }
+
+    public function convert_to_SimpleCRS_knot( $knot ) {
+        $ox = 0;
+        $oy = 0;
+        $height = 0; // height inversion
+
+        // (X, Y) => (Height - (Y-oY) , (X-oX)
+        return [
+            'x'     =>  round( $height - ($knot['y'] - $oy), self::ROUND_PRECISION),
+            'y'     =>  round(           ($knot['x'] - $ox), self::ROUND_PRECISION)
+        ];
+    }
 
 
     // ====================================================================================================
@@ -1019,15 +1055,13 @@ class SVGParser {
     /* =================== EXPORT ==================== */
 
     /**
+     * DEPRECATED
      * Подготавливает данные для экспорта в шаблон
-     *
-     * Возможно более корректный метод - работать сразу с шаблоном. Эта функция просто генерит строку данных.
      *
      * @param $all_paths
      * @return string
      */
-    public function exportSPaths( $all_paths )
-    {
+    public function exportSPaths( $all_paths ) {
         $all_paths_text = array();
 
         foreach($all_paths as $path_id => $path_data ) {

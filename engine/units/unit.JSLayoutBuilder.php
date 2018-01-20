@@ -4,12 +4,57 @@
  * Date: 16.01.2018, time: 9:22
  */
 class JSLayoutBuilder extends UnitPrototype {
+    /**
+     * Результирующий шаблон
+     * @var
+     */
     private $template;
-    private $map_alias;
-    private $map_source;
 
+    /**
+     * Файл шаблона
+     * @var string
+     */
     private $template_file = '';
+
+    /**
+     * Путь до файла шаблона
+     * @var string
+     */
     private $template_path = '';
+
+    /**
+     * имя-алиас карты
+     * @var
+     */
+    private $map_alias;
+
+    /**
+     * Тип источника данных для конфига
+     * @var string
+     */
+    private $config_type;
+
+
+    /**
+     * Имя файла конфига
+     * @var string
+     */
+    private $json_config_filename = '';
+
+    /**
+     * Контент файла конфига, строкой
+     * @var string
+     */
+    private $json_config_content = '';
+
+    /**
+     * JSON config file decoded
+     * @var object
+     */
+    private $json_config;
+
+    public $ERROR = NULL;
+    public $ERROR_MESSAGE = '';
 
     /**
      * @param $map_alias
@@ -18,18 +63,78 @@ class JSLayoutBuilder extends UnitPrototype {
     public function __construct( $map_alias, $mode = 'file' )
     {
         $this->map_alias = $map_alias;
-        $this->map_source = $mode;
+        $this->config_type = $mode;
 
-        // $this->template_file = 'viewmap.jslayout-plain.js'; // шаблон, в который вставляются данные при помощи exportSPaths()
         $this->template_file = 'viewmap.jslayout-struct.tpl';  // шаблон, куда вставляются данные из массива и генератор используется websun (но появляются пустые строки)
         $this->template_path = '$/templates/view.map';
+
+        try {
+            if ($this->map_alias == NULL)
+                throw new \Exception("[JS Builder] Map alias not defined", 1);
+
+            $this->json_config_filename = $json_config_filename = PATH_STORAGE . $this->map_alias . '/index.json';
+
+            if (!is_file($json_config_filename))
+                throw new \Exception("[JS Builder] {$json_config_filename} not found", 2);
+
+            $this->json_config_content = file_get_contents( $json_config_filename );
+
+            if (!$this->json_config_content)
+                throw new \Exception("[JS Builer] Can't get content of {$json_config_filename} file.");
+
+        } catch (\Exception $e) {
+            $this->ERROR = TRUE;
+            $this->ERROR_MESSAGE = $e->getMessage();
+        }
+
+        if ($this->ERROR) die($this->ERROR_MESSAGE);
     }
+
+    public function loadConfig(){
+
+        switch ($this->config_type) {
+            case 'file' : {
+                $this->loadConfig_File();
+                break;
+            }
+            case 'mysql': {
+                $this->loadConfig_MySQL();
+                break;
+            }
+        }
+
+        if ($this->ERROR) die($this->ERROR_MESSAGE);
+    }
+
+    private function loadConfig_File() {
+        try {
+            $json = json_decode( $this->json_config_content );
+
+            if (!$json)
+                throw new Exception("[JS Builder] {$this->json_config_filename} json file is invalid", 3);
+
+            $this->json_config = $json;
+        } catch (\Exception $e) {
+            $this->ERROR = TRUE;
+            $this->ERROR_MESSAGE = json_last_error_msg();
+        }
+    }
+
+    private function loadConfig_MySQL() {
+
+    }
+
 
     /**
      *
      */
     public function run()
     {
+        /**
+         * @var object $json
+         */
+        $json = $this->json_config;
+
         $image_info = array(
             'width'     =>  0,
             'height'    =>  0,
@@ -39,20 +144,9 @@ class JSLayoutBuilder extends UnitPrototype {
         $max_bounds = NULL;
 
         $regions_for_js = '';
-        $json = '';
         $paths_data = [];
 
         try {
-            if ($this->map_alias == NULL)
-                throw new Exception("[JS Builder] Map alias not defined", 1);
-
-            $filename = PATH_STORAGE . $this->map_alias . '/index.json';
-
-            if (!is_file($filename))
-                throw new Exception("[JS Builder] {$filename} not found", 2);
-
-            $json = json_decode( file_get_contents( $filename ));
-
             if ($json->type == "vector" && empty($json->image))
                 throw new Exception("[JS Builder] Declared vectorized image-layer, but image definition not found.");
 
@@ -93,15 +187,18 @@ class JSLayoutBuilder extends UnitPrototype {
 
             if ($json->type === "bitmap" && $sp->getImagesCount()) {
                 $image_info = $sp->getImageInfo();
-                $sp->setTranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
+                $sp->set_CRSSimple_TranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
             } else {
-                $sp->setTranslateOptions( 0, 0, $image_info['height'] );
+                $sp->set_CRSSimple_TranslateOptions( 0, 0, $image_info['height'] );
             }
 
             if (!empty($json->layout->layers)) {
 
                 foreach($json->layout->layers as $layer) {
                     $sp->parseLayer($layer);
+
+
+
                     $paths_data += $sp->getElementsAll();
                 }
 

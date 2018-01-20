@@ -90,7 +90,9 @@ toggleInfoBox = function(el) {
 }
 
 var polymap = Object.create(null);
-// build poligons
+
+/* === Build polygons === */
+
 Object.keys( theMap.regions ).forEach(function( key ){
     var region = theMap.regions[ key ];
     var type = region['type'];
@@ -115,6 +117,9 @@ Object.keys( theMap.regions ).forEach(function( key ){
 
     polymap[ key ] = entity;
 } );
+/* === end: Build polygons === */
+
+//@todo: различные варианты CRS и исходных данных тайлов в зависимости от конфига
 
 var map = L.map('map', {
     crs: L.CRS.Simple,
@@ -155,90 +160,106 @@ Object.keys( polymap ).forEach(function( id_region ) {
     );
 });
 
-// bind-action-focus-region
+/* === bind-action-focus-region === */
 // при получении параметров на старте:
 // view= - показываем попап
 // focus= = делаем центровку на регионе
-var wlh = window.location.hash;
-if (wlh.length > 1) {
-    var hashparams = wlh.match(/(view|focus)=\[(.*)\]/);
-    var id_region = '';
+if (true)
+{
+    var wlh = window.location.hash;
+    var wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
 
-    if ((hashparams !== null) && (hashparams[1] == 'view')) {
-        id_region = hashparams[2];
-        showContentViewBox(id_region, '');
+    if ((wlh.length > 1) && (wlh_params !== null)) {
+        var wlh_action = wlh_params[1],
+            wlh_region_id = wlh_params[2],
+            is_region_drawn = wlh_region_id in polymap;
 
-    } else if ((hashparams !== null) && (hashparams[1] == 'focus')) {
-        id_region = hashparams[2];
-        // focus
-        var hash_region_bounds = polymap [ id_region ].getBounds();
-        map.panTo( hash_region_bounds.getCenter(), { animate: true, duration: 0.5, noMoveStart: true} );
-        var oldstyle = polymap[ id_region ].options['fillColor'];
+        if (is_region_drawn && wlh_action == 'view' ) {
+            showContentViewBox( wlh_region_id );
+        } else if (is_region_drawn && wlh_action == 'focus') {
+            var wlh_region_bounds = polymap [ wlh_region_id ].getBounds();
+            var old_style = polymap[ wlh_region_id ].options['fillColor'];
 
-        polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-        var timeoutHandler = setInterval(function(){
-            polymap[ id_region ].setStyle({fillColor: oldstyle});
-            window.clearTimeout(timeoutHandler);
-        }, 1000);
-        // history.pushState('', document.title, window.location.pathname);
+            map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: 0.5, noMoveStart: true});
+            polymap[ wlh_region_id ].setStyle({fillColor: '#ff0000'}); //@todo: OPTIONS->VIEWBOX->highlight color
+
+            setTimeout(function(){
+                polymap[ wlh_region_id ].setStyle({fillColor: oldstyle});
+            }, 1000); //@todo: OPTIONS->VIEWBOX->onfocus_timeout
+
+            // history.pushState('', document.title, window.location.pathname);
+        } else {
+            map.fitBounds(current_bounds);
+        }
+    } else {
+        map.fitBounds(current_bounds);
     }
-} else {
-    map.fitBounds(current_bounds);
 }
+/* === end: bind-action-focus-region === */
 
 map.setZoom( theMap['map']['zoom'] );
 
-// создаем контролы
-L.Control.RegionsBox = L.Control.extend({
-    is_content_visible: false,
-    options: {
-        position: $("#section-regions").data('leaflet-control-position')
-    },
-    onAdd: function(map) {
-        var div = L.DomUtil.get('section-regions');
-        L.DomUtil.removeClass(div, 'invisible');
-        L.DomUtil.enableTextSelection();
-        L.DomEvent.disableScrollPropagation(div);
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-    },
-    onRemove: function(map) {}
-});
-L.Control.InfoBox = L.Control.extend({
-    is_content_visible: false,
-    options: {
-        position: $("#section-infobox").data('leaflet-control-position')
-    },
-    onAdd: function(map) {
-        var div = L.DomUtil.get('section-infobox');
-        L.DomUtil.removeClass(div, 'invisible');
-        L.DomUtil.enableTextSelection();
-        L.DomEvent.disableScrollPropagation(div);
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-    },
-    onRemove: function(map) {}
-});
-L.Control.Backward = L.Control.extend({
-    options: {
-        position: 'bottomleft'
-    },
-    onAdd: function(map) {
-        var div = L.DomUtil.get('section-backward');
-        L.DomUtil.removeClass(div, 'invisible');
-        L.DomEvent.disableScrollPropagation(div);
-        L.DomEvent.disableClickPropagation(div);
-        return div;
-    },
-    onRemove: function(map){}
-});
+/* === Create Controls === */
+if (true) {
+    L.Control.RegionsBox = L.Control.extend({
+        is_content_visible: false,
+        options: {
+            position: $("#section-regions").data('leaflet-control-position')
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-regions');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomUtil.enableTextSelection();
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map) {}
+    });
+
+    L.Control.InfoBox = L.Control.extend({
+        is_content_visible: false,
+        options: {
+            position: $("#section-infobox").data('leaflet-control-position')
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-infobox');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomUtil.enableTextSelection();
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map) {}
+    });
+
+    L.Control.Backward = L.Control.extend({
+        options: {
+            position: 'bottomleft'
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-backward');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map){}
+    });
+}
+/* === end: Create Controls === */
 
 
 $(function(){
     $(".leaflet-container").css('background-color', leaflet_background_color);
     // закрашиваем регионы с информацией другим цветом
     regions_with_content.forEach(function(key){
-        polymap[ key ].setStyle({fillColor: '#00ff00'});  // theMap[]['filled_region_color'] или цветом из информации о регионе
+
+    //@todo: use fillColor from DB ( polymap[key]['present_region_fillcolor']. Сейчас используется дефолтное значение, причем хардкод :(
+
+        if (key in polymap) {
+            polymap[ key ].setStyle({fillColor: '#00ff00'});
+        }
     });
 
     // не показываем контрол "назад" если страница загружена в iframe

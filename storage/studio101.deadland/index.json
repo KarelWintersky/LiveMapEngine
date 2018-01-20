@@ -10,7 +10,29 @@
   },
   "layout": {
     "file"        : "deadland.svg",
-    "layers" : [ "Paths" ]
+    "layers" : [ "Towns", "Battlegrounds" ]
+  },
+  "layers": {
+    "Towns": {
+      "zoom_min" : 0,
+      "zoom_max" : 0,
+      "empty": {
+        "border_color" : "#000000",
+        "border_width" : 1,
+        "border_opacity": 0.3,
+        "fill_color": "#2277ff",
+        "fill_opacity": 0.5
+      },
+      "present": {
+        "border_color" : "#000000",
+        "border_width" : 1,
+        "border_opacity": 0.3,
+        "fill_color": "#2277ff",
+        "fill_opacity": 0.5
+      }
+    },
+    "Battlegrounds": {
+    }
   },
   "regiondefaults" : {
     "color"       : "#000000",
@@ -25,7 +47,7 @@
   },
   "viewport": {
     "cursor": "pointer",
-    "zoom"  : "-3",
+    "zoom"  : "-2.5",
     "background_color"  : "#dcbd6d",
     "custom_css" : "deadland.css"
   }
