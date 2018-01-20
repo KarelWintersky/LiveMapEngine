@@ -39,9 +39,15 @@ var theMap = {
             "id"        : "{*regions:id*}",
             "type"      : "{*regions:type*}",
             "coords"    : {*regions:js*},
+            "layer"     : "{*regions:layer*}",
 {?*regions:fillColor*}            "fillColor" : "{*regions:fillColor*}", {?}
 {?*regions:fillOpacity*}            "fillOpacity": {*regions:fillOpacity*}, {?}
 {?*regions:fillRule*}            "fillRule": "{*regions:fillRule*}", {?}
+
+{?*regions:borderColor*}            "borderColor": "{*regions:borderColor*}", {?}
+{?*regions:borderWidth*}            "borderWidth": "{*regions:borderWidth*}", {?}
+{?*regions:borderOpacity*}            "borderOpacity": "{*regions:borderOpacity*}", {?}
+
 {?*regions:title*}            "title": "{*regions:title*}", {?}
 {?*regions:desc*}            "desc": "{*regions:desc*}", {?}
 {?*regions:radius*}            "radius": {*regions:radius*},{?}

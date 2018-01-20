@@ -42,25 +42,47 @@ class LiveMapEngine
     }
 
     /**
-     * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
-     * Входные параметры: алиас проекта и алиас карты
+
      *
      * @param $map_alias
      * @return array
      */
-    public function getRegionsWithInfo($map_alias) {
-        $table = $this->table_prefix . 'map_data_regions'; //@todo: remove table define from config
+    /**
+     * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
+     * Входные параметры: алиас проекта и алиас карты
+     *
+     * @param string $map_alias
+     * @param string $ids_list
+     * @return array
+     */
+    public function getRegionsWithInfo($map_alias, $ids_list = '') {
+        $table = $this->table_prefix . 'map_data_regions';
+
+        if ($ids_list != '') {
+            $in_subquery = "AND `id_region` IN ({$ids_list})";
+        } else {
+            $in_subquery = '';
+        }
+
         $query = "
     SELECT
     `id_region`, `title`, `edit_date`,
-    `region_border_color`, `region_border_width`, `region_border_opacity`,
-    `region_fill`, `region_fill_color`, `region_fill_opacity`
+
+    `region_stroke` AS `stroke`,
+    `region_border_color` AS `borderColor`,
+    `region_border_width` AS `borderWidth`,
+    `region_border_opacity` AS `borderOpacity`,
+
+    `region_fill` AS `fill`,
+    `region_fill_color` AS `fillColor`,
+    `region_fill_opacity` AS `fillOpacity`
     FROM
     (
 	  SELECT *
 	  FROM {$table}
 	  WHERE
     	`alias_map` = :alias_map
+    	{$in_subquery}
       ORDER BY `edit_date` DESC
     ) AS t1 GROUP BY `id_region`
         ";

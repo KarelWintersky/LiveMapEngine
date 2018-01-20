@@ -10,6 +10,9 @@
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
 
+    <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
+    <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css" />
+
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
     <script type="text/javascript" src="/js/map/{*map_alias*}.js" id="the-map-outer"></script>
 </head>
@@ -26,19 +29,6 @@
     var regions_with_content = [
         {*map_regions_with_info_jsarray*}
     ];
-
-    var regions_with_content_options = {
-        {%*map_regions_present*}
-        "{*map_regions_present:id_region*}" : {
-            {?*map_regions_present:region_border_color*}"region_border_color" : "{*map_regions_present:region_border_color*}", {?}
-            {?*map_regions_present:region_border_width*}"region_border_width" : "{*map_regions_present:region_border_width*}", {?}
-            {?*map_regions_present:region_border_opacity*}"region_border_opacity" : "{*map_regions_present:region_border_opacity*}", {?}
-            {?*map_regions_present:region_fill*}"region_fill" : "{*map_regions_present:region_fill*}", {?}
-            {?*map_regions_present:region_fill_color*}"region_fill_color" : "{*map_regions_present:region_fill_color*}", {?}
-            {?*map_regions_present:region_fill_opacity*}"region_fill_opacity" : "{*map_regions_present:region_fill_opacity*}", {?}
-        },
-        {%}
-    };
 
 </script>
 

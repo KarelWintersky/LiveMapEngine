@@ -17,6 +17,31 @@
     "file"   : "westfjord.svg",
     "layers" : [ "Paths" ]
   },
+  "layers": {
+    "Paths": {
+      "hint" : "Все пути",
+      "zoom_min" : -100,
+      "zoom_max" : 100,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#0000ff",
+        "fillOpacity": 0.1
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.1
+      }
+    }
+  },
   "regiondefaults" : {
     "color"       : "#ffffff",
     "width"       : 0,

@@ -4,6 +4,14 @@
  * Date: 16.01.2018, time: 9:22
  */
 class JSLayoutBuilder extends UnitPrototype {
+
+    /**
+     * @param DBConnectionLite $db_instance
+     */
+    // private $db_instance;
+
+    // private $db_table_prefix = '';
+
     /**
      * Результирующий шаблон
      * @var
@@ -59,9 +67,13 @@ class JSLayoutBuilder extends UnitPrototype {
     /**
      * @param $map_alias
      * @param string $mode
+     * param DBConnectionLite $dbi
      */
-    public function __construct( $map_alias, $mode = 'file' )
+    public function __construct( $map_alias, $mode = 'file' /* , \DBConnectionLite $dbi */)
     {
+        // $this->db_instance = $dbi;
+        // $this->db_table_prefix = $dbi->get_table_prefix();
+
         $this->map_alias = $map_alias;
         $this->config_type = $mode;
 
@@ -161,8 +173,7 @@ class JSLayoutBuilder extends UnitPrototype {
                 ];
             }
 
-            if (empty($json->layout))
-                throw new Exception("[JS Builder] Layout data not found.");
+            /* ============ SVG load ============= */
 
             $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
 
@@ -173,6 +184,13 @@ class JSLayoutBuilder extends UnitPrototype {
 
             if (strlen($svg_content) == 0)
                 throw new Exception("[JS Builder] Layout file is empty");
+
+
+            /* =============== Layout ============ */
+
+            // информация о слоях
+            if (empty($json->layout))
+                throw new Exception("[JS Builder] Layout data not found.");
 
             // создаем инсанс парсера, передаем SVG-контент файла
             $sp = new SVGParser( $svg_content );
@@ -193,21 +211,85 @@ class JSLayoutBuilder extends UnitPrototype {
             }
 
             if (!empty($json->layout->layers)) {
+                $layers_list = $json->layout->layers;
+            } else {
+                $layers_list[] = "Paths";
+            }
 
-                foreach($json->layout->layers as $layer) {
-                    $sp->parseLayer($layer);   // парсит слой (определяет атрибут трансформации слоя и конверит в объекты все элементы)
+            foreach($json->layout->layers as $layer) {
+                // грузим конфиг по умолчанию из $json
+                $defaults_empty = NULL;
+                $defaults_present = NULL;
+                $layer_config = NULL;
 
-                    // глобально-дефолтные значения используются на фронтэндея
-                    // $sp->setElementDefaultOptions(); // устанавливает дефолтные значения для опций элементов на слое (они могут быть перекрыты в определениях элемента)
-
-
-
-                    $paths_data += $sp->getElementsAll();
+                /**
+                 * @var stdClass $layer_config
+                 */
+                if (!empty($json->layers->$layer)) {
+                    $layer_config = $json->layers->$layer;
                 }
 
-            } else {
-                $sp->parseLayer("Paths");
-                $paths_data += $sp->getElementsAll();
+                $sp->parseLayer($layer);   // парсит слой (определяет атрибут трансформации слоя и конвертит в объекты все элементы)
+
+                // установим конфигурационные значения для пустых регионов для текущего слоя
+                $sp->setLayerDefaultOptions($layer_config);
+
+                // получаем все элементы на слое
+                $paths_at_layer = $sp->getElementsAll();
+
+                // теперь нам нужны айдишники этих элементов на слое. Их надо проверить в БД и заполнить значениями кастомных полей из БД
+                $paths_at_layers_ids = implode(", ", array_map(function($item){
+                    return "'{$item}'";
+                }, array_keys($paths_at_layer)));
+
+                // запросим БД на предмет кастомных значений и заполненности регионов
+                $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+                $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
+
+                //@TODO: ЕСЛИ СЕКЦИЯ ОПИСАНИЯ СЛОЯ НЕ ОПРЕДЕЛЕНА - ДАННЫЕ ЗАГРУЖАЮТСЯ КАК-ТО СТРАННО
+
+                foreach ($paths_at_layer_filled as $path) {
+                    $id_region = $path['id_region'];
+
+                    // обновляем $paths_at_layer [ $path["id_region"] ] значениями, полученными из базы. Если там нулл - то значениями из
+                    // конфига - если там не нулл.
+
+                    // БД > конфиг > nothing
+                    // В ФУНКЦИЮ? НАДО ЛИ?
+
+                    if ($layer_config->present->fill && $layer_config->present->fill == 1) {
+
+                        if (!$path['fillColor'] && $layer_config->present->fillColor) {
+                            $path['fillColor'] = $layer_config->present->fillColor;
+                        }
+
+                        if (!$path['fillOpacity'] && $layer_config->present->fillOpacity) {
+                            $path['fillOpacity'] = $layer_config->present->fillOpacity;
+                        }
+                    }
+
+                    if ($layer_config->present->stroke && $layer_config->present->stroke == 1) {
+
+                        if (!$path['borderColor'] && $layer_config->present->borderColor) {
+                            $path['borderColor'] = $layer_config->present->borderColor;
+                        }
+
+                        if (!$path['borderWidth'] && $layer_config->present->borderWidth) {
+                            $path['borderWidth'] = $layer_config->present->borderWidth;
+                        }
+
+                        if (!$path['borderOpacity'] && $layer_config->present->borderOpacity) {
+                            $path['borderOpacity'] = $layer_config->present->borderOpacity;
+                        }
+                    }
+
+                    $path['title'] = htmlspecialchars($path['title'], ENT_QUOTES | ENT_HTML5);
+                    unset($path['edit_date']);
+
+                    $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path);
+                }
+
+                $paths_data += $paths_at_layer;
             }
 
             // maxbounds
@@ -222,7 +304,6 @@ class JSLayoutBuilder extends UnitPrototype {
             }
 
             // $regions_for_js = $sp->exportSPaths( $paths_data );
-
 
         } catch (\Exception $e) {
 
@@ -254,10 +335,7 @@ class JSLayoutBuilder extends UnitPrototype {
         ));
         $this->template->set('/maxbounds', $max_bounds);
 
-        // $this->template->set('/map/regions_list', $regions_for_js);
-
         $this->template->set('/regions', $paths_data);
-
     }
 
     /**

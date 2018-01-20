@@ -136,7 +136,7 @@ buildPolymap = function(theMap, layer) {
         // DEFAULTS for ALL polygons
         var options = {
             color: region['color']      ||  theMap.defaults.polygon_color,
-            width: region['width']      ||  theMap.defaults.polygon_width,
+            weight: region['width']      ||  theMap.defaults.polygon_width,
             opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
             fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
             fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,

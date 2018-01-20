@@ -20,5 +20,8 @@ $js->run();
 
 $content = $js->content();
 $content = preg_replace('/^\h*\v+/m', '', $content);
+
+header("Content-Type: application/x-javascript");
+
 echo $content;
 

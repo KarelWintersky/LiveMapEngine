@@ -22,7 +22,8 @@ createControl_Backward();
    <  (Назад на карту)
 -
  */
-L.control.zoom({ position: 'bottomleft' }).addTo(map);
+// L.control.zoom({ position: 'bottomleft' }).addTo(map);
+map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
 
 var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
 
@@ -89,13 +90,12 @@ $(function(){
 
 
     // закрашиваем регионы с информацией другим цветом
-    //@todo: use fillColor from DB ( polymap[key]['present_region_fillcolor']. Сейчас используется дефолтное значение, причем хардкод :(
     // причем нужно использовать значение из элемента (БД!!!), если оно отсутствует - то слоя, если отсутвтвует - то дефолт.
-    regions_with_content.forEach(function(key){
+    /*regions_with_content.forEach(function(key){
         if (key in polymap) {
             polymap[ key ].setStyle({fillColor: '#00ff00'});
         }
-    });
+    });*/
 
 
     // toggle блоков с информацией/регионами

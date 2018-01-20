@@ -53,12 +53,20 @@ class SVGParser {
     // = layer_paths_oxy
     public $crs_translation_options = NULL;
 
+    // Имя текущего слоя-контейнера с данными
+    private $layer_name = '';
 
     // Текущий слой-контейнер с данными.
     private $layer_elements = [];
 
     // Сдвиг (translate) элементов на текущем слое
     private $layer_elements_translation = NULL;
+
+    // Конфиг текущего слоя
+    /**
+     * @var stdClass null
+     */
+    private $layer_elements_config = NULL;
 
 
     // ========================================================================================
@@ -187,6 +195,7 @@ class SVGParser {
      */
     public function parseLayer($layer_name) {
         if ($layer_name !== '') {
+            $this->layer_name = $layer_name;
 
             // xpath атрибутов слоя разметки
             $xpath_paths_layer_attrs = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]';
@@ -312,6 +321,8 @@ class SVGParser {
             }
         }
 
+        // получем информацию об атрибутах региона из SVG-разметки
+
         // получаем атрибут fillColor
         if (preg_match('#fill:([\#\d\w]{7})#', $path_style, $path_style_fillColor) ) {
             $data['fillColor'] = $path_style_fillColor[1];
@@ -329,6 +340,32 @@ class SVGParser {
             }
         };
 
+        // кастомные значения для пустых регионов
+        if ($this->layer_elements_config->empty->fill && $this->layer_elements_config->empty->fill == 1) {
+            if ($this->layer_elements_config->empty->fillColor) {
+                $data['fillColor'] = $this->layer_elements_config->empty->fillColor; //fillColor
+            }
+
+            if ($this->layer_elements_config->empty->fillOpacity) {
+                $data['fillOpacity'] = $this->layer_elements_config->empty->fillOpacity;
+            }
+        }
+
+        if ($this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1) {
+            if ($this->layer_elements_config->empty->borderColor) {
+                $data['borderColor'] = $this->layer_elements_config->empty->borderColor;
+            }
+
+            if ($this->layer_elements_config->empty->borderWidth) {
+                $data['borderWidth'] = $this->layer_elements_config->empty->borderWidth;
+            }
+
+            if ($this->layer_elements_config->empty->borderOpacity) {
+                $data['borderOpacity'] = $this->layer_elements_config->empty->borderOpacity;
+            }
+
+        }
+
         // получаем title узла
         $path_title = (string)$element->{'title'}[0];
         if ($path_title) {
@@ -340,6 +377,8 @@ class SVGParser {
         if ($path_desc) {
             $data['desc'] = htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
         }
+
+        $data['layer'] = $this->layer_name; //@todo: имя слоя надо передавать иначе
 
         return $data;
     }
@@ -393,6 +432,10 @@ class SVGParser {
         }
 
         return $all_paths;
+    }
+
+    public function setLayerDefaultOptions($options) {
+        $this->layer_elements_config = $options;
     }
 
 
