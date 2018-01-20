@@ -68,7 +68,7 @@ map.setZoom( theMap['map']['zoom'] );
 // основные функции
 $(function(){
     // умолчательные действия
-    $(".leaflet-container").css('background-color', leaflet_background_color);
+    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
 
     // создаем контролы
     // не показываем контрол "назад" если страница загружена в iframe
