@@ -1,3 +1,4 @@
+<!-- Неоптимизированный код -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +9,8 @@
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet.js"></script>
+
+    <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
 
     <script type="text/javascript" src="/js/map/{*map_alias*}.js" id="the-map-outer"></script>
 
@@ -73,33 +76,7 @@
 
     document.title = theMap['map']['title'];
 
-    var polymap = Object.create(null);
-
-    // build polygons
-    Object.keys( theMap.regions ).forEach(function( key ){
-        var region = theMap.regions[ key ];
-        var type = region['type'];
-        var coords = region['coords'];
-        var options = {
-            color: region['color']      ||  theMap.defaults.polygon_color,
-            width: region['width']      ||  theMap.defaults.polygon_width,
-            opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
-            fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
-            fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,
-            radius: region['radius'] || 0
-        };
-
-        var entity;
-        if (type == 'polygon') {
-            entity = L.polygon(coords, options);
-        } else if (type == 'rect') {
-            entity = L.rectangle(coords, options);
-        } else if (type == 'circle') {
-            entity = L.circle(coords, options)
-        }
-
-        polymap[ key ] = entity;
-    } );
+    polymap = buildPolymap(theMap);
 
     var map = L.map('map', {
         crs: L.CRS.Simple,
@@ -110,12 +87,10 @@
     });
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    var h = theMap['map']['height'];
-    var w = theMap['map']['width'];
-    var current_bounds  = [ [0, 0], [h, w ] ];
-
+    var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
     var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
 
+    // max bounds
     if (theMap['maxbounds']) {
         var mb = theMap['maxbounds'];
         map.setMaxBounds([ [ mb['topleft_h'] * h, mb['topleft_w'] * w ]  , [ mb['bottomright_h'] * h, mb['bottomright_w'] * w ] ]);
@@ -132,41 +107,14 @@
     map.fitBounds(current_bounds);
     map.setZoom( theMap['map']['zoom']);
 
-    L.Control.Backward = L.Control.extend({
-        options: {
-            position: 'bottomleft'
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-backward');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map){}
-    });
-
     // не показываем контрол "назад" если страница загружена в iframe
-    if (!(window != window.top || document != top.document || self.location != top.location)) {
-        var __BackwardBox = new L.Control.Backward();
-        map.addControl( __BackwardBox );
+    if (! (window != window.top || document != top.document || self.location != top.location)) {
+        createControl_Backward();
+        map.addControl( new L.Control.Backward() );
     }
 
-    L.Control.Title = L.Control.extend({
-        options: {
-            position: 'topleft'
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-region-title');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map){}
-    });
-    var __RegionTitleBox = new L.Control.Title();
-    map.addControl( __RegionTitleBox );
+    createControl_RegionTitle('topleft');
+    map.addControl( new L.Control.Title() );
 
     $(function(){
         $("#actor-backward-toggle").on('click', function (el){
@@ -187,8 +135,6 @@
     map.on('zoomend', function(ev) {
         console.log( map.getZoom() );
     });
-
-
 
 
 </script>

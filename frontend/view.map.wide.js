@@ -24,9 +24,7 @@ createControl_Backward();
  */
 L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-var h = theMap['map']['height'];
-var w = theMap['map']['width'];
-var current_bounds  = [ [0, 0], [h, w ] ];
+var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
 
 var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
 
@@ -73,7 +71,6 @@ $(function(){
     $(".leaflet-container").css('background-color', leaflet_background_color);
 
     // создаем контролы
-
     // не показываем контрол "назад" если страница загружена в iframe
     if (! (window != window.top || document != top.document || self.location != top.location)) {
         var __BackwardBox = new L.Control.Backward();

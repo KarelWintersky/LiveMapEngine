@@ -12,12 +12,15 @@
  * @param title
  *
  * @global map_alias, colorbox_width, colorbox_height
- * @todo: colorbox.width, colorbox.height
  */
 showContentColorbox = function(id_region , title) {
-    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+    var is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
+    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region + is_iframe;
+
     $.get( url, function() {
     }).done(function(data) {
+        var colorbox_width  =   theMap.colorbox.width      || 800;
+        var colorbox_height =   theMap.colorbox.height     || 600;
         $.colorbox({
             html: data,
             width: colorbox_width,
@@ -233,7 +236,28 @@ wlhBased_RegionFocus = function(options, polymap, layer) {
 
 /* ==================================================== begin: create controls ==================================================== */
 /**
- * Создает на в объекте L Control-элемент: список регионов (только создает
+ * Создает в объекте L Control-элемент: имя региона (для карт типа folio)
+ */
+createControl_RegionTitle = function(pos){
+    // return L.control.extend делать нельзя (ошибка TypeError: t.addTo is not a function )
+    L.Control.Title = L.Control.extend({
+        options: {
+            position: pos || 'topleft'
+        },
+        onAdd: function(map) {
+            var div = L.DomUtil.get('section-region-title');
+            L.DomUtil.removeClass(div, 'invisible');
+            L.DomEvent.disableScrollPropagation(div);
+            L.DomEvent.disableClickPropagation(div);
+            return div;
+        },
+        onRemove: function(map){}
+    });
+};
+
+
+/**
+ * Создает в объекте L Control-элемент: список регионов (только создает
  */
 createControl_RegionsBox = function() {
     L.Control.RegionsBox = L.Control.extend({
@@ -254,7 +278,7 @@ createControl_RegionsBox = function() {
 };
 
 /**
- * Создает на в объекте L Control элемент: информация о регионе
+ * Создает в объекте L Control элемент: информация о регионе
  */
 createControl_InfoBox = function(){
     L.Control.InfoBox = L.Control.extend({
@@ -275,12 +299,12 @@ createControl_InfoBox = function(){
 };
 
 /**
- * Создает на в объекте L Control элемент: кнопка "назад"
+ * Создает в объекте L Control элемент: кнопка "назад"
  */
-createControl_Backward = function(){
+createControl_Backward = function(pos){
     L.Control.Backward = L.Control.extend({
         options: {
-            position: 'bottomleft'
+            position: pos || 'bottomleft'
         },
         onAdd: function(map) {
             var div = L.DomUtil.get('section-backward');
