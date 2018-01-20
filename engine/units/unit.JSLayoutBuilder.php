@@ -195,7 +195,10 @@ class JSLayoutBuilder extends UnitPrototype {
             if (!empty($json->layout->layers)) {
 
                 foreach($json->layout->layers as $layer) {
-                    $sp->parseLayer($layer);
+                    $sp->parseLayer($layer);   // парсит слой (определяет атрибут трансформации слоя и конверит в объекты все элементы)
+
+                    // глобально-дефолтные значения используются на фронтэндея
+                    // $sp->setElementDefaultOptions(); // устанавливает дефолтные значения для опций элементов на слое (они могут быть перекрыты в определениях элемента)
 
 
 

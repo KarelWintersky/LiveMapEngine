@@ -1,126 +1,8 @@
 var current_infobox_region_id = '';
 
-showContentColorbox = function(id_region , title) {
-    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
-    $.get( url, function() {
-    }).done(function(data) {
-        $.colorbox({
-            html: data,
-            width: colorbox_width,
-            height: colorbox_height,
-            title: title,
-            onClosed: function(){
-                history.pushState('', document.title, window.location.pathname);
-            }
-        });
-    });
-}
-
-toggleContentViewBox = function(id_region, title) {
-    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
-    if (current_infobox_region_id == id_region) {
-        toggleInfoBox('#actor-viewbox-toggle');
-
-        if ( $('#actor-viewbox-toggle').data('content-is-visible') == false ) {
-            history.pushState('', document.title, window.location.pathname);
-        } else {
-            window.location.hash = "#view=[" + id_region + "]";
-        }
-
-    } else {
-        current_infobox_region_id = id_region;
-        $("#section-info-content").html('');
-        document.getElementById('section-info-content').scrollTop = 0; // scroll box to top
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            async: false
-        }).done(function(data){
-            var region_center = polymap [ id_region ].getBounds().getCenter();
-
-            // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-            if (map_centring_panning_step > 0) {
-                if (region_center.lng > map.getBounds().getCenter().lng ) {
-                    region_center.lng += map_centring_panning_step;
-                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-                }
-            } else {
-                if (region_center.lng <= map.getBounds().getCenter().lng ) {
-                    region_center.lng += map_centring_panning_step;
-                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-                }
-            }
-
-            $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
-            $("#section-info-content").html(data).show();
-
-        });
-    }
-}
-showContentViewBox = function(id_region, title) {
-    var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
-
-    $.get(url, function(){}).done(function(data){
-        var region_center = polymap [ id_region ].getBounds().getCenter();
-        region_center.lng -= 50; // move center to right (50px)
-        map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-        $("#section-info-content").html(data).show();
-        $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
-    });
-}
-toggleRegionsBox = function(el) {
-    var state = $(el).data('content-is-visible');
-    var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-    $(el).html(text);
-
-    var data = $(el).data('content');
-    $('#' + data).toggle();
-    $('#sort-select').toggle();
-    $(el).data('content-is-visible', !state);
-};
-toggleInfoBox = function(el) {
-    var state = $(el).data('content-is-visible');
-    var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-    $(el).html(text);
-
-    var data = $(el).data('content');
-    $('#' + data).toggle();
-    $(el).data('content-is-visible', !state);
-}
-
-var polymap = Object.create(null);
-
-/* === Build polygons === */
-
-Object.keys( theMap.regions ).forEach(function( key ){
-    var region = theMap.regions[ key ];
-    var type = region['type'];
-    var coords = region['coords'];
-    var options = {
-        color: region['color']      ||  theMap.defaults.polygon_color,
-        width: region['width']      ||  theMap.defaults.polygon_width,
-        opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
-        fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
-        fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,
-        radius: region['radius'] || 10
-    };
-
-    var entity;
-    if (type == 'polygon') {
-        entity = L.polygon(coords, options);
-    } else if (type == 'rect') {
-        entity = L.rectangle(coords, options);
-    } else if (type == 'circle') {
-        entity = L.circle(coords, options)
-    }
-
-    polymap[ key ] = entity;
-} );
-/* === end: Build polygons === */
+polymap = buildPolymap(theMap);
 
 //@todo: различные варианты CRS и исходных данных тайлов в зависимости от конфига
-
 var map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -3,
@@ -129,7 +11,18 @@ var map = L.map('map', {
     renderer: L.canvas(),
     zoomControl: false,
 });
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+createControl_RegionsBox();
+createControl_InfoBox();
+createControl_Backward();
+
+//@todo: придумать, как объединить в одном контроле кнопки +/- и кнопку backward:
+/*
++
+   <  (Назад на карту)
+-
+ */
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
 var h = theMap['map']['height'];
 var w = theMap['map']['width'];
@@ -160,114 +53,34 @@ Object.keys( polymap ).forEach(function( id_region ) {
     );
 });
 
-/* === bind-action-focus-region === */
-// при получении параметров на старте:
-// view= - показываем попап
-// focus= = делаем центровку на регионе
-if (true)
-{
-    var wlh = window.location.hash;
-    var wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
 
-    if ((wlh.length > 1) && (wlh_params !== null)) {
-        var wlh_action = wlh_params[1],
-            wlh_region_id = wlh_params[2],
-            is_region_drawn = wlh_region_id in polymap;
-
-        if (is_region_drawn && wlh_action == 'view' ) {
-            showContentViewBox( wlh_region_id );
-        } else if (is_region_drawn && wlh_action == 'focus') {
-            var wlh_region_bounds = polymap [ wlh_region_id ].getBounds();
-            var old_style = polymap[ wlh_region_id ].options['fillColor'];
-
-            map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: 0.5, noMoveStart: true});
-            polymap[ wlh_region_id ].setStyle({fillColor: '#ff0000'}); //@todo: OPTIONS->VIEWBOX->highlight color
-
-            setTimeout(function(){
-                polymap[ wlh_region_id ].setStyle({fillColor: oldstyle});
-            }, 1000); //@todo: OPTIONS->VIEWBOX->onfocus_timeout
-
-            // history.pushState('', document.title, window.location.pathname);
-        } else {
-            map.fitBounds(current_bounds);
-        }
+// обрабатываем Window Location Hash
+if (true) {
+    var wlh_options = wlhBased_GetAction(polymap);
+    if (wlh_options) {
+        wlhBased_RegionShowInfo(wlh_options);
+        wlhBased_RegionFocus(wlh_options, polymap);
     } else {
         map.fitBounds(current_bounds);
     }
 }
-/* === end: bind-action-focus-region === */
 
 map.setZoom( theMap['map']['zoom'] );
 
-/* === Create Controls === */
-if (true) {
-    L.Control.RegionsBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: $("#section-regions").data('leaflet-control-position')
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-regions');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-
-    L.Control.InfoBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: $("#section-infobox").data('leaflet-control-position')
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-infobox');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-
-    L.Control.Backward = L.Control.extend({
-        options: {
-            position: 'bottomleft'
-        },
-        onAdd: function(map) {
-            var div = L.DomUtil.get('section-backward');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map){}
-    });
-}
-/* === end: Create Controls === */
-
-
+// основные функции
 $(function(){
+    // умолчательные действия
     $(".leaflet-container").css('background-color', leaflet_background_color);
-    // закрашиваем регионы с информацией другим цветом
-    regions_with_content.forEach(function(key){
 
-    //@todo: use fillColor from DB ( polymap[key]['present_region_fillcolor']. Сейчас используется дефолтное значение, причем хардкод :(
-
-        if (key in polymap) {
-            polymap[ key ].setStyle({fillColor: '#00ff00'});
-        }
-    });
+    // создаем контролы
 
     // не показываем контрол "назад" если страница загружена в iframe
-    if (!(window != window.top || document != top.document || self.location != top.location)) {
+    if (! (window != window.top || document != top.document || self.location != top.location)) {
         var __BackwardBox = new L.Control.Backward();
         map.addControl( __BackwardBox );
     }
 
+    // показываем контентный регион только если есть список регионов с данными
     if (regions_with_content.length) {
         var __RegionsBox = new L.Control.RegionsBox();
         map.addControl( __RegionsBox );
@@ -277,15 +90,29 @@ $(function(){
     var __InfoBox = new L.Control.InfoBox();
     map.addControl( __InfoBox );
 
+
+    // закрашиваем регионы с информацией другим цветом
+    //@todo: use fillColor from DB ( polymap[key]['present_region_fillcolor']. Сейчас используется дефолтное значение, причем хардкод :(
+    // причем нужно использовать значение из элемента, если оно отсутствует - то слоя, если отсутвтвует - то дефолт.
+    regions_with_content.forEach(function(key){
+        if (key in polymap) {
+            polymap[ key ].setStyle({fillColor: '#00ff00'});
+        }
+    });
+
+
     // toggle блоков с информацией/регионами
+    //@todo: внести это правило внутрь метода создания контрола?
     $('#actor-regions-toggle').on('click', function (el) {
         toggleRegionsBox(this);
     });
 
+    //@todo: внести это правило внутрь метода создания контрола?
     $('#actor-viewbox-toggle').on('click', function (el) {
         toggleInfoBox(this);
     });
 
+    //@todo: внести это правило внутрь метода создания контрола?
     $("#actor-backward-toggle").on('click', function (el){
         var state = $(this).data('content-is-visible');
         var text = (state == false) ? '&lt;' : '&gt;'; //@todo: сообщения на активном/свернутом виде перенести в дата-атрибуты
@@ -322,46 +149,13 @@ $(function(){
 
 });
 
-// клик по региону в списке "интересных мест"
+// клик по региону в списке "интересных мест", созданном контролом createControl_RegionsBox()
+// для красоты .on() можно прикрепить к $(function() {}) выше.
 $(document).on('click', '.action-focus-at-region', function(){
-    var id_region = $(this).data('region-id');
-
-    var bound = polymap [ id_region ].getBounds();
-    map.panTo( bound.getCenter(), { animate: true, duration: 0.7, noMoveStart: true});
-
-    var oldstyle = polymap[ id_region ].options['fillColor'];
-
-    polymap[ id_region ].setStyle({fillColor: '#ff0000'});
-
-    setTimeout(function(){
-        polymap[ id_region ].setStyle({fillColor: oldstyle});
-        //когда сделаем кнопку, дающую ссылку на регион - эту строчку раскомментируем
-        // history.pushState('', document.title, window.location.pathname);
-    }, 1200);
-
-});
-
-// id="bind-actor-click-inside-colorbox"
-// обрабатываем клик по ссылке внутри попап окна
-// (на самом деле надо проверять, это ссылка на ту же карту или нет?)
-//@todo: протестировать, отладить!
-$(document).on('click', '#cboxLoadedContent a', function(){ // здесь другой элемент ловит событие!
-    var href = $(this).attr('href');
-    var wlh = window.location.href;
-
-    if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
-        var href_params = href.match(/view=\[(.*)\]/);
-        if (href_params != null) {
-            history.pushState('', document.title, window.location.pathname + href);
-
-            showContentBox(href_params[1], '');
-        }
-    } else {
-        window.location.assign(href);
-        window.location.reload(true);
-    }
-
-    return false;
+    wlhBased_RegionFocus({
+        action: 'focus',
+        region_id: $(this).data('region-id')
+    }, polymap);
 });
 
 // id="bind-actor-edit"
