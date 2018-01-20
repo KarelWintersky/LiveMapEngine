@@ -1,6 +1,33 @@
 {
   "title"         : "Map of Confederation",
   "type"          : "vector",
+  "display": {
+    "zoom": 0,
+    "zoom_min": -3,
+    "zoom_max": 2,
+    "background_color"  : "transparent",
+    "maxbounds": [[-0.5, -1], [1.5, 2]]
+  },
+  "display_defaults": {
+    "empty": {
+      "stroke": 0,
+      "borderColor" : "#000000",
+      "borderWidth" : 0,
+      "borderOpacity": 0,
+      "fill": 1,
+      "fillColor": "#0000ff",
+      "fillOpacity": 0.3
+    },
+    "present": {
+      "stroke": 0,
+      "borderColor" : "#000000",
+      "borderWidth" : 0,
+      "borderOpacity": 0,
+      "fill": 1,
+      "fillColor": "#00ff00",
+      "fillOpacity": 0.4
+    }
+  },
   "files" : {
     "image"       : "image.svg",
     "layout"      : "layout.svg"
@@ -15,20 +42,6 @@
   "layout": {
     "file"   : "temp.svg",
     "layers" : [ "Stars&Channels", "CLOutline", "Paths" ]
-  },
-  "regiondefaults" : {
-    "color"       : "#ffffff",
-    "width"       : 0,
-    "opacity"     : 0,
-    "fillcolor"   : "#ff0000",
-    "fillopacity" : 0.7
-  },
-  "viewport": {
-    "width" : "800px",
-    "height": "600px",
-    "zoom"  : "0",
-    "background_color"  : "transparent",
-    "maxbounds": [[-0.5, -1], [1.5, 2]]
   },
   "edit_templates": {
     "templates": [

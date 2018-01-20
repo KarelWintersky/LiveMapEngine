@@ -33,7 +33,7 @@ Object.keys( polymap ).forEach(function(id_region){
 });
 
 map.fitBounds(current_bounds);
-map.setZoom( theMap['map']['zoom']);
+map.setZoom( theMap['display']['zoom'] );
 
 // обрабатываем Window Location Hash
 if (true) {
@@ -50,7 +50,7 @@ map.setZoom( theMap['map']['zoom'] );
 createControl_Backward();
 
 $(function(){
-    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
+    $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
     // создаем контролы
     // не показываем контрол "назад" если страница загружена в iframe

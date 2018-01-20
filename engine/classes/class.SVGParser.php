@@ -341,30 +341,36 @@ class SVGParser {
         };
 
         // кастомные значения для пустых регионов
-        if ($this->layer_elements_config->empty->fill && $this->layer_elements_config->empty->fill == 1) {
-            if ($this->layer_elements_config->empty->fillColor) {
-                $data['fillColor'] = $this->layer_elements_config->empty->fillColor; //fillColor
-            }
+        if ($this->layer_elements_config) {
+            if ($this->layer_elements_config->empty->fill && $this->layer_elements_config->empty->fill == 1) {
+                if ($this->layer_elements_config->empty->fillColor) {
+                    $data['fillColor'] = $this->layer_elements_config->empty->fillColor; //fillColor
+                }
 
-            if ($this->layer_elements_config->empty->fillOpacity) {
-                $data['fillOpacity'] = $this->layer_elements_config->empty->fillOpacity;
-            }
-        }
+                if ($this->layer_elements_config->empty->fillOpacity) {
+                    $data['fillOpacity'] = $this->layer_elements_config->empty->fillOpacity;
+                }
+            } // if ... $this->layer_elements_config->empty->fill == 1)
 
-        if ($this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1) {
-            if ($this->layer_elements_config->empty->borderColor) {
-                $data['borderColor'] = $this->layer_elements_config->empty->borderColor;
-            }
+            if ($this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1) {
+                if ($this->layer_elements_config->empty->borderColor) {
+                    $data['borderColor'] = $this->layer_elements_config->empty->borderColor;
+                }
 
-            if ($this->layer_elements_config->empty->borderWidth) {
-                $data['borderWidth'] = $this->layer_elements_config->empty->borderWidth;
-            }
+                if ($this->layer_elements_config->empty->borderWidth) {
+                    $data['borderWidth'] = $this->layer_elements_config->empty->borderWidth;
+                }
 
-            if ($this->layer_elements_config->empty->borderOpacity) {
-                $data['borderOpacity'] = $this->layer_elements_config->empty->borderOpacity;
-            }
+                if ($this->layer_elements_config->empty->borderOpacity) {
+                    $data['borderOpacity'] = $this->layer_elements_config->empty->borderOpacity;
+                }
 
-        }
+            } // if ... $this->layer_elements_config->empty->stroke == 1)
+
+        } // if ($this->layer_elements_config)
+
+
+
 
         // получаем title узла
         $path_title = (string)$element->{'title'}[0];

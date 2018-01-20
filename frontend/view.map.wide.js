@@ -64,12 +64,12 @@ if (true) {
     }
 }
 
-map.setZoom( theMap['map']['zoom'] );
+map.setZoom( theMap['display']['zoom'] );
 
 // основные функции
 $(function(){
     // умолчательные действия
-    $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
+    $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
     // создаем контролы
     // не показываем контрол "назад" если страница загружена в iframe
@@ -87,16 +87,6 @@ $(function(){
     // его надо создавать только когда заявили показ информации!
     var __InfoBox = new L.Control.InfoBox();
     map.addControl( __InfoBox );
-
-
-    // закрашиваем регионы с информацией другим цветом
-    // причем нужно использовать значение из элемента (БД!!!), если оно отсутствует - то слоя, если отсутвтвует - то дефолт.
-    /*regions_with_content.forEach(function(key){
-        if (key in polymap) {
-            polymap[ key ].setStyle({fillColor: '#00ff00'});
-        }
-    });*/
-
 
     // toggle блоков с информацией/регионами
     //@todo: внести это правило внутрь метода создания контрола?

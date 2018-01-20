@@ -251,36 +251,60 @@ class JSLayoutBuilder extends UnitPrototype {
                 foreach ($paths_at_layer_filled as $path) {
                     $id_region = $path['id_region'];
 
-                    // обновляем $paths_at_layer [ $path["id_region"] ] значениями, полученными из базы. Если там нулл - то значениями из
-                    // конфига - если там не нулл.
+                    // если конфиг слоя определен
+                    if ($layer_config) {
 
-                    // БД > конфиг > nothing
-                    // В ФУНКЦИЮ? НАДО ЛИ?
+                        // если определены параметры заполнения региона
+                        if ($layer_config->present->fill && $layer_config->present->fill == 1) {
 
-                    if ($layer_config->present->fill && $layer_config->present->fill == 1) {
+                            if (!$path['fillColor'] && $layer_config->present->fillColor) {
+                                $path['fillColor'] = $layer_config->present->fillColor;
+                            }
 
-                        if (!$path['fillColor'] && $layer_config->present->fillColor) {
-                            $path['fillColor'] = $layer_config->present->fillColor;
+                            if (!$path['fillOpacity'] && $layer_config->present->fillOpacity) {
+                                $path['fillOpacity'] = $layer_config->present->fillOpacity;
+                            }
                         }
 
-                        if (!$path['fillOpacity'] && $layer_config->present->fillOpacity) {
-                            $path['fillOpacity'] = $layer_config->present->fillOpacity;
-                        }
-                    }
+                        // если определены параметры кастомной отрисовки границ региона
+                        if ($layer_config->present->stroke && $layer_config->present->stroke == 1) {
 
-                    if ($layer_config->present->stroke && $layer_config->present->stroke == 1) {
+                            if (!$path['borderColor'] && $layer_config->present->borderColor) {
+                                $path['borderColor'] = $layer_config->present->borderColor;
+                            }
 
-                        if (!$path['borderColor'] && $layer_config->present->borderColor) {
-                            $path['borderColor'] = $layer_config->present->borderColor;
+                            if (!$path['borderWidth'] && $layer_config->present->borderWidth) {
+                                $path['borderWidth'] = $layer_config->present->borderWidth;
+                            }
+
+                            if (!$path['borderOpacity'] && $layer_config->present->borderOpacity) {
+                                $path['borderOpacity'] = $layer_config->present->borderOpacity;
+                            }
                         }
 
-                        if (!$path['borderWidth'] && $layer_config->present->borderWidth) {
-                            $path['borderWidth'] = $layer_config->present->borderWidth;
+                    } else {
+                        // иначе, конфиг слоя не определен, используются глобальные дефолтные значения
+
+                        if (!$path['fillColor']) {
+                            $path['fillColor'] = $json->display_defaults->present->fillColor;
                         }
 
-                        if (!$path['borderOpacity'] && $layer_config->present->borderOpacity) {
-                            $path['borderOpacity'] = $layer_config->present->borderOpacity;
+                        if (!$path['fillOpacity']) {
+                            $path['fillOpacity'] = $json->display_defaults->present->fillOpacity;
                         }
+
+                        if (!$path['borderColor']) {
+                            $path['borderColor'] = $json->display_defaults->present->borderColor;
+                        }
+
+                        if (!$path['borderWidth']) {
+                            $path['borderWidth'] = $json->display_defaults->present->borderWidth;
+                        }
+
+                        if (!$path['borderOpacity']) {
+                            $path['borderOpacity'] = $json->display_defaults->present->borderOpacity;
+                        }
+
                     }
 
                     $path['title'] = htmlspecialchars($path['title'], ENT_QUOTES | ENT_HTML5);
@@ -293,13 +317,13 @@ class JSLayoutBuilder extends UnitPrototype {
             }
 
             // maxbounds
-            if (!empty($json->viewport->maxbounds)) {
+            if (!empty($json->display->maxbounds)) {
                 $max_bounds = [
                     'present'   =>  1,
-                    'topleft_h'     =>  $json->viewport->maxbounds[0][0],
-                    'topleft_w'     =>  $json->viewport->maxbounds[0][1],
-                    'bottomright_h' =>  $json->viewport->maxbounds[1][0],
-                    'bottomright_w' =>  $json->viewport->maxbounds[1][1]
+                    'topleft_h'     =>  $json->display->maxbounds[0][0],
+                    'topleft_w'     =>  $json->display->maxbounds[0][1],
+                    'bottomright_h' =>  $json->display->maxbounds[1][0],
+                    'bottomright_w' =>  $json->display->maxbounds[1][1]
                 ];
             }
 
@@ -311,7 +335,7 @@ class JSLayoutBuilder extends UnitPrototype {
 
         // теперь генерируем подстановочные значения для шаблона
         $this->template = new Template($this->template_file, $this->template_path);
-        $this->template->set('/map', array(
+        $this->template->set('/map', [
             'title'         =>  $json->title,
             'alias'         =>  $this->map_alias,
             'imagefile'     =>  $json->image->file,
@@ -319,21 +343,17 @@ class JSLayoutBuilder extends UnitPrototype {
             'height'        =>  $image_info['height'],
             'ox'            =>  $image_info['ox'],
             'oy'            =>  $image_info['oy'],
-            'default_zoom'  =>  $json->viewport->zoom,
-        ));
-        $this->template->set('/defaults', array(
-            'color'         =>  $json->regiondefaults->color,
-            'width'         =>  $json->regiondefaults->width,
-            'opacity'       =>  $json->regiondefaults->opacity,
-            'fillcolor'     =>  $json->regiondefaults->fillcolor,
-            'fillopacity'   =>  $json->regiondefaults->fillopacity
-        ));
-        $this->template->set('/viewport', array(
-            'width'         =>  $json->viewport->width,
-            'height'        =>  $json->viewport->height,
-            'background_color'  =>  $json->viewport->background_color
-        ));
+        ]);
+        $this->template->set('/display', [
+            'zoom'          =>  $json->display->zoom,
+            'zoom_max'      =>  $json->display->zoom_max,
+            'zoom_min'      =>  $json->display->zoom_min,
+            'background_color'  =>  $json->display->background_color,
+        ]);
         $this->template->set('/maxbounds', $max_bounds);
+
+        $this->template->set('/region_defaults_empty', (array)$json->display_defaults->empty);
+        $this->template->set('/region_defaults_present', (array)$json->display_defaults->present);
 
         $this->template->set('/regions', $paths_data);
     }

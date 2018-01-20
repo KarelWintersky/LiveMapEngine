@@ -103,7 +103,7 @@
     });
 
     map.fitBounds(current_bounds);
-    map.setZoom( theMap['map']['zoom']);
+    map.setZoom( theMap['display']['zoom'] );
 
     // не показываем контрол "назад" если страница загружена в iframe
     if (! (window != window.top || document != top.document || self.location != top.location)) {
@@ -115,7 +115,7 @@
     map.addControl( new L.Control.Title() );
 
     $(function(){
-        $(".leaflet-container").css('background-color', theMap['viewport']['background_color']);
+        $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
         $("#actor-backward-toggle").on('click', function (el){
             var state = $(this).data('content-is-visible');

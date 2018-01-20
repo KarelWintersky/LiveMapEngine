@@ -135,11 +135,11 @@ buildPolymap = function(theMap, layer) {
 
         // DEFAULTS for ALL polygons
         var options = {
-            color: region['color']      ||  theMap.defaults.polygon_color,
-            weight: region['width']      ||  theMap.defaults.polygon_width,
-            opacity: region['opacity']    ||  theMap.defaults.polygon_opacity,
-            fillColor: region['fillColor']  ||  theMap.defaults.polygon_fillColor,
-            fillOpacity: region['fillOpacity'] || theMap.defaults.polygon_fillOpacity,
+            color: region['borderColor']      ||  theMap.region_defaults_empty.borderColor,
+            weight: region['borderWidth']      ||  theMap.region_defaults_empty.borderWidth,
+            opacity: region['borderOpacity']    ||  theMap.region_defaults_empty.borderOpacity,
+            fillColor: region['fillColor']  ||  theMap.region_defaults_empty.fillColor,
+            fillOpacity: region['fillOpacity'] || theMap.region_defaults_empty.fillOpacity,
             radius: region['radius'] || 10
         };
 
