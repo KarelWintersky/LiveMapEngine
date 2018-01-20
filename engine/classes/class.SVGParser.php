@@ -256,14 +256,6 @@ class SVGParser {
 
         $data['id'] = $path_id;
 
-        /*
-        // немного грязной магии: и сдвиг слоя, и трансляция в другую модель делается при помощи одной и той же функции
-        // и вызывается она всегда
-        if ($this->crs_translation_options) {
-            $coords = self::translate_knot_from_XY_to_CRS( $coords );
-        }
-        */
-
         switch ($type) {
             case 'path' : {
                 // кол-во путей ~

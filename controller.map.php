@@ -36,6 +36,7 @@ $viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $view
 $map = new MapRender( $alias_map, $json_config );
 $map_found = $map->run( $viewmode );
 $content = $map->content();
+$content = preg_replace('/^\h*\v+/m', '', $content);
 echo $content;
 
 

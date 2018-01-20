@@ -26,6 +26,20 @@
     var regions_with_content = [
         {*map_regions_with_info_jsarray*}
     ];
+
+    var regions_with_content_options = {
+        {%*map_regions_present*}
+        "{*map_regions_present:id_region*}" : {
+            {?*map_regions_present:region_border_color*}"region_border_color" : "{*map_regions_present:region_border_color*}", {?}
+            {?*map_regions_present:region_border_width*}"region_border_width" : "{*map_regions_present:region_border_width*}", {?}
+            {?*map_regions_present:region_border_opacity*}"region_border_opacity" : "{*map_regions_present:region_border_opacity*}", {?}
+            {?*map_regions_present:region_fill*}"region_fill" : "{*map_regions_present:region_fill*}", {?}
+            {?*map_regions_present:region_fill_color*}"region_fill_color" : "{*map_regions_present:region_fill_color*}", {?}
+            {?*map_regions_present:region_fill_opacity*}"region_fill_opacity" : "{*map_regions_present:region_fill_opacity*}", {?}
+        },
+        {%}
+    };
+
 </script>
 
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>

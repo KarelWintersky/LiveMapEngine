@@ -49,11 +49,15 @@ class LiveMapEngine
      * @return array
      */
     public function getRegionsWithInfo($map_alias) {
-        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions'); //@todo: remove table define from config
+        $table = $this->table_prefix . 'map_data_regions'; //@todo: remove table define from config
         $query = "
-    SELECT `id_region`, `title`, `edit_date` FROM
+    SELECT
+    `id_region`, `title`, `edit_date`,
+    `region_border_color`, `region_border_width`, `region_border_opacity`,
+    `region_fill`, `region_fill_color`, `region_fill_opacity`
+    FROM
     (
-	  SELECT `id_region`, `title`, `edit_date`
+	  SELECT *
 	  FROM {$table}
 	  WHERE
     	`alias_map` = :alias_map
@@ -67,7 +71,11 @@ class LiveMapEngine
                 'alias_map'        =>  $map_alias
             ));
 
-            $all_regions = $sth->fetchAll();
+            //@todo: HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
+            array_map(function($item) use (&$all_regions) {
+                $all_regions[ $item['id_region'] ] = $item;
+            }, $sth->fetchAll());
+
         } catch (\PDOException $e) {
         }
         return $all_regions;

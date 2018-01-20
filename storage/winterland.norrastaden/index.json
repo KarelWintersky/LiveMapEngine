@@ -18,9 +18,9 @@
     "layers" : [ "Paths" ]
   },
   "regiondefaults" : {
-    "color"       : "#ffffff",
-    "width"       : 0,
-    "opacity"     : 0,
+    "color"       : "#000000",
+    "width"       : 1,
+    "opacity"     : 1,
     "fillcolor"   : "#0000ff",
     "fillopacity" : 0.1
   },
