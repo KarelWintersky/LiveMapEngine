@@ -30,7 +30,7 @@ var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(ma
 
 if (theMap['maxbounds']) {
     var mb = theMap['maxbounds'];
-    map.setMaxBounds([ [ mb['topleft_h'] * h, mb['topleft_w'] * w ]  , [ mb['bottomright_h'] * h, mb['bottomright_w'] * w ] ]);
+    map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
 }
 
 var poly_layer = new L.LayerGroup();
@@ -90,7 +90,7 @@ $(function(){
 
     // закрашиваем регионы с информацией другим цветом
     //@todo: use fillColor from DB ( polymap[key]['present_region_fillcolor']. Сейчас используется дефолтное значение, причем хардкод :(
-    // причем нужно использовать значение из элемента, если оно отсутствует - то слоя, если отсутвтвует - то дефолт.
+    // причем нужно использовать значение из элемента (БД!!!), если оно отсутствует - то слоя, если отсутвтвует - то дефолт.
     regions_with_content.forEach(function(key){
         if (key in polymap) {
             polymap[ key ].setStyle({fillColor: '#00ff00'});

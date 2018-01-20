@@ -17,7 +17,7 @@ var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(ma
 
 if (theMap['maxbounds']) {
     var mb = theMap['maxbounds'];
-    map.setMaxBounds([ [ mb['topleft_h'] * h, mb['topleft_w'] * w ]  , [ mb['bottomright_h'] * h, mb['bottomright_w'] * w ] ]);
+    map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
 }
 
 // draw polygons on map, bind on-click function

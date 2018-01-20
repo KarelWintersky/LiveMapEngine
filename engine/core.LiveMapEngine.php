@@ -49,7 +49,7 @@ class LiveMapEngine
      * @return array
      */
     public function getRegionsWithInfo($map_alias) {
-        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
+        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions'); //@todo: remove table define from config
         $query = "
     SELECT `id_region`, `title`, `edit_date` FROM
     (
