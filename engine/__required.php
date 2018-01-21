@@ -29,6 +29,7 @@ require_once (__ROOT__ . '/engine/classes/class.SVGParser.php');
 require_once (__ROOT__ . '/engine/classes/class.CLIConsole.php');
 require_once (__ROOT__ . '/engine/classes/class.Template.php');
 require_once (__ROOT__ . '/engine/classes/proto.UnitPrototype.php');
+require_once (__ROOT__ . '/engine/classes/class.LMEMapConfigLoader.php');
 
 // INIT
 $main_config = new INI_Config(PATH_CONFIG . 'config.ini');

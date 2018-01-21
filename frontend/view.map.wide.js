@@ -79,7 +79,7 @@ $(function(){
     }
 
     // показываем контентный регион только если есть список регионов с данными
-    if (regions_with_content.length) {
+    if (regions_with_content_ids.length) {
         var __RegionsBox = new L.Control.RegionsBox();
         map.addControl( __RegionsBox );
     }

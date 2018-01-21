@@ -65,30 +65,13 @@ class MapRender extends UnitPrototype
         $map_info = $lm_engine->getMapInfo( $this->map_alias );
 
         $this->template->set('/', array(
-            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
+            // 'regions_with_content_ids'      =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
+
+            'regions_with_content_ids'      =>  array_keys( $regions_with_data ),
+
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
             'map_regions_count'             =>  count($regions_with_data),
-
-            'map_regions_present'           =>  array_map(function($item){
-                // нам надо ансетать те элементы, у которых
-                $id_region = $item['id_region'];
-                unset($item['title']);
-                unset($item['id_region']);
-                unset($item['edit_date']);
-                if (empty($item)) {
-
-                    return false;
-                } else {
-                    $item['id_region'] = $id_region;
-                    return $item;
-                }
-            }, $regions_with_data),
-
-
-            // map
-            // тайтл карты и настройки мы должны брать из таблицы settings_map
-            // но сейчас она не заполняется никак и все данные берутся из json-файла настроек или SVG-файла разметки
         ));
 
 

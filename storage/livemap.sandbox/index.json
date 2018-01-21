@@ -1,6 +1,35 @@
 {
-  "title" : "Trollfjorden",
-  "type"  : "bitmap",
+  "title"         : "Trollfjorden",
+  "type"          : "bitmap",
+  "display": {
+    "zoom": -1,
+    "zoom_min": -3,
+    "zoom_max": 2,
+    "background_color"  : "white",
+    "maxbounds": [],
+    "cursor": "crosshair",
+    "viewmode": "folio"
+  },
+  "display_defaults": {
+    "empty": {
+      "stroke": 0,
+      "borderColor" : "#000000",
+      "borderWidth" : 0,
+      "borderOpacity": 0,
+      "fill": 1,
+      "fillColor": "#0000ff",
+      "fillOpacity": 0.3
+    },
+    "present": {
+      "stroke": 0,
+      "borderColor" : "#000000",
+      "borderWidth" : 0,
+      "borderOpacity": 0,
+      "fill": 1,
+      "fillColor": "##2277ff",
+      "fillOpacity": 0.4
+    }
+  },
   "image" : {
     "file"  : "trollfjorden_xl.png",
     "width" : 2096,
@@ -8,21 +37,37 @@
     "ox"    : 0,
     "oy"    : 0
   },
-  "regiondefaults" : {
-    "color"       : "#000000",
-    "width"       : 1,
-    "opacity"     : 0.3,
-    "fillcolor"   : "#2277ff",
-    "fillopacity" : 0.5
+  "layout": {
+    "file"   : "temp.svg",
+    "layers" : [ "" ]
+  },
+  "layers": {
+    "Paths": {
+      "hint" : "Все пути",
+      "zoom_min" : -100,
+      "zoom_max" : 100,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#0000ff",
+        "fillOpacity": 0.1
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.1
+      }
+    }
   },
   "colorbox": {
     "width" : "900px",
     "height": "700px"
-  },
-  "viewport": {
-    "viewmode" : "folio",
-    "cursor": "crosshair",
-    "zoom"  : "-1",
-    "background_color"  : "white"
   }
 }

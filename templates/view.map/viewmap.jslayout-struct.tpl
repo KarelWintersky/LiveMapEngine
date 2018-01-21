@@ -1,6 +1,7 @@
 var theMap = {
+    {?*JSBuilderError*}"error": "{*JSBuilderError*}",{?}
     "map": {
-        "title"             : "{*map.title*}",
+        "title"             :   "{*map.title*}",
         "imagefile"         :   "/storage/{*map.alias*}/{*map.imagefile*}",
         "width"             :   {*map.width*},
         "height"            :   {*map.height*},

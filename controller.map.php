@@ -12,31 +12,39 @@ require_once (__ROOT__ . '/engine/units/unit.MapRender.php');
 $valid_view_modes = array(
     'colorbox', 'tabled:colorbox', 'folio', 'iframe', 'iframe:colorbox', 'wide:infobox>regionbox', 'wide:regionbox>infobox'
 );
-// дефолтный режим просмотра
-$viewmode = 'wide:infobox>regionbox'; // default view mode
+$viewmode = 'wide:infobox>regionbox';
 
-$alias_map  = $_GET['alias'] ?? NULL;
-if (!$alias_map) die('404');
+try {
+    $alias_map  = $_GET['alias'] ?? NULL;
 
-// загружаем "скин" из json-файла (или БД) карты
-$filename = PATH_STORAGE . $alias_map . '/index.json';
-if (!is_file($filename)) {
-    die('Incorrect path: ' . PATH_STORAGE . $alias_map);
+    $cfl = new LMEMapConfigLoader($alias_map, 'file', LMEConfig::get_dbi());
+    if ($cfl->ERROR)
+        throw new \Exception($cfl->ERROR_MESSAGE);
+
+    /**
+     * @var stdClass $json_config
+     */
+    $json_config = $cfl->loadConfig();
+
+    if (!empty($json_config->display->viewmode))
+        $viewmode = $json_config->display->viewmode;
+
+    // перекрываем его из $_GET
+    $viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
+    $viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
+
+    $map = new MapRender( $alias_map, $json_config );
+    $map_found = $map->run( $viewmode );
+    $content = $map->content();
+    $content = preg_replace('/^\h*\v+/m', '', $content);
+
+    echo $content;
+
+} catch (\Exception $e) {
+    die( $e->getMessage() );
 }
 
-$json_config = json_decode( file_get_contents( $filename ) );
 
-if (!empty($json_config->viewport->viewmode))
-    $viewmode = $json_config->viewport->viewmode;
 
-// перекрываем его из $_GET
-$viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
-$viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
-
-$map = new MapRender( $alias_map, $json_config );
-$map_found = $map->run( $viewmode );
-$content = $map->content();
-$content = preg_replace('/^\h*\v+/m', '', $content);
-echo $content;
 
 

@@ -6,7 +6,9 @@
     "zoom_min": -3,
     "zoom_max": 2,
     "background_color"  : "transparent",
-    "maxbounds": [[-0.5, -1], [1.5, 2]]
+    "maxbounds": [[-0.5, -1], [1.5, 2]],
+    "custom_css" : "style.css",
+    "cursor": "pointer"
   },
   "display_defaults": {
     "empty": {
@@ -28,10 +30,6 @@
       "fillOpacity": 0.4
     }
   },
-  "files" : {
-    "image"       : "image.svg",
-    "layout"      : "layout.svg"
-  },
   "image" : {
     "file"  : "temp.svg",
     "width" : 2104,
@@ -42,6 +40,54 @@
   "layout": {
     "file"   : "temp.svg",
     "layers" : [ "Stars&Channels", "CLOutline", "Paths" ]
+  },
+  "layers": {
+    "Stars&Channels": {
+      "hint" : "Все пути",
+      "zoom_min" : -100,
+      "zoom_max" : 100,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#0000ff",
+        "fillOpacity": 0.3
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.3
+      }
+    },
+    "CLOutline": {
+      "hint" : "Все пути",
+      "zoom_min" : -100,
+      "zoom_max" : 100,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#5500ff",
+        "fillOpacity": 0.3
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#ffff00",
+        "fillOpacity": 0.4
+      }
+    }
   },
   "edit_templates": {
     "templates": [

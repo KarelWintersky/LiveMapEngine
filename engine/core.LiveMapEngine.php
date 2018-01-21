@@ -93,7 +93,7 @@ class LiveMapEngine
                 'alias_map'        =>  $map_alias
             ));
 
-            //@todo: HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
+            //@HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
             array_map(function($item) use (&$all_regions) {
                 $all_regions[ $item['id_region'] ] = $item;
             }, $sth->fetchAll());
@@ -104,6 +104,7 @@ class LiveMapEngine
     }
 
     /**
+     * Выделяет из массива регионов
      * @param $regions_array
      * @return string
      */

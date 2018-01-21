@@ -84,6 +84,9 @@ class JSLayoutBuilder extends UnitPrototype {
             if ($this->map_alias == NULL)
                 throw new \Exception("[JS Builder] Map alias not defined", 1);
 
+
+
+
             $this->json_config_filename = $json_config_filename = PATH_STORAGE . $this->map_alias . '/index.json';
 
             if (!is_file($json_config_filename))
@@ -246,8 +249,6 @@ class JSLayoutBuilder extends UnitPrototype {
                 $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
                 $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
 
-                //@TODO: ЕСЛИ СЕКЦИЯ ОПИСАНИЯ СЛОЯ НЕ ОПРЕДЕЛЕНА - ДАННЫЕ ЗАГРУЖАЮТСЯ КАК-ТО СТРАННО
-
                 foreach ($paths_at_layer_filled as $path) {
                     $id_region = $path['id_region'];
 
@@ -330,11 +331,16 @@ class JSLayoutBuilder extends UnitPrototype {
             // $regions_for_js = $sp->exportSPaths( $paths_data );
 
         } catch (\Exception $e) {
-
+            $this->ERROR = TRUE;
+            $this->ERROR_MESSAGE = $e->getMessage();
         }
 
         // теперь генерируем подстановочные значения для шаблона
         $this->template = new Template($this->template_file, $this->template_path);
+
+        if ($this->ERROR)
+            $this->template->set('/JSBuilderError', $this->ERROR_MESSAGE);
+
         $this->template->set('/map', [
             'title'         =>  $json->title,
             'alias'         =>  $this->map_alias,
