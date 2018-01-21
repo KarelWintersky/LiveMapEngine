@@ -13,18 +13,23 @@ $valid_view_modes = array(
     'colorbox', 'tabled:colorbox', 'folio', 'iframe', 'iframe:colorbox', 'wide:infobox>regionbox', 'wide:regionbox>infobox'
 );
 $viewmode = 'wide:infobox>regionbox';
+/**
+ * @var stdClass $json_config
+ */
+$json_config = NULL;
 
 try {
     $alias_map  = $_GET['alias'] ?? NULL;
 
-    $cfl = new LMEMapConfigLoader($alias_map, 'file', LMEConfig::get_dbi());
+    $cfl = new LMEMapConfigLoader($alias_map, 'file');
     if ($cfl->ERROR)
         throw new \Exception($cfl->ERROR_MESSAGE);
 
-    /**
-     * @var stdClass $json_config
-     */
-    $json_config = $cfl->loadConfig();
+    $cfl->loadConfig();
+    if ($cfl->ERROR)
+        throw new \Exception($cfl->ERROR_MESSAGE);
+
+    $json_config = $cfl->getConfig();
 
     if (!empty($json_config->display->viewmode))
         $viewmode = $json_config->display->viewmode;

@@ -69,11 +69,8 @@ class JSLayoutBuilder extends UnitPrototype {
      * @param string $mode
      * param DBConnectionLite $dbi
      */
-    public function __construct( $map_alias, $mode = 'file' /* , \DBConnectionLite $dbi */)
+    public function __construct( $map_alias, $mode = 'file' )
     {
-        // $this->db_instance = $dbi;
-        // $this->db_table_prefix = $dbi->get_table_prefix();
-
         $this->map_alias = $map_alias;
         $this->config_type = $mode;
 
@@ -81,21 +78,15 @@ class JSLayoutBuilder extends UnitPrototype {
         $this->template_path = '$/templates/view.map';
 
         try {
-            if ($this->map_alias == NULL)
-                throw new \Exception("[JS Builder] Map alias not defined", 1);
+            $cfl = new LMEMapConfigLoader($this->map_alias, 'file');
+            if ($cfl->ERROR)
+                throw new \Exception($cfl->ERROR_MESSAGE);
 
+            $cfl->loadConfig();
+            if ($cfl->ERROR)
+                throw new \Exception($cfl->ERROR_MESSAGE);
 
-
-
-            $this->json_config_filename = $json_config_filename = PATH_STORAGE . $this->map_alias . '/index.json';
-
-            if (!is_file($json_config_filename))
-                throw new \Exception("[JS Builder] {$json_config_filename} not found", 2);
-
-            $this->json_config_content = file_get_contents( $json_config_filename );
-
-            if (!$this->json_config_content)
-                throw new \Exception("[JS Builer] Can't get content of {$json_config_filename} file.");
+            $this->json_config = $cfl->getConfig();
 
         } catch (\Exception $e) {
             $this->ERROR = TRUE;
@@ -103,40 +94,6 @@ class JSLayoutBuilder extends UnitPrototype {
         }
 
         if ($this->ERROR) die($this->ERROR_MESSAGE);
-    }
-
-    public function loadConfig(){
-
-        switch ($this->config_type) {
-            case 'file' : {
-                $this->loadConfig_File();
-                break;
-            }
-            case 'mysql': {
-                $this->loadConfig_MySQL();
-                break;
-            }
-        }
-
-        if ($this->ERROR) die($this->ERROR_MESSAGE);
-    }
-
-    private function loadConfig_File() {
-        try {
-            $json = json_decode( $this->json_config_content );
-
-            if (!$json)
-                throw new Exception("[JS Builder] {$this->json_config_filename} json file is invalid", 3);
-
-            $this->json_config = $json;
-        } catch (\Exception $e) {
-            $this->ERROR = TRUE;
-            $this->ERROR_MESSAGE = json_last_error_msg();
-        }
-    }
-
-    private function loadConfig_MySQL() {
-
     }
 
 
@@ -355,6 +312,7 @@ class JSLayoutBuilder extends UnitPrototype {
             'zoom_max'      =>  $json->display->zoom_max,
             'zoom_min'      =>  $json->display->zoom_min,
             'background_color'  =>  $json->display->background_color,
+            'custom_css'    =>  $json->display->custom_css
         ]);
         $this->template->set('/maxbounds', $max_bounds);
 

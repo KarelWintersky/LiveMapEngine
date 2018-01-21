@@ -136,8 +136,8 @@ class MapRender extends UnitPrototype
 
         $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
 
-        if (!empty($this->map_config->viewport->custom_css)) {
-            $this->template->set('custom_css_style', "/storage/{$this->map_alias}/styles/" . $this->map_config->viewport->custom_css);
+        if (!empty($this->map_config->display->custom_css)) {
+            $this->template->set('custom_css', "/storage/{$this->map_alias}/styles/" . $this->map_config->display->custom_css);
         }
 
         $this->template->set('html_callback', '/');
@@ -147,11 +147,11 @@ class MapRender extends UnitPrototype
     private function viewport_get_map_cursor()
     {
         $cursor_style = '';
-        if (!empty($this->map_config->viewport->cursor)) {
+        if (!empty($this->map_config->display->cursor)) {
 
             $cursor_style
-                = in_array($this->map_config->viewport->cursor, $this->allowed_cursors)
-                ?  $this->map_config->viewport->cursor
+                = in_array($this->map_config->display->cursor, $this->allowed_cursors)
+                ?  $this->map_config->display->cursor
                 : 'pointer';
             $cursor_style = " cursor:{$cursor_style}; ";
         }

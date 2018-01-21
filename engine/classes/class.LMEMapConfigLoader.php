@@ -11,6 +11,9 @@ class LMEMapConfigLoader {
     public $ERROR = FALSE;
     public $ERROR_MESSAGE = '';
 
+    // конфиг
+    private $CONFIG = '';
+
     /**
      * Алиас карты
      * @var string
@@ -29,10 +32,15 @@ class LMEMapConfigLoader {
      */
     private $json_config_filename = '';
 
-    // конфиг
-    private $CONFIG = '';
+    /**
+     * DB Instance
+     * @var
+     */
+    private $dbi;
 
-    public function __construct($map_alias, $mode = 'file', \DBConnectionLite $dbi) {
+
+
+    public function __construct($map_alias, $mode = 'file') {
 
         $this->map_alias = $map_alias;
         $this->json_config_filename = $json_config_filename = PATH_STORAGE . $this->map_alias . '/index.json';
@@ -63,7 +71,9 @@ class LMEMapConfigLoader {
         }
 
         if ($this->ERROR) die($this->ERROR_MESSAGE);
+    }
 
+    public function getConfig(){
         return $this->CONFIG;
     }
 
@@ -91,7 +101,7 @@ class LMEMapConfigLoader {
     }
 
     private function loadConfig_MySQL() {
-
+        $this->dbi = LMEConfig::get_dbi();
     }
 
 

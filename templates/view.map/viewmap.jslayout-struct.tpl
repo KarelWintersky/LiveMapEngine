@@ -13,6 +13,7 @@ var theMap = {
         "zoom_min"          :   {*display.zoom_min*},
         "zoom_max"          :   {*display.zoom_max*},
         "background_color"  :   "{*display.background_color*}",
+        {?*display.custom_css*}"custom_css" : "{*display.custom_css*}",{?}
         {?*maxbounds*}
         "maxbounds" : {
         {%*maxbounds*}

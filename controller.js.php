@@ -15,7 +15,6 @@ $map_alias = $_GET['map'] ?? NULL;
 $map_source = $_GET['datasrc'] ?? 'file';
 
 $js = new JSLayoutBuilder( $map_alias, $map_source );
-$js->loadConfig();
 $js->run();
 
 $content = $js->content();
