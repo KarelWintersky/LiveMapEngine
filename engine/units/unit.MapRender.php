@@ -63,11 +63,8 @@ class MapRender extends UnitPrototype
         });
 
         $map_info = $lm_engine->getMapInfo( $this->map_alias );
-
         $this->template->set('/', array(
-            // 'regions_with_content_ids'      =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
-
-            'regions_with_content_ids'      =>  array_keys( $regions_with_data ),
+            'regions_with_content_ids'      =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
 
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,

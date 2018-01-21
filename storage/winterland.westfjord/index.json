@@ -7,7 +7,6 @@
     "zoom_max": 2,
     "background_color"  : "transparent",
     "maxbounds": [[-0.5, -1], [1.5, 2]],
-    "custom_css" : "style.css",
     "cursor": "pointer"
   },
   "display_defaults": {

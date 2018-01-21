@@ -134,6 +134,8 @@ class JSLayoutBuilder extends UnitPrototype {
             }
 
             /* ============ SVG load ============= */
+            if (empty($json->layout->file))
+                throw new Exception("[JS Builder] Layout file not defined.");
 
             $svg_filename = PATH_STORAGE . $this->map_alias . '/' . $json->layout->file;
 
@@ -312,7 +314,7 @@ class JSLayoutBuilder extends UnitPrototype {
             'zoom_max'      =>  $json->display->zoom_max,
             'zoom_min'      =>  $json->display->zoom_min,
             'background_color'  =>  $json->display->background_color,
-            'custom_css'    =>  $json->display->custom_css
+            'custom_css'    =>  !empty($json->display->custom_css) ? $json->display->custom_css : ''
         ]);
         $this->template->set('/maxbounds', $max_bounds);
 

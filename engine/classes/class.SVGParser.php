@@ -272,7 +272,7 @@ class SVGParser {
                 $data['type'] = 'polygon';
 
                 // SVG Path -> Polygon
-                $coords = self::convert_SVGElement_to_Polygon( $element );
+                $coords = $this->convert_SVGElement_to_Polygon( $element );
                 if (!$coords) return FALSE;
 
                 // сдвиг координат и преобразрвание в CRS-модель
@@ -343,25 +343,27 @@ class SVGParser {
         // кастомные значения для пустых регионов
         if ($this->layer_elements_config) {
             if ($this->layer_elements_config->empty->fill && $this->layer_elements_config->empty->fill == 1) {
-                if ($this->layer_elements_config->empty->fillColor) {
+
+                if ($this->layer_elements_config->empty->fillColor && !$data['fillColor']) {
                     $data['fillColor'] = $this->layer_elements_config->empty->fillColor; //fillColor
                 }
 
-                if ($this->layer_elements_config->empty->fillOpacity) {
+                if ($this->layer_elements_config->empty->fillOpacity && !$data['fillOpacity']) {
                     $data['fillOpacity'] = $this->layer_elements_config->empty->fillOpacity;
                 }
             } // if ... $this->layer_elements_config->empty->fill == 1)
 
             if ($this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1) {
-                if ($this->layer_elements_config->empty->borderColor) {
+
+                if ($this->layer_elements_config->empty->borderColor && $data['borderColor']) {
                     $data['borderColor'] = $this->layer_elements_config->empty->borderColor;
                 }
 
-                if ($this->layer_elements_config->empty->borderWidth) {
+                if ($this->layer_elements_config->empty->borderWidth && $data['borderWidth']) {
                     $data['borderWidth'] = $this->layer_elements_config->empty->borderWidth;
                 }
 
-                if ($this->layer_elements_config->empty->borderOpacity) {
+                if ($this->layer_elements_config->empty->borderOpacity && $data['borderOpacity']) {
                     $data['borderOpacity'] = $this->layer_elements_config->empty->borderOpacity;
                 }
 
@@ -384,7 +386,7 @@ class SVGParser {
             $data['desc'] = htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
         }
 
-        $data['layer'] = $this->layer_name; //@todo: имя слоя надо передавать иначе
+        $data['layer'] = $this->layer_name; //@todo: сейчас мы передаем имя слоя так, но в будущем нам понадобится многоуровневая структура слой->данные
 
         return $data;
     }
@@ -629,7 +631,7 @@ class SVGParser {
      * @param SimpleXMLElement $element
      * @return array
      */
-    public static function convert_SVGElement_to_Polygon( $element ) {
+    public function convert_SVGElement_to_Polygon( $element ) {
 
         // @var SimpleXMLElement $element
         // получаем значение атрибута <path d="">
@@ -654,8 +656,8 @@ class SVGParser {
         ];
         $transform = (string)$element->attributes()->{'transform'};
 
-        $translate = self::parseTransform($transform);
-
+        $translate = $this->parseTransform($transform);
+        //@todo: добавить обработку трансформации элемента
 
 
 
@@ -697,7 +699,6 @@ class SVGParser {
                         break;
                     }
                     case 'z': {
-                        //@todo: все гораздо интереснее. Это не конец всего пути. Это конец полигона. Реальный путь может состоять из нескольких полигонов. это надо обрабатывать.
                         $LOOKAHEAD_FLAG = self::PATHSEG_CLOSEPATH;
                         break;
                     }
@@ -1012,7 +1013,7 @@ class SVGParser {
      * @param SimpleXMLElement $element
      * @return array
      */
-    public static function convert_SVGElement_to_Circle( $element ) {
+    public function convert_SVGElement_to_Circle( $element ) {
         return [
             'x' =>  (string)$element->attributes()->{'cx'},
             'y' =>  (string)$element->attributes()->{'cy'}
@@ -1023,7 +1024,7 @@ class SVGParser {
      * @param SimpleXMLElement $element
      * @return array
      */
-    private static function convert_SVGElement_to_Rect($element)
+    private function convert_SVGElement_to_Rect($element)
     {
         $x = $element->attributes()->{'x'};
         $y = $element->attributes()->{'y'};

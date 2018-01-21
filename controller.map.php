@@ -18,6 +18,8 @@ $viewmode = 'wide:infobox>regionbox';
  */
 $json_config = NULL;
 
+//@todo: дергаем инфу из базы. Если есть в БД описание карты - ок, нет - дёргаем файл. Нет файла - ква.
+
 try {
     $alias_map  = $_GET['alias'] ?? NULL;
 
