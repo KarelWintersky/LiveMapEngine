@@ -10,8 +10,8 @@ $(function(){
 
     map = L.map('map', {
         crs: L.CRS.Simple,
-        minZoom: -3,
-        maxZoom: 2,
+        minZoom: -3,                    /* theMap */
+        maxZoom: 2,                     /* theMap */
         preferCanvas: true,
         renderer: L.canvas(),
         zoomControl: false,

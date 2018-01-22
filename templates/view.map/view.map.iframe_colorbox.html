@@ -1,17 +1,20 @@
-<!-- Неоптимизированный код -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>{*html.title*}</title>
     <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="/frontend/view.map.iframe_colorbox.css">
-    {?*custom_css_style*}<link rel="stylesheet" href="{*custom_css_style*}" />{?}
+    {?*custom_css*}<link rel="stylesheet" href="{*custom_css*}" />{?}
 
-    <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
+    <script type="text/javascript" src="/frontend/jquery/jquery-3.2.1_min.js"></script>
+
     <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
+
+    <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
+    <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css" />
 
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
     <script type="text/javascript" src="/js/map/{*map_alias*}.js" id="the-map-outer"></script>
@@ -38,8 +41,6 @@
     var regions_with_content_ids = [
         {*regions_with_content_ids*}
     ];
-
-    document.title = theMap['map']['title'];
 </script>
 
 <script type="text/javascript" src="/frontend/view.map.iframe_colorbox.js"></script>

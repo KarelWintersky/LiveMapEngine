@@ -19,8 +19,8 @@ showContentColorbox = function(id_region , title) {
 
     $.get( url, function() {
     }).done(function(data) {
-        var colorbox_width  =   theMap.colorbox.width      || 800;
-        var colorbox_height =   theMap.colorbox.height     || 600;
+        var colorbox_width  =   /*theMap['colorbox']['width']      || */ 800;
+        var colorbox_height =   /* theMap['colorbox']['height']     ||*/ 600;
         $.colorbox({
             html: data,
             width: colorbox_width,
@@ -62,7 +62,7 @@ toggleContentViewBox = function(id_region, title) {
             var region_center = polymap [ id_region ].getBounds().getCenter();
 
             // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-            if (map_centring_panning_step > 0) {
+            /*if (map_centring_panning_step > 0) {
                 if (region_center.lng > map.getBounds().getCenter().lng ) {
                     region_center.lng += map_centring_panning_step;
                     map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
@@ -72,7 +72,7 @@ toggleContentViewBox = function(id_region, title) {
                     region_center.lng += map_centring_panning_step;
                     map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
                 }
-            }
+            }*/
 
             $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
             $("#section-info-content").html(data).show();

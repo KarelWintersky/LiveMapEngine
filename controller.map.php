@@ -13,10 +13,11 @@ $valid_view_modes = array(
     'colorbox', 'tabled:colorbox', 'folio', 'iframe', 'iframe:colorbox', 'wide:infobox>regionbox', 'wide:regionbox>infobox'
 );
 $viewmode = 'wide:infobox>regionbox';
+
 /**
- * @var stdClass $json_config
+ * @var stdClass $map_config
  */
-$json_config = NULL;
+$map_config = NULL;
 
 //@todo: дергаем инфу из базы. Если есть в БД описание карты - ок, нет - дёргаем файл. Нет файла - ква.
 
@@ -31,16 +32,16 @@ try {
     if ($cfl->ERROR)
         throw new \Exception($cfl->ERROR_MESSAGE);
 
-    $json_config = $cfl->getConfig();
+    $map_config = $cfl->getConfig();
 
-    if (!empty($json_config->display->viewmode))
-        $viewmode = $json_config->display->viewmode;
+    if (!empty($map_config->display->viewmode))
+        $viewmode = $map_config->display->viewmode;
 
     // перекрываем его из $_GET
     $viewmode = filter_array_for_allowed($_GET, 'viewmode', $valid_view_modes, $viewmode);
     $viewmode = filter_array_for_allowed($_GET, 'view',     $valid_view_modes, $viewmode);
 
-    $map = new MapRender( $alias_map, $json_config );
+    $map = new MapRender( $alias_map, $map_config );
     $map_found = $map->run( $viewmode );
     $content = $map->content();
     $content = preg_replace('/^\h*\v+/m', '', $content);

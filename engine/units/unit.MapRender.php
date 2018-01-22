@@ -30,45 +30,124 @@ class MapRender extends UnitPrototype
      */
     private $map_config = NULL;
 
-    public function __construct($map_alias, $json_config = null)
+    /**
+     * Массив регионов с информацией
+     * @var array
+     */
+    private $map_regions_with_info = [];
+
+
+    /**
+     * Информация о карте (массив?)
+     * @var null
+     */
+    private $map_info = NULL;
+
+
+    /**
+     * @var \LiveMapEngine $lme;
+     */
+    private $lme;
+
+
+    /* ================================= */
+
+    public function __construct($map_alias, $map_config = null)
     {
         $this->map_alias = $map_alias;
-        $this->map_config = $json_config;
+        $this->map_config = $map_config;
 
         $this->template_file = '';
         $this->template_path = '$/templates/view.map';
+
+        $this->lme = new LiveMapEngine( LMEConfig::get_dbi() );
+
+        $this->map_info = $this->lme->getMapInfo( $this->map_alias );
     }
 
-    private function makemap_widemap( $orientation )
-    {
-        if ($orientation === 'infobox>regionbox') {
-            $this->template_file = 'view.map.wide_left=info_right=region.html';
-        } else {
-            $this->template_file = 'view.map.wide_left=region_right=info.html';
+    public function run( $viewmode = 'folio') {
+        $this->template = new Template('', $this->template_path);
+        $this->template->set('/map_alias', $this->map_alias);
+
+        if (!empty($this->map_config->display->custom_css)) {
+            $this->template->set('custom_css', "/storage/{$this->map_alias}/styles/{$this->map_config->display->custom_css}");
         }
 
-        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+        $this->template->set('/panning_step', $this->map_config->display->panning_step ?? 70);
+        $this->template->set('/html/title', $this->map_config->title);
+        $this->template->set('/html_callback', '/');
 
-        $regions_with_data = $lm_engine->getRegionsWithInfo( $this->map_alias );
+        $this->map_regions_with_info = $this->lme->getRegionsWithInfo( $this->map_alias );
 
-        $regions_with_data_order_by_title = $regions_with_data;
+        $this->template->set('/regions_with_content_ids', $this->lme->convertRegionsWithInfo_to_IDs_String($this->map_regions_with_info));
+
+        switch ($viewmode) {
+            case 'iframe': {
+                $this->makemap_iframe_colorbox();
+                break;
+            }
+
+            case 'iframe:colorbox': {
+                $this->makemap_iframe_colorbox();
+                break;
+            }
+
+            case 'folio': {
+                $this->makemap_folio();
+                break;
+            }
+
+            case 'wide:infobox>regionbox': {
+                $this->makemap_fullscreen('infobox>regionbox');
+                break;
+            }
+
+            case 'wide:regionbox>infobox': {
+                $this->makemap_fullscreen('regionbox>infobox');
+                break;
+            }
+
+            default: {
+                $this->makemap_404( $viewmode );
+                die( $this->template->render() );
+            }
+        } // switch $viewmode
+
+        return true;
+    }
+
+
+    private function makemap_fullscreen( $orientation )
+    {
+        $this->template_file = 'view.map.fullscreen.html';
+
+        $regions_with_data_order_by_title = $this->map_regions_with_info;
+
         usort($regions_with_data_order_by_title, function($value1, $value2){
             return ($value1['title'] > $value2['title']);
         });
 
-        $regions_with_data_order_by_date = $regions_with_data;
+        $regions_with_data_order_by_date = $this->map_regions_with_info;
         usort($regions_with_data_order_by_date, function($value1, $value2){
             return ($value1['edit_date'] < $value2['edit_date']);
         });
 
-        $map_info = $lm_engine->getMapInfo( $this->map_alias );
         $this->template->set('/', array(
-            'regions_with_content_ids'      =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data ),
-
             'map_regions_order_by_title'    =>  $regions_with_data_order_by_title,
             'map_regions_order_by_date'     =>  $regions_with_data_order_by_date,
-            'map_regions_count'             =>  count($regions_with_data),
+            'map_regions_count'             =>  count($this->map_regions_with_info),
         ));
+
+        if ($orientation === 'infobox>regionbox') {
+            $this->template->set('/section/infobox_control_position', 'topleft');
+            $this->template->set('/section/regionbox_control_position', 'topright');
+            $this->template->set('/section/regionbox_textalign', 'right');
+
+        } else {
+            $this->template->set('/section/infobox_control_position', 'topright');
+            $this->template->set('/section/regionbox_control_position', 'topleft');
+            $this->template->set('/section/regionbox_textalign', 'left');
+        }
 
 
     }
@@ -82,69 +161,10 @@ class MapRender extends UnitPrototype
     {
         $this->template_file = 'view.map.iframe_colorbox.html';
 
-        $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
-
-        $regions_with_data = $lm_engine->getRegionsWithInfo( $this->map_alias );
-
         $this->template->set('map_viewport_width', filter_input(INPUT_GET, 'width', FILTER_VALIDATE_INT) ?? 800);
         $this->template->set('map_viewport_height', filter_input(INPUT_GET, 'height', FILTER_VALIDATE_INT) ?? 600);
-
-        $this->template->set('/', array(
-            'map_regions_with_info_jsarray' =>  $lm_engine->convertRegionsWithInfo_to_IDs_String( $regions_with_data),
-        ));
     }
 
-    public function run( $skin = 'colorbox' )
-    {
-        $this->template = new Template('', $this->template_path);
-        $this->template->set('/map_alias', $this->map_alias);
-
-        switch ($skin) {
-            case 'iframe': {
-                $this->makemap_iframe_colorbox();
-                break;
-            }
-            case 'iframe:colorbox': {
-                $this->makemap_iframe_colorbox();
-                break;
-            }
-
-            case 'folio': {
-                $this->makemap_folio();
-                break;
-            }
-
-            case 'wide:infobox>regionbox': {
-                // infobox left, regionbox right
-                $this->makemap_widemap('infobox>regionbox');
-                break;
-            }
-            case 'wide:regionbox>infobox': {
-                // regionbox left, infobox righr
-                $this->makemap_widemap('regionbox>infobox');
-                break;
-            }
-            default: {
-                $this->makemap_404( $skin );
-                die( $this->template->render() );
-            }
-        }
-
-        // работает только для карты folio
-        // так как определен через <div tabindex="0" id="map" style="{*viewport_cursor*}"></div>
-        // $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
-
-        if (!empty($this->map_config->display->custom_css)) {
-            $this->template->set('custom_css', "/storage/{$this->map_alias}/styles/{$this->map_config->display->custom_css}");
-        }
-
-        $this->template->set('panning_step', $this->map_config->display->panning_step ?? 70); // если empty - то 70
-
-        $this->template->set('/html/title', $this->map_config->title);
-
-        $this->template->set('html_callback', '/');
-        return true;
-    }
 
     private function viewport_get_map_cursor()
     {

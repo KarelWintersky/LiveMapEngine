@@ -106,7 +106,7 @@ switch ($edit_what) {
             'is_logged_user'    =>  $userinfo['email'],
             'is_logged_user_ip' =>  $userinfo['ip'],
 
-            'edit_templates'   =>  $edit_templates, // странно, если эту строку закомментировать - все равно все работает,
+            'edit_templates'    =>  $edit_templates, // странно, если эту строку закомментировать - все равно все работает,
                                                     // смотри https://github.com/1234ru/websun/issues/2
             'edit_templates_options' => $edit_templates_options,
 

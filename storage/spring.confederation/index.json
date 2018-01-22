@@ -30,14 +30,14 @@
     }
   },
   "image" : {
-    "file"  : "temp.svg",
+    "file"  : "confmap.svg",
     "width" : 2104,
     "height": 1488,
     "ox"    : 0,
     "oy"    : 0
   },
   "layout": {
-    "file"   : "temp.svg",
+    "file"   : "confmap.svg",
     "layers" : [ "Stars&Channels", "CLOutline", "Paths" ]
   },
   "layers": {

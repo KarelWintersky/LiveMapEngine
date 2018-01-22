@@ -1,13 +1,14 @@
+<!-- this -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>{*html.title*}</title>
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
-    <link rel="stylesheet" href="/frontend/view.map.wide.css" />
+    <link rel="stylesheet" href="/frontend/view.map.fullscreen.css" />
     {?*custom_css*}<link rel="stylesheet" href="{*custom_css*}" />{?}
 
-    <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
+    <script type="text/javascript" src="/frontend/jquery/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
 
     <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
@@ -18,13 +19,9 @@
 </head>
 <body>
 <script type="text/javascript" id="init">
-    var template_orientation = +1;
+    var template_orientation = -1; // инфо слева: -1, инфо справа: +2
+    var map_centring_panning_step = +"{*panning_step*}";  // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
     var map_alias = '{*map_alias*}';
-    document.title = theMap['map']['title'];
-
-    // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
-    // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
-    var map_centring_panning_step = +70;
 
     var regions_with_content_ids = [
         {*regions_with_content_ids*}
@@ -33,8 +30,25 @@
 
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
 
-<section id="section-regions" class="section-regions-viewbox invisible" data-leaflet-control-position="topleft">
-    <div style="text-align: left">
+<!-- /*
+Section-infobox:
+- атрибуте data-leaflet-control-position="topleft" | "topright"  section.infobox_control_position
+*/ -->
+<section id="section-infobox" class="section-info-viewbox invisible" data-leaflet-control-position="{*section.infobox_control_position*}">
+    <div style="text-align: right">
+        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="null">?</button>
+    </div>
+    <div id="section-info-content" class="invisible section-info-content"></div>
+</section>
+
+<!-- /*
+Section-regions:
+- в атрибуте  data-leaflet-control-position = topright + topleft ====> section.regionbox_control_position
+- в div.style text-align: right | left ====> section.regionbox_textalign
+*/ -->
+
+<section id="section-regions" class="section-regions-viewbox invisible" data-leaflet-control-position="{*section.regionbox_control_position*}">
+    <div style="text-align: {*section.regionbox_textalign*}">
         <button id="actor-regions-toggle" class="action-toggle-div-visibility" data-content="section-regions-content" data-content-is-visible="false">Показать</button>
         <h3>Интересные места на карте {?*map_regions_count*}<span style="font-weight: normal">(<em >Всего: {*map_regions_count*}</em>)</span>{*map_regions_count*?}</h3>
         <select id="sort-select" class="invisible">
@@ -56,17 +70,8 @@
             <br/><small>({*map_regions_order_by_date:edit_date*})</small></li>
             {*map_regions_order_by_date*%}
         </ul>
-
-
     </div>
     {*target*?!}
-</section>
-
-<section id="section-infobox" class="section-info-viewbox invisible" data-leaflet-control-position="topright">
-    <div style="text-align: right">
-        <button id="actor-viewbox-toggle" class="action-toggle-div-visibility" data-content="section-info-content" data-content-is-visible="null">?</button>
-    </div>
-    <div id="section-info-content" class="invisible section-info-content"></div>
 </section>
 
 <section id="section-backward" class="invisible section-backward-viewbox">
@@ -75,7 +80,6 @@
         <form style="display: inline-block" class="invisible" action="{*html_callback*}" method="get"><button><<< К списку карт</button></form>
     </span>
 </section>
-
 
 <script type="text/javascript" src="/frontend/view.map.fullscreen.js"></script>
 

@@ -1,0 +1,38 @@
+html, body, #map {
+    height:100%;
+    width:100%;
+    padding:0px;
+    margin:0px;
+}
+
+/* === Section Backward === */
+.section-backward-viewbox {
+    padding: 8px 8px;
+    background: white;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.section-backward-content {
+    margin: 0;
+    font-size: 140%;
+    text-align: left;
+    color: #000000;
+}
+/* === Section Region Title === */
+.section-region-title-viewbox {
+    padding: 8px 8px;
+    background: white;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    font-size: 140%;
+}
+.section-region-title-content {
+    margin: 0;
+    color: #000000;
+}
+
+.invisible {
+    display: none;
+}

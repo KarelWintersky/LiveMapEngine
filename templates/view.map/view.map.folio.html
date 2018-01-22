@@ -2,10 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>{*html.title*}</title>
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="/frontend/view.map.folio.css">
 
-    <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
+    <script type="text/javascript" src="/frontend/jquery/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
 
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
@@ -13,50 +14,14 @@
     <script type="text/javascript" src="/js/map/{*map_alias*}.js" id="the-map-outer"></script>
 
     <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
-    <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css" />
-
-    <style type="text/css">
-        html, body, #map {
-            height:100%;
-            width:100%;
-            padding:0px;
-            margin:0px;
-        }
-
-        /* === Section Backward === */
-        .section-backward-viewbox {
-            padding: 8px 8px;
-            background: white;
-            background: rgba(255,255,255,1);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-        .section-backward-content {
-            margin: 0;
-            font-size: 140%;
-            text-align: left;
-            color: #000000;
-        }
-        /* === Section Region Title === */
-        .section-region-title-viewbox {
-            padding: 8px 8px;
-            background: white;
-            background: rgba(255,255,255,1);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-            font-size: 140%;
-        }
-        .section-region-title-content {
-            margin: 0;
-            color: #000000;
-        }
-
-        .invisible {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet"        href="/frontend/leaflet/L.Control.Zoomslider.css"/>
 </head>
+
 <body>
+<script type="text/javascript" id="init">
+    var map_alias = '{*map_alias*}';
+</script>
+
 <div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map" style="{*viewport_cursor*}"></div>
 
 <section id="section-backward" class="invisible section-backward-viewbox">
@@ -70,73 +35,7 @@
     <span>Selected region:</span> <strong id="section-region-title-content" class="section-region-title-content"></strong>
 </section>
 
-<script type="text/javascript" id="build-layout">
-    var map_alias = '{*map_alias*}';
-    document.title = theMap['map']['title'];
+<script type="text/javascript" src="/frontend/view.map.folio.js"></script>
 
-    polymap = buildPolymap(theMap);
-
-    var map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom: -3,
-        maxZoom: 2,
-        preferCanvas: true,
-        zoomControl: false,
-    });
-    map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
-
-    var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
-    var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
-
-    // max bounds
-    if (theMap['maxbounds']) {
-        var mb = theMap['maxbounds'];
-        map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
-    }
-
-    // draw polygons on map, bind on-click function
-    Object.keys( polymap ).forEach(function(id_region){
-        polymap[ id_region ].addTo(map).on('click', function(){
-            var t = theMap['regions'][ id_region ]['title'] || id_region;
-            $("#section-region-title-content").html(t);
-        });
-    });
-
-    map.fitBounds(current_bounds);
-    map.setZoom( theMap['display']['zoom'] );
-
-    // не показываем контрол "назад" если страница загружена в iframe
-    if (! (window != window.top || document != top.document || self.location != top.location)) {
-        createControl_Backward();
-        map.addControl( new L.Control.Backward() );
-    }
-
-    createControl_RegionTitle('topleft');
-    map.addControl( new L.Control.Title() );
-
-    $(function(){
-        $(".leaflet-container").css('background-color', theMap['display']['background_color']);
-
-        $("#actor-backward-toggle").on('click', function (el){
-            var state = $(this).data('content-is-visible');
-            var text = (state == false) ? '&lt;' : '&gt;';
-            $(this).html(text);
-
-            var data = $(this).data('content');
-            $('#' + data).toggle();
-            $(this).data('content-is-visible', !state);
-        });
-    });
-
-    map.on('click', function(ev) {
-        // console.log(ev); // ev is an event object (MouseEvent in this case)
-    });
-
-    map.on('zoomend', function(ev) {
-        // console.log( map.getZoom() );
-    });
-
-
-</script>
 </body>
 </html>

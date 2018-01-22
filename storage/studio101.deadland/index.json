@@ -52,7 +52,7 @@
         "borderWidth" : 1,
         "borderOpacity": 0.3,
         "fill": 1,
-        "fillColor": "#333333",
+        "fillColor": "#2277ff",
         "fillOpacity": 0.5
       },
       "present": {
@@ -73,8 +73,8 @@
         "stroke": 0,
         "borderColor" : "#000000",
         "borderWidth" : 1,
-        "borderOpacity": 0.3,
         "fill": 1,
+        "borderOpacity": 0.3,
         "fillColor": "#E63939",
         "fillOpacity": 0.5
       },
@@ -96,8 +96,8 @@
         "stroke": 0,
         "borderColor" : "#000000",
         "borderWidth" : 1,
-        "borderOpacity": 0.3,
         "fill": 1,
+        "borderOpacity": 0.3,
         "fillColor": "#69F7FA",
         "fillOpacity": 0.2
       },
