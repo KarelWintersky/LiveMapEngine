@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>{*html.title*}</title>
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="/frontend/view.map.wide.css" />
     {?*custom_css*}<link rel="stylesheet" href="{*custom_css*}" />{?}
@@ -18,12 +18,9 @@
 </head>
 <body>
 <script type="text/javascript" id="init">
+    var template_orientation = -1;
+    var map_centring_panning_step = +"{*panning_step*}";  // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
     var map_alias = '{*map_alias*}';
-    document.title = theMap['map']['title'];
-
-    // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
-    // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
-    var map_centring_panning_step = -70;
 
     var regions_with_content_ids = [
         {*regions_with_content_ids*}
@@ -63,6 +60,7 @@
             {*map_regions_order_by_date*%}
         </ul>
 
+
     </div>
     {*target*?!}
 </section>
@@ -74,7 +72,8 @@
     </span>
 </section>
 
-<script type="text/javascript" src="/frontend/view.map.wide.js"></script>
+
+<script type="text/javascript" src="/frontend/view.map.fullscreen.js"></script>
 
 </body>
 </html>

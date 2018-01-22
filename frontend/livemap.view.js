@@ -54,6 +54,11 @@ toggleContentViewBox = function(id_region, title) {
             type: 'GET',
             async: false
         }).done(function(data){
+            if (!(id_region in polymap)) {
+                console.log("[" + id_region + "] not found at Polymap ");
+                return false;
+            }
+
             var region_center = polymap [ id_region ].getBounds().getCenter();
 
             // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
@@ -62,7 +67,7 @@ toggleContentViewBox = function(id_region, title) {
                     region_center.lng += map_centring_panning_step;
                     map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
                 }
-            } else {
+            } else if (map_centring_panning_step < 0) {
                 if (region_center.lng <= map.getBounds().getCenter().lng ) {
                     region_center.lng += map_centring_panning_step;
                     map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
@@ -80,9 +85,23 @@ showContentViewBox = function(id_region, title) {
     var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
 
     $.get(url, function(){}).done(function(data){
+        map.setZoom( theMap['display']['zoom'] );
+
+        // move center:
+        // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
+        // если инфоблок слева, регионы справа - то "-"
+        // если инфоблок справа, регионы слева - то "+"
+        if (!(id_region in polymap)) {
+            console.log("[" + id_region + "] not found at Polymap ");
+            return false;
+        }
+
         var region_center = polymap [ id_region ].getBounds().getCenter();
-        region_center.lng -= 50; // move center to right (50px)
+        var region_center_shifting_method = template_orientation || 0;
+        region_center.lng = region_center.lng + (region_center_shifting_method * map_centring_panning_step);
+
         map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
+
         $("#section-info-content").html(data).show();
         $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
     });
@@ -187,7 +206,7 @@ wlhBased_GetAction = function(polymap, layer) {
     ) {
         options = {};
         options.action = wlh_params[1];
-        options.region_id = wlh_params[2];
+        options.id_region = wlh_params[2];
     }
     return options;
 };
@@ -201,9 +220,34 @@ wlhBased_GetAction = function(polymap, layer) {
  * @param options
  * @returns {boolean}
  */
-wlhBased_RegionShowInfo = function(options) {
+do_RegionShowInfo = function(options) {
     if (options && options.action == 'view') {
-        showContentViewBox( options.region_id );
+        var id_region = options.id_region;
+        var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
+
+        if (!(id_region in polymap)) {
+            console.log("[" + id_region + "] not found at Polymap ");
+            return false;
+        }
+
+        $.get(url, function(){}).done(function(data){
+
+            // move center:
+            // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
+            // если инфоблок слева, регионы справа - то "-"
+            // если инфоблок справа, регионы слева - то "+"
+            var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.5;
+
+            var region_center = polymap [ id_region ].getBounds().getCenter();
+            var region_center_shifting_method = template_orientation;
+
+            region_center.lng = region_center.lng + (region_center_shifting_method * map_centring_panning_step);
+
+            map.panTo( region_center, { animate: true, duration: focus_animate_duration, noMoveStart: true} );
+
+            $("#section-info-content").html(data).show();
+            $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
+        });
         return true;
     }
 };
@@ -211,7 +255,6 @@ wlhBased_RegionShowInfo = function(options) {
 /**
  * Анализирует options и выполняем фокусировку на регион.
  *
- * @todo: Переименовать: метод на самом деле не имеет никакой привязки к WLH и работает на основании переданных опций.
  * Опции могут быть сгенерированы как методом wlhBased_GetAction(), так и сделаны вручную, например для .on('click', '.action-focus-at-region'...)
  *
  * @param options
@@ -219,16 +262,26 @@ wlhBased_RegionShowInfo = function(options) {
  * @param layer
  * @returns {boolean}
  */
-wlhBased_RegionFocus = function(options, polymap, layer) {
+do_RegionFocus = function(options /*, polymap, layer */) {
     if (options && options.action == 'focus') {
+
+        if (!(options.region_id in polymap)) {
+            console.log("[" + options.region_id + "] not found at Polymap ");
+            return false;
+        }
+
         var wlh_region_bounds = polymap [ options.region_id ].getBounds();
-        var old_style = polymap[ options.region_id ].options['fillColor']; //@todo: уточнить имя опции при переходе к ExtendedLayerOptions
-        map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: 0.7, noMoveStart: true}); //@todo: OPTIONS->VIEWPORT->focus_animate_duration
-        polymap[ options.region_id ].setStyle({fillColor: '#ff0000'}); //@todo: OPTIONS->VIEWPORT->focus_highlight_color
+        var old_style = polymap[ options.region_id ].options['fillColor'];
+        var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
+        var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
+        var focus_timeout = theMap['display']['focus_timeout'] || 1000;
+
+        map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: focus_animate_duration, noMoveStart: true});
+        polymap[ options.region_id ].setStyle({fillColor: focus_highlight_color});
 
         setTimeout(function(){
             polymap[ options.region_id ].setStyle({fillColor: old_style});
-        }, 1000); //@todo: OPTIONS->VIEWPORT->focus_timeout || 1000
+        }, focus_timeout);
         return true;
     }
 };

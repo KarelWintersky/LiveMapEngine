@@ -21,6 +21,9 @@ var theMap = {
         {%}
         },
         {?}
+        {?*focus_animate_duration*}"focus_animate_duration": {*focus_animate_duration*}, {?}
+        {?*focus_highlight_color*}"focus_highlight_color": "{*focus_highlight_color*}",{?}
+        {?*focus_timeout*}"focus_timeout": {*focus_timeout*}, {?}
     },
     "region_defaults_empty" : {
         "stroke" : {*region_defaults_empty.stroke*},

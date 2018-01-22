@@ -39,8 +39,8 @@ map.setZoom( theMap['display']['zoom'] );
 if (true) {
     var wlh_options = wlhBased_GetAction(polymap);
     if (wlh_options) {
-        wlhBased_RegionShowInfo(wlh_options);
-        wlhBased_RegionFocus(wlh_options, polymap);
+        do_RegionShowInfo(wlh_options);
+        do_RegionFocus(wlh_options, polymap);
     } else {
         map.fitBounds(current_bounds);
     }
@@ -84,7 +84,7 @@ $(function(){
 // клик по региону в списке "интересных мест", созданном контролом createControl_RegionsBox()
 // для красоты .on() можно прикрепить к $(function() {}) выше.
 $(document).on('click', '.action-focus-at-region', function(){
-    wlhBased_RegionFocus({
+    do_RegionFocus({
         action: 'focus',
         region_id: $(this).data('region-id')
     }, polymap);

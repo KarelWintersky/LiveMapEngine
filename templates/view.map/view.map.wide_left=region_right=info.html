@@ -5,7 +5,7 @@
     <title></title>
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="/frontend/view.map.wide.css" />
-    {?*custom_css_style*}<link rel="stylesheet" href="{*custom_css_style*}" />{?}
+    {?*custom_css*}<link rel="stylesheet" href="{*custom_css*}" />{?}
 
     <script type="text/javascript" src="/frontend/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/leaflet/leaflet.js"></script>
@@ -18,6 +18,7 @@
 </head>
 <body>
 <script type="text/javascript" id="init">
+    var template_orientation = +1;
     var map_alias = '{*map_alias*}';
     document.title = theMap['map']['title'];
 
@@ -76,7 +77,7 @@
 </section>
 
 
-<script type="text/javascript" src="/frontend/view.map.wide.js"></script>
+<script type="text/javascript" src="/frontend/view.map.fullscreen.js"></script>
 
 </body>
 </html>

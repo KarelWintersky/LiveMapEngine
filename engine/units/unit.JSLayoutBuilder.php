@@ -310,11 +310,15 @@ class JSLayoutBuilder extends UnitPrototype {
             'oy'            =>  $image_info['oy'],
         ]);
         $this->template->set('/display', [
-            'zoom'          =>  $json->display->zoom,
-            'zoom_max'      =>  $json->display->zoom_max,
-            'zoom_min'      =>  $json->display->zoom_min,
-            'background_color'  =>  $json->display->background_color,
-            'custom_css'    =>  !empty($json->display->custom_css) ? $json->display->custom_css : ''
+            'zoom'                      =>  $json->display->zoom,
+            'zoom_max'                  =>  $json->display->zoom_max,
+            'zoom_min'                  =>  $json->display->zoom_min,
+            'background_color'          =>  $json->display->background_color,
+            'custom_css'                =>  $json->display->custom_css ?? '',
+            'focus_animate_duration'    =>  $json->display->focus_animate_duration ?? 0.7,
+            'focus_highlight_color'     =>  $json->display->focus_highlight_color ?? '#ff0000',
+            'focus_timeout'             =>  $json->display->focus_timeout ?? 1000,
+
         ]);
         $this->template->set('/maxbounds', $max_bounds);
 

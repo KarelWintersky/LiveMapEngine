@@ -26,10 +26,9 @@ class MapRender extends UnitPrototype
     private $template_path = '';
 
     /**
-     * json map config
-     * @json null
+     * @var stdClass $map_config
      */
-    private $map_config;
+    private $map_config = NULL;
 
     public function __construct($map_alias, $json_config = null)
     {
@@ -131,11 +130,17 @@ class MapRender extends UnitPrototype
             }
         }
 
-        $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
+        // работает только для карты folio
+        // так как определен через <div tabindex="0" id="map" style="{*viewport_cursor*}"></div>
+        // $this->template->set('viewport_cursor', $this->viewport_get_map_cursor());
 
         if (!empty($this->map_config->display->custom_css)) {
-            $this->template->set('custom_css', "/storage/{$this->map_alias}/styles/" . $this->map_config->display->custom_css);
+            $this->template->set('custom_css', "/storage/{$this->map_alias}/styles/{$this->map_config->display->custom_css}");
         }
+
+        $this->template->set('panning_step', $this->map_config->display->panning_step ?? 70); // если empty - то 70
+
+        $this->template->set('/html/title', $this->map_config->title);
 
         $this->template->set('html_callback', '/');
         return true;
