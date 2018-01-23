@@ -7,8 +7,6 @@ $(function(){
     // умолчательные действия
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
-    // polymap = buildPolymap(theMap);
-
     map = L.map('map', {
         crs: L.CRS.Simple,
         minZoom: theMap['display']['zoom_min'],
@@ -17,7 +15,6 @@ $(function(){
         renderer: L.canvas(),
         zoomControl: false,
     });
-
     map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
 
     var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
@@ -31,40 +28,67 @@ $(function(){
 
     map.setZoom( theMap['display']['zoom'] );
 
-
     /* ================================================================================================ */
-
-    Object.keys( theMap['layers'] ).forEach(function(layer){
-        let lg = new L.LayerGroup();
-        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][layer] );
+    /* A */
+    Object.keys( theMap['layers'] ).forEach(function(id_layer){
+        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][id_layer] );
 
         Object.keys( regions_at_layer ).forEach(function(id_region){
             regions_at_layer[id_region].on('click', function(){
-
-                /* === Region onclick method */
-
-                window.location.hash = "#view=[" + layer + '|' + id_region + "]";
-                toggleContentViewBox(id_region, layer);
-
-                /* === Region onclick method */
-
+                window.location.hash = "#view=[" + id_layer + '|' + id_region + "]";
+                toggleContentViewBox(id_region, id_layer);
             });
+        });
+        polymap[ id_layer ] = regions_at_layer;
+    });
 
+    Object.keys( polymap ).forEach(function(id_layer){
+        let lg = new L.LayerGroup();
+
+        Object.keys( polymap[id_layer] ).forEach(function(id_region){
+            lg.addLayer( polymap[id_layer][id_region] );
+        });
+
+        if (map.getZoom().inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] )) {
+            map.addLayer(lg);
+        } else {
+        }
+
+        LGS[id_layer] = lg;
+    });
+
+
+    /* B */
+    /*Object.keys( theMap['layers'] ).forEach(function(id_layer){
+        let lg = new L.LayerGroup();
+        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][id_layer] );
+
+        Object.keys( regions_at_layer ).forEach(function(id_region){
+            regions_at_layer[id_region].on('click', function(){
+                /!* === Region onclick method *!/
+
+                window.location.hash = "#view=[" + id_layer + '|' + id_region + "]";
+                toggleContentViewBox(id_region, id_layer);
+
+                /!* === Region onclick method *!/
+            });
             lg.addLayer( regions_at_layer[id_region] );
         });
 
-        lg.addTo(map); // на самом деле надо показывать только если текущий зум позволяет видеть регион
+        var currentZoom = map.getZoom();
+        // map.addLayer(lg);
 
-        LGS[layer] = lg;
-        polymap[layer] = regions_at_layer;
-    });
+        if (currentZoom.inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] )) {
+            map.addLayer(lg);
+            // console.log(layer + " must be visible. ");
+        } else {
+            // console.log(layer + " must be hidden. ");
+        }
 
-    /*L.DomUtil.get('hidem').onclick = function(){
-     LGS["CLOutline"].remove();
-     };
-     L.DomUtil.get('showm').onclick = function(){
-     LGS["CLOutline"].addTo(map);
-     };*/
+        LGS[id_layer] = lg;
+        polymap[id_layer] = regions_at_layer;
+    });*/
+    /* ==================================================================================================== */
 
     createControl_RegionsBox();
     createControl_InfoBox();
@@ -86,8 +110,8 @@ $(function(){
 
     if (true) {
         var wlh_options = wlhBased_GetAction(polymap);
-        map.fitBounds(current_bounds);
         if (wlh_options) {
+            // map.fitBounds(current_bounds);
             do_RegionShowInfo(wlh_options);
             do_RegionFocus(wlh_options);
         } else {
@@ -98,32 +122,19 @@ $(function(){
     // zoom control (а если сектора нет?)
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
-
-        console.log("Current zoom: " + currentZoom);
-
         Object.keys( theMap['layers'] ).forEach(function(layer){
             var zmin = theMap['layers'][layer]['zoom_min'];
             var zmax = theMap['layers'][layer]['zoom_max'];
 
-            console.log(layer + " have zoom bounds [ " + zmin + " .. " + zmax + " ], visibility is " + currentZoom.inbound(zmin, zmax));
+            console.log("Current zoom: [" + currentZoom + "], Layer [" + layer + "] have zoom bounds [" + zmin + " .. " + zmax + "], visibility is " + currentZoom.inbound(zmin, zmax));
 
-            if ((zmin <= currentZoom) && (currentZoom <= zmax)) {
-                console.log("At zoom " + currentZoom + " Layer " + layer + " is visible");
-            } else {
-                console.log("At zoom " + currentZoom + " Layer " + layer + " is HIDDEN");
+            if (currentZoom.inbound(zmin, zmax)) {
+                map.addLayer( LGS[layer] );
+            }
+            else {
+                map.removeLayer( LGS[layer] );
             }
         });
-        console.log("----");
-
-        /*if (sector == null) return;
-
-         if (currentZoom < sector_options.zoom_threshold) {
-         group.clearLayers();
-         // map.removeLayer(sector);
-         } else {
-         group.addLayer( sector );
-         // map.addLayer(sector);
-         }*/
     });
 
 
@@ -160,7 +171,7 @@ $(function(){
 
         do_RegionFocus({
             action: 'focus',
-            layer: find_LayerWithRegion(id_region),
+            layer: find_RegionInLayers(id_region),
             id_region: id_region
         }, polymap);
     })

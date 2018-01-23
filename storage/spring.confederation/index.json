@@ -43,6 +43,7 @@
   "layers": {
     "Stars&Channels": {
       "hint" : "Все пути",
+      "zoom" : 0,
       "zoom_min" : -100,
       "zoom_max" : 100,
       "empty": {
@@ -66,6 +67,7 @@
     },
     "CLOutline": {
       "hint" : "Все пути",
+      "zoom" : 0,
       "zoom_min" : -100,
       "zoom_max" : 100,
       "empty": {

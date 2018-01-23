@@ -47,6 +47,7 @@ var theMap = {
     {%*layers*}
         "{*layers:id*}": {
             "id" : "{*layers:id*}",
+            "zoom" : {*layers:zoom*},
             "zoom_min" : {*layers:zoom_min*},
             "zoom_max" : {*layers:zoom_max*},
             "regions": {

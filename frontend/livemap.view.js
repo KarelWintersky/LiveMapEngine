@@ -54,7 +54,7 @@ toggleContentViewBox = function(id_region, layer) {
             type: 'GET',
             async: false
         }).done(function(data){
-            if (!find_LayerWithRegion(id_region)) {
+            if (!find_RegionInLayers(id_region)) {
                 console.log("[" + id_region + "] not found at Layer " + layer + " at polymap.");
                 return false;
             }
@@ -137,7 +137,9 @@ buildRegionsAtLayer = function(layer_data) {
             opacity: region['borderOpacity']    || theMap.region_defaults_empty.borderOpacity,
             fillColor: region['fillColor']      || theMap.region_defaults_empty.fillColor,
             fillOpacity: region['fillOpacity']  || theMap.region_defaults_empty.fillOpacity,
-            radius: region['radius']            || 10
+            radius: region['radius']            || 10,
+            id_region: key,
+            id_layer: layer_data.id
         };
 
         var entity;
@@ -249,7 +251,7 @@ do_RegionShowInfo = function(options) {
         var id_layer = options.layer;
         var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
 
-        if (!find_LayerWithRegion(id_region)) {
+        if (!find_RegionInLayers(id_region)) {
             console.log("[" + id_region + "] not found at Layer " + id_layer + " at polymap.");
             return false;
         }
@@ -260,23 +262,47 @@ do_RegionShowInfo = function(options) {
             // (минус - вправо, плюс - влево -- потому что сдвигаем саму карту, а не регион)
             // если инфоблок слева, регионы справа - то "-"
             // если инфоблок справа, регионы слева - то "+"
-            var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.5;
+            // var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.5;
 
-            var region_center = polymap[ id_layer ][ id_region ].getBounds().getCenter();
-            var region_center_shifting_method = template_orientation;
+            // if (polymap[ id_layer ][ id_region ]) {
+                // map.setZoom( theMap['layers'][id_layer]['zoom'] );
 
-            region_center.lng = region_center.lng + (region_center_shifting_method * map_centring_panning_step);
+                // var region_center = polymap[ id_layer ][ id_region ].getBounds().getCenter();
 
-            map.panTo( region_center, { animate: true, duration: focus_animate_duration, noMoveStart: true} );
+                // console.log(region_center);
+
+                // var region_center_shifting_method = +1;
+                // region_center.lng = region_center.lng + (region_center_shifting_method * map_centring_panning_step);
+
+                // map.panTo( region_center, { animate: true, duration: focus_animate_duration, noMoveStart: true} );
+            // }
 
             $("#section-info-content").html(data).show();
             $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
         });
+
+        map.setZoom( theMap['layers'][id_layer]['zoom'] );
+
+        do_RegionFocus({
+            action: 'focus',
+            layer: find_RegionInLayers(id_region),
+            id_region: id_region
+        }, polymap);
+
         return true;
-    }
+    };
+
 };
 
-find_LayerWithRegion = function(id_region){
+find_RegionInLayerGroups = function(id_region) {
+    let found = false;
+
+    Object.keys( LGS ).forEach(function(lg){
+
+    });
+};
+
+find_RegionInLayers = function(id_region){
     let found_layer = false;
     Object.keys( polymap ).forEach(function(layer){
         if (id_region in polymap[layer]) found_layer = layer;
@@ -300,9 +326,17 @@ do_RegionFocus = function(options) {
         var id_region = options.id_region;
         var id_layer = options.layer;
 
-        if (!find_LayerWithRegion(id_region)) {
+        if (!find_RegionInLayers(id_region)) {
             console.log("[" + id_region + "] not found at Layer " + id_layer + " at polymap.");
             return false;
+        }
+
+        console.log( find_RegionInLayerGroups(id_region) );
+
+        if (!(map.getZoom().inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] ))) {
+            console.log('X');
+            map.addLayer( LGS[id_layer] );
+            map.setZoom( theMap['layers'][id_layer]['zoom'] );
         }
 
         var wlh_region_bounds = polymap[ id_layer ] [ id_region ].getBounds();
@@ -405,42 +439,6 @@ createControl_Backward = function(pos){
     });
 };
 /* ==================================================== end: create controls ==================================================== */
-
-/* DEPRECATED METHODS */
-
-if (false){
-    // id="bind-actor-click-inside-colorbox"
-    // обрабатываем клик по ссылке внутри попап окна
-    // (на самом деле надо проверять, это ссылка на ту же карту или нет?)
-    //@todo: протестировать, отладить!
-    // причем только внутри колорбокса
-    $(document).on('click', '#cboxLoadedContent a', function(){ // здесь другой элемент ловит событие!
-        var href = $(this).attr('href');
-        var wlh = window.location.href;
-
-        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
-            var href_params = href.match(/view=\[(.*)\]/);
-            if (href_params != null) {
-                history.pushState('', document.title, window.location.pathname + href);
-
-                showContentBox(href_params[1], '');
-            }
-        } else {
-            window.location.assign(href);
-            window.location.reload(true);
-        }
-
-        return false;
-    });
-}
-
-/* === Panes === */
-pane_show = function(id) {
-    map_panes[id].style.display = '';
-};
-pane_hide = function(id) {
-    map_panes[id].style.display = 'none';
-};
 
 Number.prototype.between = function(a, b) {
     var min = Math.min.apply(Math, [a, b]),

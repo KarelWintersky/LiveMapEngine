@@ -2,7 +2,7 @@
   "title"         : "Deadlands",
   "type"          : "bitmap",
   "display": {
-    "zoom": -2,
+    "zoom": -3,
     "zoom_min": -3,
     "zoom_max": 2,
     "background_color"  : "#dcbd6d",
@@ -44,7 +44,8 @@
   "layers": {
     "Towns": {
       "hint" : "Города и посёлки",
-      "zoom_min" : -2,
+      "zoom" : 0,
+      "zoom_min" : -1,
       "zoom_max" : 3,
       "empty": {
         "stroke": 0,
@@ -67,7 +68,8 @@
     },
     "Battlegrounds": {
       "hint" : "Поля битв",
-      "zoom_min" : -2,
+      "zoom" : 0,
+      "zoom_min" : -1,
       "zoom_max" : 3,
       "empty": {
         "stroke": 0,
@@ -90,7 +92,8 @@
     },
     "Domains": {
       "hint" : "Территории",
-      "zoom_min" : -3,
+      "zoom" : -2,
+      "zoom_min" : -2,
       "zoom_max" : -3,
       "empty": {
         "stroke": 0,

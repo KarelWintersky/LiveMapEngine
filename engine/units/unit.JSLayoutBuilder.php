@@ -286,6 +286,7 @@ class JSLayoutBuilder extends UnitPrototype {
                 $LAYERS[] = [
                     'id'        =>  $layer,
                     'hint'      =>  $layer_config->hint,
+                    'zoom'      =>  $layer_config->zoom ?? $json->display->zoom,
                     'zoom_min'  =>  $layer_config->zoom_min ?? -100,
                     'zoom_max'  =>  $layer_config->zoom_max ?? 100,
                     'regions'   =>  $paths_at_layer

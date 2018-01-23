@@ -47,6 +47,7 @@
   "layers": {
     "Paths": {
       "hint" : "Все пути",
+      "zoom" : -2,
       "zoom_min" : -100,
       "zoom_max" : 100,
       "empty": {
