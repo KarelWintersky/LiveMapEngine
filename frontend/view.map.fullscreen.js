@@ -1,17 +1,18 @@
 var current_infobox_region_id = '';
 var map;
-var polymap;
+var polymap = Object.create(null);
+var LGS = Object.create(null);
 
 $(function(){
     // умолчательные действия
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
-    polymap = buildPolymap(theMap);
+    // polymap = buildPolymap(theMap);
 
     map = L.map('map', {
         crs: L.CRS.Simple,
-        minZoom: -3,                    /* theMap */
-        maxZoom: 2,                     /* theMap */
+        minZoom: theMap['display']['zoom_min'],
+        maxZoom: theMap['display']['zoom_max'],
         preferCanvas: true,
         renderer: L.canvas(),
         zoomControl: false,
@@ -30,24 +31,40 @@ $(function(){
 
     map.setZoom( theMap['display']['zoom'] );
 
-    var poly_layer = new L.LayerGroup();
 
-    // draw polygons on map, bind on-click function
-    Object.keys( polymap ).forEach(function( id_region ) {
-        poly_layer.addLayer(
-            polymap[ id_region ].on('click', function(){
+    /* ================================================================================================ */
 
-                window.location.hash = 'view=[' + id_region + ']';
-                var t = (theMap['regions'][ id_region ]['title'] != '')
-                    ? theMap['regions'][ id_region ]['title']
-                    : '';
+    Object.keys( theMap['layers'] ).forEach(function(layer){
+        let lg = new L.LayerGroup();
+        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][layer] );
 
-                toggleContentViewBox(id_region, t);
-            })
-        );
+        Object.keys( regions_at_layer ).forEach(function(id_region){
+            regions_at_layer[id_region].on('click', function(){
+
+                /* === Region onclick method */
+
+                window.location.hash = "#view=[" + layer + '|' + id_region + "]";
+                toggleContentViewBox(id_region, layer);
+
+                /* === Region onclick method */
+
+            });
+
+            lg.addLayer( regions_at_layer[id_region] );
+        });
+
+        lg.addTo(map); // на самом деле надо показывать только если текущий зум позволяет видеть регион
+
+        LGS[layer] = lg;
+        polymap[layer] = regions_at_layer;
     });
 
-    poly_layer.addTo(map);
+    /*L.DomUtil.get('hidem').onclick = function(){
+     LGS["CLOutline"].remove();
+     };
+     L.DomUtil.get('showm').onclick = function(){
+     LGS["CLOutline"].addTo(map);
+     };*/
 
     createControl_RegionsBox();
     createControl_InfoBox();
@@ -69,12 +86,10 @@ $(function(){
 
     if (true) {
         var wlh_options = wlhBased_GetAction(polymap);
-
         map.fitBounds(current_bounds);
-
         if (wlh_options) {
             do_RegionShowInfo(wlh_options);
-            do_RegionFocus(wlh_options, polymap);
+            do_RegionFocus(wlh_options);
         } else {
             map.fitBounds(current_bounds);
         }
@@ -83,7 +98,23 @@ $(function(){
     // zoom control (а если сектора нет?)
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
+
         console.log("Current zoom: " + currentZoom);
+
+        Object.keys( theMap['layers'] ).forEach(function(layer){
+            var zmin = theMap['layers'][layer]['zoom_min'];
+            var zmax = theMap['layers'][layer]['zoom_max'];
+
+            console.log(layer + " have zoom bounds [ " + zmin + " .. " + zmax + " ], visibility is " + currentZoom.inbound(zmin, zmax));
+
+            if ((zmin <= currentZoom) && (currentZoom <= zmax)) {
+                console.log("At zoom " + currentZoom + " Layer " + layer + " is visible");
+            } else {
+                console.log("At zoom " + currentZoom + " Layer " + layer + " is HIDDEN");
+            }
+        });
+        console.log("----");
+
         /*if (sector == null) return;
 
          if (currentZoom < sector_options.zoom_threshold) {
@@ -125,9 +156,12 @@ $(function(){
     })
     .on('click', '.action-focus-at-region', function(){
         // клик на ссылке в списке регионов
+        var id_region = $(this).data('region-id');
+
         do_RegionFocus({
             action: 'focus',
-            region_id: $(this).data('region-id')
+            layer: find_LayerWithRegion(id_region),
+            id_region: id_region
         }, polymap);
     })
     .on('click', '#actor-edit', function(){

@@ -43,25 +43,32 @@ var theMap = {
         "fillColor" : "{*region_defaults_present.fillColor*}",
         "fillOpacity" : {*region_defaults_present.fillOpacity*},
     },
-    "regions": {
-    {%*regions*}
-        "{*regions:id*}" : {
-            "id"        : "{*regions:id*}",
-            "type"      : "{*regions:type*}",
-            "coords"    : {*regions:js*},
-            "layer"     : "{*regions:layer*}",
+    "layers": {
+    {%*layers*}
+        "{*layers:id*}": {
+            "id" : "{*layers:id*}",
+            "zoom_min" : {*layers:zoom_min*},
+            "zoom_max" : {*layers:zoom_max*},
+            "regions": {
+            {%*layers:regions*}
+                "{*layers:regions:id*}": {
+                    "id"        : "{*layers:regions:id*}",
+                    "type"      : "{*layers:regions:type*}",
+                    "coords"    : {*layers:regions:js*},
+                    {?*layers:regions:fillColor*}"fillColor" : "{*layers:regions:fillColor*}", {?}
+                    {?*layers:regions:fillOpacity*}"fillOpacity": {*layers:regions:fillOpacity*}, {?}
+                    {?*layers:regions:fillRule*}"fillRule": "{*layers:regions:fillRule*}", {?}
 
-            {?*regions:fillColor*}"fillColor" : "{*regions:fillColor*}", {?}
-            {?*regions:fillOpacity*}"fillOpacity": {*regions:fillOpacity*}, {?}
-            {?*regions:fillRule*}"fillRule": "{*regions:fillRule*}", {?}
+                    {?*layers:regions:borderColor*}"borderColor": "{*layers:regions:borderColor*}", {?}
+                    {?*layers:regions:borderWidth*}"borderWidth": "{*layers:regions:borderWidth*}", {?}
+                    {?*layers:regions:borderOpacity*}"borderOpacity": "{*layers:regions:borderOpacity*}", {?}
 
-            {?*regions:borderColor*}"borderColor": "{*regions:borderColor*}", {?}
-            {?*regions:borderWidth*}"borderWidth": "{*regions:borderWidth*}", {?}
-            {?*regions:borderOpacity*}"borderOpacity": "{*regions:borderOpacity*}", {?}
-
-            {?*regions:title*}"title": "{*regions:title*}", {?}
-            {?*regions:desc*}"desc": "{*regions:desc*}", {?}
-            {?*regions:radius*}"radius": {*regions:radius*},{?}
+                    {?*layers:regions:title*}"title": "{*layers:regions:title*}", {?}
+                    {?*layers:regions:desc*}"desc": "{*layers:regions:desc*}", {?}
+                    {?*layers:regions:radius*}"radius": {*layers:regions:radius*},{?}
+                },
+            {%}
+            }
         },
     {%}
     },

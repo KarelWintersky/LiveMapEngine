@@ -117,6 +117,9 @@ class JSLayoutBuilder extends UnitPrototype {
 
         $regions_for_js = '';
         $paths_data = [];
+        $layers_data = [];
+
+        $LAYERS = [];
 
         try {
             if ($json->type == "vector" && empty($json->image))
@@ -190,6 +193,13 @@ class JSLayoutBuilder extends UnitPrototype {
                 if (!empty($json->layers->$layer)) {
                     $layer_config = $json->layers->$layer;
                 }
+
+                $layers_data[] = [
+                    'id'        =>  $layer,
+                    'hint'      =>  $layer_config->hint,
+                    'zoom_min'  =>  $layer_config->zoom_min ?? -100,
+                    'zoom_max'  =>  $layer_config->zoom_max ?? 100
+                ];
 
                 $sp->parseLayer($layer);   // парсит слой (определяет атрибут трансформации слоя и конвертит в объекты все элементы)
 
@@ -273,6 +283,14 @@ class JSLayoutBuilder extends UnitPrototype {
                     $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path);
                 }
 
+                $LAYERS[] = [
+                    'id'        =>  $layer,
+                    'hint'      =>  $layer_config->hint,
+                    'zoom_min'  =>  $layer_config->zoom_min ?? -100,
+                    'zoom_max'  =>  $layer_config->zoom_max ?? 100,
+                    'regions'   =>  $paths_at_layer
+                ];
+
                 $paths_data += $paths_at_layer;
             }
 
@@ -299,6 +317,9 @@ class JSLayoutBuilder extends UnitPrototype {
 
         if ($this->ERROR)
             $this->template->set('/JSBuilderError', $this->ERROR_MESSAGE);
+
+        // $this->template->set('/layers', $layers_data);
+        $this->template->set('/layers', $LAYERS);
 
         $this->template->set('/map', [
             'title'         =>  $json->title,

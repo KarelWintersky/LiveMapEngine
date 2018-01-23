@@ -386,7 +386,7 @@ class SVGParser {
             $data['desc'] = htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
         }
 
-        $data['layer'] = $this->layer_name; //@todo: сейчас мы передаем имя слоя так, но в будущем нам понадобится многоуровневая структура слой->данные
+        // $data['layer'] = $this->layer_name; //@todo: сейчас мы передаем имя слоя так, но в будущем нам понадобится многоуровневая структура слой->данные
 
         return $data;
     }

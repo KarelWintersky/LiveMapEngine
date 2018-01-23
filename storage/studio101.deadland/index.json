@@ -39,13 +39,13 @@
   },
   "layout": {
     "file"        : "deadland.svg",
-    "layers" : [ "Towns", "Battlegrounds" ]
+    "layers" : [ "Towns", "Battlegrounds", "Domains" ]
   },
   "layers": {
     "Towns": {
       "hint" : "Города и посёлки",
-      "zoom_min" : -3,
-      "zoom_max" : -2,
+      "zoom_min" : -2,
+      "zoom_max" : 3,
       "empty": {
         "stroke": 0,
         "borderColor" : "#000000",
@@ -67,7 +67,7 @@
     },
     "Battlegrounds": {
       "hint" : "Поля битв",
-      "zoom_min" : -1,
+      "zoom_min" : -2,
       "zoom_max" : 3,
       "empty": {
         "stroke": 0,
@@ -90,8 +90,8 @@
     },
     "Domains": {
       "hint" : "Территории",
-      "zoom_min" : -1,
-      "zoom_max" : 3,
+      "zoom_min" : -3,
+      "zoom_max" : -3,
       "empty": {
         "stroke": 0,
         "borderColor" : "#000000",

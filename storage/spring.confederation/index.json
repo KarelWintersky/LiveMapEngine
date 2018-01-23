@@ -38,7 +38,7 @@
   },
   "layout": {
     "file"   : "confmap.svg",
-    "layers" : [ "Stars&Channels", "CLOutline", "Paths" ]
+    "layers" : [ "Stars&Channels", "CLOutline" ]
   },
   "layers": {
     "Stars&Channels": {

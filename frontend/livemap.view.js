@@ -33,7 +33,7 @@ showContentColorbox = function(id_region , title) {
     });
 }
 
-toggleContentViewBox = function(id_region, title) {
+toggleContentViewBox = function(id_region, layer) {
     var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
     if (current_infobox_region_id == id_region) {
         toggleInfoBox('#actor-viewbox-toggle');
@@ -41,7 +41,7 @@ toggleContentViewBox = function(id_region, title) {
         if ( $('#actor-viewbox-toggle').data('content-is-visible') == false ) {
             history.pushState('', document.title, window.location.pathname);
         } else {
-            window.location.hash = "#view=[" + id_region + "]";
+            window.location.hash = "#view=[" + layer + '|' + id_region + "]";
         }
 
     } else {
@@ -54,25 +54,12 @@ toggleContentViewBox = function(id_region, title) {
             type: 'GET',
             async: false
         }).done(function(data){
-            if (!(id_region in polymap)) {
-                console.log("[" + id_region + "] not found at Polymap ");
+            if (!find_LayerWithRegion(id_region)) {
+                console.log("[" + id_region + "] not found at Layer " + layer + " at polymap.");
                 return false;
             }
 
-            var region_center = polymap [ id_region ].getBounds().getCenter();
-
-            // сдвиг происходит только если регион слишком близко к центру (ближе 70 пикселей)
-            /*if (map_centring_panning_step > 0) {
-                if (region_center.lng > map.getBounds().getCenter().lng ) {
-                    region_center.lng += map_centring_panning_step;
-                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-                }
-            } else if (map_centring_panning_step < 0) {
-                if (region_center.lng <= map.getBounds().getCenter().lng ) {
-                    region_center.lng += map_centring_panning_step;
-                    map.panTo( region_center, { animate: true, duration: 0.5, noMoveStart: true} );
-                }
-            }*/
+            var region_center = polymap[layer][ id_region ].getBounds().getCenter();
 
             $("#actor-viewbox-toggle").data('content-is-visible', true).html("Скрыть");
             $("#section-info-content").html(data).show();
@@ -135,6 +122,39 @@ toggleInfoBox = function(el) {
 
 /* ==================================================== create map regions ==================================================== */
 
+buildRegionsAtLayer = function(layer_data) {
+    var set_of_regions = Object.create(null);
+
+    Object.keys( layer_data.regions ).forEach(function( key ){
+        var region = layer_data.regions[ key ];
+        var type = region['type'];
+        var coords = region['coords'];
+
+        // DEFAULTS for ALL polygons
+        var options = {
+            color: region['borderColor']        || theMap.region_defaults_empty.borderColor,
+            weight: region['borderWidth']       || theMap.region_defaults_empty.borderWidth,
+            opacity: region['borderOpacity']    || theMap.region_defaults_empty.borderOpacity,
+            fillColor: region['fillColor']      || theMap.region_defaults_empty.fillColor,
+            fillOpacity: region['fillOpacity']  || theMap.region_defaults_empty.fillOpacity,
+            radius: region['radius']            || 10
+        };
+
+        var entity;
+        if (type == 'polygon') {
+            entity = L.polygon(coords, options);
+        } else if (type == 'rect') {
+            entity = L.rectangle(coords, options);
+        } else if (type == 'circle') {
+            entity = L.circle(coords, options)
+        }
+
+        set_of_regions[ key ] = entity;
+    } );
+
+    return set_of_regions;
+}
+
 /**
  * Возвращает объект, содержащий все регионы.
  *
@@ -194,7 +214,7 @@ buildPolymap = function(theMap, layer) {
  */
 wlhBased_GetAction = function(polymap, layer) {
     var wlh = window.location.hash;
-    var wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
+    var wlh_params = wlh.match(/(view|focus)=\[(.*)\|(.*)\]/);
     var options = false;
 
     if (
@@ -203,10 +223,13 @@ wlhBased_GetAction = function(polymap, layer) {
         (((wlh_params[1] == 'view') || (wlh_params[1] == 'focus')) && (wlh_params[2] != ''))
         &&
         ( wlh_params[2] in polymap )
+        &&
+        ( wlh_params[3] in polymap[ wlh_params[2] ])
     ) {
         options = {};
         options.action = wlh_params[1];
-        options.id_region = wlh_params[2];
+        options.layer = wlh_params[2];
+        options.id_region = wlh_params[3];
     }
     return options;
 };
@@ -223,10 +246,11 @@ wlhBased_GetAction = function(polymap, layer) {
 do_RegionShowInfo = function(options) {
     if (options && options.action == 'view') {
         var id_region = options.id_region;
+        var id_layer = options.layer;
         var url = '/api/get/regiondata?map=' + map_alias + '&id=' + id_region;
 
-        if (!(id_region in polymap)) {
-            console.log("[" + id_region + "] not found at Polymap ");
+        if (!find_LayerWithRegion(id_region)) {
+            console.log("[" + id_region + "] not found at Layer " + id_layer + " at polymap.");
             return false;
         }
 
@@ -238,7 +262,7 @@ do_RegionShowInfo = function(options) {
             // если инфоблок справа, регионы слева - то "+"
             var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.5;
 
-            var region_center = polymap [ id_region ].getBounds().getCenter();
+            var region_center = polymap[ id_layer ][ id_region ].getBounds().getCenter();
             var region_center_shifting_method = template_orientation;
 
             region_center.lng = region_center.lng + (region_center_shifting_method * map_centring_panning_step);
@@ -252,6 +276,15 @@ do_RegionShowInfo = function(options) {
     }
 };
 
+find_LayerWithRegion = function(id_region){
+    let found_layer = false;
+    Object.keys( polymap ).forEach(function(layer){
+        if (id_region in polymap[layer]) found_layer = layer;
+    });
+
+    return found_layer;
+}
+
 /**
  * Анализирует options и выполняем фокусировку на регион.
  *
@@ -262,25 +295,27 @@ do_RegionShowInfo = function(options) {
  * @param layer
  * @returns {boolean}
  */
-do_RegionFocus = function(options /*, polymap, layer */) {
+do_RegionFocus = function(options) {
     if (options && options.action == 'focus') {
+        var id_region = options.id_region;
+        var id_layer = options.layer;
 
-        if (!(options.region_id in polymap)) {
-            console.log("[" + options.region_id + "] not found at Polymap ");
+        if (!find_LayerWithRegion(id_region)) {
+            console.log("[" + id_region + "] not found at Layer " + id_layer + " at polymap.");
             return false;
         }
 
-        var wlh_region_bounds = polymap [ options.region_id ].getBounds();
-        var old_style = polymap[ options.region_id ].options['fillColor'];
+        var wlh_region_bounds = polymap[ id_layer ] [ id_region ].getBounds();
+        var old_style = polymap[ id_layer ][ id_region ].options['fillColor'];
         var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
         var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
         var focus_timeout = theMap['display']['focus_timeout'] || 1000;
 
         map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: focus_animate_duration, noMoveStart: true});
-        polymap[ options.region_id ].setStyle({fillColor: focus_highlight_color});
+        polymap[ id_layer ][ id_region ].setStyle({fillColor: focus_highlight_color});
 
         setTimeout(function(){
-            polymap[ options.region_id ].setStyle({fillColor: old_style});
+            polymap[ id_layer ][ id_region ].setStyle({fillColor: old_style});
         }, focus_timeout);
         return true;
     }
@@ -398,3 +433,23 @@ if (false){
         return false;
     });
 }
+
+/* === Panes === */
+pane_show = function(id) {
+    map_panes[id].style.display = '';
+};
+pane_hide = function(id) {
+    map_panes[id].style.display = 'none';
+};
+
+Number.prototype.between = function(a, b) {
+    var min = Math.min.apply(Math, [a, b]),
+        max = Math.max.apply(Math, [a, b]);
+    return this > min && this < max;
+};
+
+Number.prototype.inbound = function(a, b) {
+    var min = Math.min.apply(Math, [a, b]),
+        max = Math.max.apply(Math, [a, b]);
+    return this >= min && this <= max;
+};
