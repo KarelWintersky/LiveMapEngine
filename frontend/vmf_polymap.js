@@ -161,10 +161,12 @@ wlh_ShowRegionInfo = function(id_region){
     var is_visible = LGS[id_layer].visible;
     var bounds;
 
+    console.log("Текущий зум: ", map.getZoom());
     console.log("Запрашиваемый регион: " , id_region);
     console.log("принадлежит группе слоёв " , id_layer);
     console.log("Видимость группы слоёв с регионом: " , is_visible);
     console.log("Описание группы слоёв: ", LGS[id_layer]);
+
 
     var zmin = LGS[id_layer].zoom_min;
     var zmax = LGS[id_layer].zoom_max;
@@ -183,7 +185,7 @@ wlh_ShowRegionInfo = function(id_region){
     map.fitBounds(base_map_bounds);
 
     // зум
-    map.setZoom( theMap['layers'][id_layer]['zoom'], {
+    map.setZoom( LGS[id_layer]['zoom'], {
         animate: false
     });
 
