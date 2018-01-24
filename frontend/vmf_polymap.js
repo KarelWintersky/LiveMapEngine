@@ -3,6 +3,7 @@ var map;
 var LGS = Object.create(null);
 var polymap = Object.create(null);
 var _prevent = false;
+var base_map_bounds;
 
 var LGDef = Object.create(null);
 
@@ -18,8 +19,8 @@ $(function(){
         zoomControl: false,
     });
     map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
-    var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
-    var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
+    base_map_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
+    var image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
     if (theMap['maxbounds']) {
         var mb = theMap['maxbounds'];
         map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
@@ -36,6 +37,7 @@ $(function(){
             LGS[ id_layer ] = {
                 actor: lg,
                 visible: false,
+                zoom: theMap['layers'][id_layer]['zoom'],
                 zoom_min: theMap['layers'][id_layer]['zoom_min'],
                 zoom_max: theMap['layers'][id_layer]['zoom_max'],
             };
@@ -59,7 +61,7 @@ $(function(){
         }
     });
 
-    map.fitBounds(current_bounds);
+    map.fitBounds(base_map_bounds);
 
     createControl_RegionsBox();
     createControl_InfoBox();
@@ -83,11 +85,11 @@ $(function(){
 
 
 
-            // map.fitBounds(current_bounds);
+            // map.fitBounds(base_map_bounds);
             // do_RegionShowInfo(wlh_options);
             // do_RegionFocus(wlh_options);
         } else {
-            // map.fitBounds(current_bounds);
+            // map.fitBounds(base_map_bounds);
         }
     }
 
@@ -110,20 +112,6 @@ $(function(){
                 LGS[lg].visible = false;
             }
         });
-
-        /*Object.keys( theMap['layers'] ).forEach(function(layer){
-            var zmin = theMap['layers'][layer]['zoom_min'];
-            var zmax = theMap['layers'][layer]['zoom_max'];
-
-            if (currentZoom.inbound(zmin, zmax)) {
-                map.addLayer( LGS[layer].actor );
-                LGS[layer].visible = true;
-            }
-            else {
-                map.removeLayer( LGS[layer].actor );
-                LGS[layer].visible = false;
-            }
-        });*/
     });
 
 }).on('click', '#actor-regions-toggle', function (el) {
@@ -167,7 +155,6 @@ direct_FocusRegion = function(id_region){
 };
 
 wlh_ShowRegionInfo = function(id_region){
-
     /* позиционируем */
 
     var id_layer = theMap['regions'][id_region]['layer'];
@@ -178,53 +165,41 @@ wlh_ShowRegionInfo = function(id_region){
     console.log("принадлежит группе слоёв " , id_layer);
     console.log("Видимость группы слоёв с регионом: " , is_visible);
     console.log("Описание группы слоёв: ", LGS[id_layer]);
-    console.log("Зум слоя (из инфо карты)" , theMap['layers'][id_layer]['zoom']);
+
+    var zmin = LGS[id_layer].zoom_min;
+    var zmax = LGS[id_layer].zoom_max;
+
+    console.log("Зум слоя (из инфо карты)", theMap['layers'][id_layer]['zoom']);
+    console.log("Зум слоя (из layergroup)", LGS[id_layer]['zoom']);
 
     var currentZoom = map.getZoom();
 
-    /*map.setZoom( theMap['layers'][id_layer]['zoom'], {
-        animate: false
-    } );
-
-
-    Object.keys( theMap['layers'] ).forEach(function(layer){
-        var zmin = theMap['layers'][layer]['zoom_min'];
-        var zmax = theMap['layers'][layer]['zoom_max'];
-
-        if (currentZoom.inbound(zmin, zmax)) {
-            map.addLayer( LGS[layer].actor );
-            LGS[layer].visible = true;
-        }
-        else {
-            map.removeLayer( LGS[layer].actor );
-            LGS[layer].visible = false;
-        }
-    });
-*/
-
-/*
-    if (!is_visible) {
+    // добавляем все слои
+    Object.keys( LGS ).forEach(function(lg){
         map.addLayer( LGS[lg].actor );
         LGS[lg].visible = true;
+    });
 
+    map.fitBounds(base_map_bounds);
 
+    // зум
+    map.setZoom( theMap['layers'][id_layer]['zoom'], {
+        animate: false
+    });
 
+    // пан
+    bounds = polymap[id_region].getBounds();
+    map.panTo( bounds.getCenter(), { animate: false, duration: 1, noMoveStart: true});
 
+    // удаляем все невидные слои
+    Object.keys( LGS ).forEach(function(lg){
+        if (!(theMap['layers'][id_layer]['zoom'].inbound(zmin, zmax))) {
+            console.log('Надо скрыть слой ' + lg);
 
-        bounds = polymap[id_region].getBounds();
-        map.panTo( bounds.getCenter(), { animate: false, duration: 1, noMoveStart: true});
-    } else {
-
-        bounds = polymap[id_region].getBounds();
-        map.panTo( bounds.getCenter(), { animate: false, duration: 1, noMoveStart: true});
-
-    }
-*/
-
-
-
-    // direct_FocusRegion(id_region);
-    // direct_ShowRegionInfo(id_region);
+            map.removeLayer( LGS[id_layer].actor );
+            LGS[id_layer].visible = false;
+        }
+    });
 
 };
 
