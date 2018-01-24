@@ -117,6 +117,15 @@ toggleInfoBox = function(el) {
     $('#' + data).toggle();
     $(el).data('content-is-visible', !state);
 }
+toggle_BackwardBox = function(el){
+    var state = $(el).data('content-is-visible');
+    var text = (state == false) ? '&lt;' : '&gt;'; //@todo: сообщения на активном/свернутом виде перенести в дата-атрибуты
+    $(this).html(text);
+
+    var data = $(el).data('content');
+    $('#' + data).toggle();
+    $(this).data('content-is-visible', !state);
+}
 
 /* ==================================================== end: toggle ==================================================== */
 
@@ -160,13 +169,11 @@ buildRegionsAtLayer = function(layer_data) {
 /**
  * Возвращает объект, содержащий все регионы.
  *
- * Аргумент layer в 0.5.8 не используется
- *
  * @param theMap
  * @param layer
  * @returns {Object}
  */
-buildPolymap = function(theMap, layer) {
+buildPolymap = function(theMap) {
     var polymap = Object.create(null);
 
     Object.keys( theMap.regions ).forEach(function( key ){
@@ -294,13 +301,30 @@ do_RegionShowInfo = function(options) {
 
 };
 
-find_RegionInLayerGroups = function(id_region) {
+find_RegionNameInLayerGroups = function(id_region) {
+    let found = false;
+    Object.keys( LGS ).forEach(function(lg){
+        Object.keys( LGS[lg]._layers ).forEach(function(id) {
+            if ( LGS[lg]._layers[id].options.id_region == id_region )
+                found = lg;
+        });
+    });
+    return found;
+};
+
+find_RegionDefInLayerGroup = function(id_region) {
     let found = false;
 
     Object.keys( LGS ).forEach(function(lg){
-
+        Object.keys( LGS[lg]._layers ).forEach(function(id) {
+            if ( LGS[lg]._layers[id].options.id_region == id_region ) {
+                found = LGS[lg]._layers[id];
+            }
+        });
     });
-};
+
+    return found;
+}
 
 find_RegionInLayers = function(id_region){
     let found_layer = false;
@@ -322,6 +346,10 @@ find_RegionInLayers = function(id_region){
  * @returns {boolean}
  */
 do_RegionFocus = function(options) {
+    var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
+    var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
+    var focus_timeout = theMap['display']['focus_timeout'] || 1000;
+
     if (options && options.action == 'focus') {
         var id_region = options.id_region;
         var id_layer = options.layer;
@@ -331,19 +359,33 @@ do_RegionFocus = function(options) {
             return false;
         }
 
-        console.log( find_RegionInLayerGroups(id_region) );
+        let lg_name = find_RegionNameInLayerGroups(id_region);
+
+        console.log("Искомый регион принадлежит layer-group: " + lg_name );
+
+        // тут проверяется, находится ли текущий зум карты в диапазоне зума layergroup'а , на котором находится регион
 
         if (!(map.getZoom().inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] ))) {
-            console.log('X');
-            map.addLayer( LGS[id_layer] );
-            map.setZoom( theMap['layers'][id_layer]['zoom'] );
+
+            console.log('Нужно изменить зум на ' + theMap['layers'][id_layer]['zoom']);
+
+            map.setZoom( theMap['layers'][id_layer]['zoom'], { animate: false } );
+            map.addLayer( LGS[lg_name] );
+        } else {
+            console.log("Текущий зум нужный");
         }
 
-        var wlh_region_bounds = polymap[ id_layer ] [ id_region ].getBounds();
+        // надо найти описание региона в layer_group по имени LGS[lg_name]
+        var lg_region_def = find_RegionDefInLayerGroup(id_region);
+
+        console.log("Описание региона по идентификатору: ", lg_region_def );
+
+        var wlh_region_bounds = lg_region_def.getBounds();
+
+        // var wlh_region_bounds = polymap[ id_layer ] [ id_region ].getBounds();
         var old_style = polymap[ id_layer ][ id_region ].options['fillColor'];
-        var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
-        var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
-        var focus_timeout = theMap['display']['focus_timeout'] || 1000;
+
+        console.log("Делаем panTo к региону: " , wlh_region_bounds);
 
         map.panTo( wlh_region_bounds.getCenter(), { animate: true, duration: focus_animate_duration, noMoveStart: true});
         polymap[ id_layer ][ id_region ].setStyle({fillColor: focus_highlight_color});

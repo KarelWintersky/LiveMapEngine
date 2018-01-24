@@ -306,8 +306,6 @@ class JSLayoutBuilder extends UnitPrototype {
                 ];
             }
 
-            // $regions_for_js = $sp->exportSPaths( $paths_data );
-
         } catch (\Exception $e) {
             $this->ERROR = TRUE;
             $this->ERROR_MESSAGE = $e->getMessage();
@@ -318,9 +316,6 @@ class JSLayoutBuilder extends UnitPrototype {
 
         if ($this->ERROR)
             $this->template->set('/JSBuilderError', $this->ERROR_MESSAGE);
-
-        // $this->template->set('/layers', $layers_data);
-        $this->template->set('/layers', $LAYERS);
 
         $this->template->set('/map', [
             'title'         =>  $json->title,
@@ -347,6 +342,7 @@ class JSLayoutBuilder extends UnitPrototype {
         $this->template->set('/region_defaults_empty', (array)$json->display_defaults->empty);
         $this->template->set('/region_defaults_present', (array)$json->display_defaults->present);
 
+        $this->template->set('/layers', $LAYERS);
         $this->template->set('/regions', $paths_data);
     }
 

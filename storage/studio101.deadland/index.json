@@ -8,7 +8,10 @@
     "background_color"  : "#dcbd6d",
     "maxbounds": [[-0.5, -1], [1.5, 2]],
     "custom_css" : "deadland.css",
-    "cursor": "pointer"
+    "cursor": "pointer",
+    "focus_highlight_color": "#e900ff",
+    "focus_timeout": 1500,
+    "focus_animate_duration": 0.7
   },
   "image" : {
     "file"  : "deadland.jpg",
@@ -53,7 +56,7 @@
         "borderWidth" : 1,
         "borderOpacity": 0.3,
         "fill": 1,
-        "fillColor": "#2277ff",
+        "fillColor": "#b1a0ff",
         "fillOpacity": 0.5
       },
       "present": {
@@ -62,7 +65,7 @@
         "borderWidth" : 1,
         "borderOpacity": 0.3,
         "fill": 1,
-        "fillColor": "2277ff",
+        "fillColor": "#1cff82",
         "fillOpacity": 0.5
       }
     },
@@ -77,7 +80,7 @@
         "borderWidth" : 1,
         "fill": 1,
         "borderOpacity": 0.3,
-        "fillColor": "#E63939",
+        "fillColor": "#ffbc21",
         "fillOpacity": 0.5
       },
       "present": {
@@ -86,13 +89,13 @@
         "borderWidth" : 1,
         "borderOpacity": 0.3,
         "fill": 1,
-        "fillColor": "#2277ff",
+        "fillColor": "#ff0000",
         "fillOpacity": 0.5
       }
     },
     "Domains": {
       "hint" : "Территории",
-      "zoom" : -2,
+      "zoom" : -3,
       "zoom_min" : -2,
       "zoom_max" : -3,
       "empty": {
@@ -101,8 +104,8 @@
         "borderWidth" : 1,
         "fill": 1,
         "borderOpacity": 0.3,
-        "fillColor": "#69F7FA",
-        "fillOpacity": 0.2
+        "fillColor": "#bafcff",
+        "fillOpacity": 0.4
       },
       "present": {
         "stroke": 0,
@@ -110,8 +113,8 @@
         "borderWidth" : 1,
         "borderOpacity": 0.3,
         "fill": 1,
-        "fillColor": "#2277ff",
-        "fillOpacity": 0.5
+        "fillColor": "#9bb7ff",
+        "fillOpacity": 0.6
       }
     }
   }

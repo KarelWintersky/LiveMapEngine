@@ -2,6 +2,9 @@ var current_infobox_region_id = '';
 var map;
 var polymap = Object.create(null);
 var LGS = Object.create(null);
+var fullpolymap = Object.create(null);
+
+// map.scrollWheelZoom.disable();
 
 $(function(){
     // умолчательные действия
@@ -57,37 +60,6 @@ $(function(){
         LGS[id_layer] = lg;
     });
 
-
-    /* B */
-    /*Object.keys( theMap['layers'] ).forEach(function(id_layer){
-        let lg = new L.LayerGroup();
-        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][id_layer] );
-
-        Object.keys( regions_at_layer ).forEach(function(id_region){
-            regions_at_layer[id_region].on('click', function(){
-                /!* === Region onclick method *!/
-
-                window.location.hash = "#view=[" + id_layer + '|' + id_region + "]";
-                toggleContentViewBox(id_region, id_layer);
-
-                /!* === Region onclick method *!/
-            });
-            lg.addLayer( regions_at_layer[id_region] );
-        });
-
-        var currentZoom = map.getZoom();
-        // map.addLayer(lg);
-
-        if (currentZoom.inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] )) {
-            map.addLayer(lg);
-            // console.log(layer + " must be visible. ");
-        } else {
-            // console.log(layer + " must be hidden. ");
-        }
-
-        LGS[id_layer] = lg;
-        polymap[id_layer] = regions_at_layer;
-    });*/
     /* ==================================================================================================== */
 
     createControl_RegionsBox();
@@ -109,8 +81,9 @@ $(function(){
     map.addControl( __InfoBox );
 
     if (true) {
-        var wlh_options = wlhBased_GetAction(polymap);
+        var wlh_options = wlhBased_GetActionWOL(polymap);
         if (wlh_options) {
+
             // map.fitBounds(current_bounds);
             do_RegionShowInfo(wlh_options);
             do_RegionFocus(wlh_options);
@@ -122,16 +95,19 @@ $(function(){
     // zoom control (а если сектора нет?)
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
+        console.log("Zoom: " + currentZoom);
         Object.keys( theMap['layers'] ).forEach(function(layer){
             var zmin = theMap['layers'][layer]['zoom_min'];
             var zmax = theMap['layers'][layer]['zoom_max'];
 
-            console.log("Current zoom: [" + currentZoom + "], Layer [" + layer + "] have zoom bounds [" + zmin + " .. " + zmax + "], visibility is " + currentZoom.inbound(zmin, zmax));
+            // console.log("Current zoom: [" + currentZoom + "], Layer [" + layer + "] have zoom bounds [" + zmin + " .. " + zmax + "], visibility is " + currentZoom.inbound(zmin, zmax));
 
             if (currentZoom.inbound(zmin, zmax)) {
+                console.log("+" + layer);
                 map.addLayer( LGS[layer] );
             }
             else {
+                console.log("-" + layer);
                 map.removeLayer( LGS[layer] );
             }
         });
@@ -145,13 +121,7 @@ $(function(){
         toggleInfoBox(this);
     })
     .on('click', "#actor-backward-toggle", function (el) {
-        var state = $(this).data('content-is-visible');
-        var text = (state == false) ? '&lt;' : '&gt;'; //@todo: сообщения на активном/свернутом виде перенести в дата-атрибуты
-        $(this).html(text);
-
-        var data = $(this).data('content');
-        $('#' + data).toggle();
-        $(this).data('content-is-visible', !state);
+        toggle_BackwardBox(this);
     })
     .on('change', "#sort-select", function(e){
         var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
@@ -168,12 +138,19 @@ $(function(){
     .on('click', '.action-focus-at-region', function(){
         // клик на ссылке в списке регионов
         var id_region = $(this).data('region-id');
+        var id_layer = find_RegionInLayers(id_region);
+
+        console.log('Сделан клик на ссылке в списке регионов');
+        console.log("Запрошен регион: " + id_region + " принадлежащий слою: " + id_layer );
 
         do_RegionFocus({
             action: 'focus',
-            layer: find_RegionInLayers(id_region),
+            layer: id_layer,
             id_region: id_region
         }, polymap);
+
+        window.location.hash = "#focus=[" + id_layer + '|' + id_region + "]";
+        return false;
     })
     .on('click', '#actor-edit', function(){
         var region_id = $(this).data('region-id');
