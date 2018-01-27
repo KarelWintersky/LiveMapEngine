@@ -61,17 +61,18 @@ button {
     list-style-type: square;
 }
 
-/* === Section Viewbox === */
-#actor-viewbox-toggle {
-    width: 100%;
-}
-.section-info-viewbox {
+/* === Section InfoBox === */
+.section-infobox-wrapper {
     padding: 8px 8px;
     background: rgba(255,255,255,1);
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
-.section-info-content {
+.section-infobox-button-toggle-visibility {
+    width: 100%;
+}
+
+.section-infobox-content {
     margin: 10px 5px 10px 5px;
     font-size: 140%;
     text-align: left;

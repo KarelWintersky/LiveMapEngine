@@ -1,13 +1,11 @@
 var current_infobox_region_id = '';
 var map;
-var polymap = Object.create(null);
 var LGS = Object.create(null);
-var fullpolymap = Object.create(null);
-
-// map.scrollWheelZoom.disable();
+var polymap = Object.create(null);
+var base_map_bounds;
+var __InfoBox = null;
 
 $(function(){
-    // умолчательные действия
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
     map = L.map('map', {
@@ -20,47 +18,64 @@ $(function(){
     });
     map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
 
-    var current_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
-
-    var image = L.imageOverlay( theMap['map']['imagefile'], current_bounds).addTo(map);
-
+    base_map_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
+    var image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
     if (theMap['maxbounds']) {
         var mb = theMap['maxbounds'];
         map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
     }
-
     map.setZoom( theMap['display']['zoom'] );
 
-    /* ================================================================================================ */
-    /* A */
-    Object.keys( theMap['layers'] ).forEach(function(id_layer){
-        let regions_at_layer = buildRegionsAtLayer( theMap['layers'][id_layer] );
+    // строим массив всех регионов
+    polymap = buildPolymap( theMap );
 
-        Object.keys( regions_at_layer ).forEach(function(id_region){
-            regions_at_layer[id_region].on('click', function(){
-                window.location.hash = "#view=[" + id_layer + '|' + id_region + "]";
-                toggleContentViewBox(id_region, id_layer);
-            });
+    // биндим к каждому объекту функцию, показывающую информацию
+    Object.keys( polymap ).forEach(function(id_region){
+        polymap[id_region].on('click', function(){
+
+            if (current_infobox_region_id == id_region) {
+                manageInfoBox('toggle', id_region);
+            } else {
+                manageInfoBox('show', id_region);
+                window.location.hash = "#view=[" + id_region + "]";
+            }
+            current_infobox_region_id = id_region;
+
         });
-        polymap[ id_layer ] = regions_at_layer;
     });
 
-    Object.keys( polymap ).forEach(function(id_layer){
-        let lg = new L.LayerGroup();
+    // раскладываем регионы по layer-группам
+    Object.keys( polymap ).forEach(function(id_region){
+        let id_layer = theMap['regions'][id_region]['layer'];
 
-        Object.keys( polymap[id_layer] ).forEach(function(id_region){
-            lg.addLayer( polymap[id_layer][id_region] );
-        });
-
-        if (map.getZoom().inbound( theMap['layers'][id_layer]['zoom_min'], theMap['layers'][id_layer]['zoom_max'] )) {
-            map.addLayer(lg);
-        } else {
+        if (!(id_layer in LGS)) {
+            let lg = new L.LayerGroup();
+            LGS[ id_layer ] = {
+                actor: lg,
+                visible: false, // все слои скрыты
+                zoom: theMap['layers'][id_layer]['zoom'],
+                zoom_min: theMap['layers'][id_layer]['zoom_min'],
+                zoom_max: theMap['layers'][id_layer]['zoom_max'],
+            };
         }
-
-        LGS[id_layer] = lg;
+        LGS[id_layer].actor.addLayer( polymap[id_region] );
     });
 
-    /* ==================================================================================================== */
+    // показываем layer-группы или скрываем нужные
+    Object.keys( LGS ).forEach(function(lg) {
+        if (
+            map.getZoom().inbound( LGS[lg].zoom_min, LGS[lg].zoom_max )
+        ) {
+            map.addLayer( LGS[lg].actor );
+            LGS[lg].visible = true;
+        } else {
+            LGS[lg].actor.addTo(map);
+            LGS[lg].actor.remove(); // map.addLayer( LGS[lg].actor );
+            LGS[lg].visible = false;
+        }
+    });
+
+    map.fitBounds(base_map_bounds);
 
     createControl_RegionsBox();
     createControl_InfoBox();
@@ -71,88 +86,86 @@ $(function(){
         map.addControl( new L.Control.Backward() );
     }
 
-    // показываем контентный регион только если есть список регионов с данными
     if (regions_with_content_ids.length) {
         map.addControl( new L.Control.RegionsBox() );
     }
 
-    // его надо создавать только когда заявили показ информации!
-    var __InfoBox = new L.Control.InfoBox();
-    map.addControl( __InfoBox );
-
     if (true) {
-        var wlh_options = wlhBased_GetActionWOL(polymap);
+        var wlh_options = wlhBased_GetAction(polymap);
         if (wlh_options) {
+            // было бы более интересным решением имитировать триггером клик по ссылке на регионе, но.. оно не работает
+            // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
 
-            // map.fitBounds(current_bounds);
-            do_RegionShowInfo(wlh_options);
-            do_RegionFocus(wlh_options);
+            wlh_FocusRegion(wlh_options.id_region);
+            manageInfoBox('show', wlh_options.id_region);
         } else {
-            map.fitBounds(current_bounds);
         }
     }
 
-    // zoom control (а если сектора нет?)
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
-        console.log("Zoom: " + currentZoom);
-        Object.keys( theMap['layers'] ).forEach(function(layer){
-            var zmin = theMap['layers'][layer]['zoom_min'];
-            var zmax = theMap['layers'][layer]['zoom_max'];
+        console.log("zoom at zoomend -> " + currentZoom);
 
-            // console.log("Current zoom: [" + currentZoom + "], Layer [" + layer + "] have zoom bounds [" + zmin + " .. " + zmax + "], visibility is " + currentZoom.inbound(zmin, zmax));
+        Object.keys( LGS ).forEach(function(lg){
+            var zmin = LGS[lg].zoom_min;
+            var zmax = LGS[lg].zoom_max;
 
             if (currentZoom.inbound(zmin, zmax)) {
-                console.log("+" + layer);
-                map.addLayer( LGS[layer] );
+                map.addLayer( LGS[lg].actor );
+                LGS[lg].visible = true;
             }
             else {
-                console.log("-" + layer);
-                map.removeLayer( LGS[layer] );
+                map.removeLayer( LGS[lg].actor );
+                LGS[lg].visible = false;
             }
         });
     });
 
+}).on('click', '#actor-edit', function(){
+
+    var region_id = $(this).data('region-id');
+    document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
 
 }).on('click', '#actor-regions-toggle', function (el) {
-        toggleRegionsBox(this);
-    })
-    .on('click', '#actor-viewbox-toggle', function (el) {
-        toggleInfoBox(this);
-    })
-    .on('click', "#actor-backward-toggle", function (el) {
-        toggle_BackwardBox(this);
-    })
-    .on('change', "#sort-select", function(e){
-        var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-        var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
-        $(must_hide).hide();
-        $(must_display).show();
-    })
-    .on('change', "#sort-select", function(e){
-        var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-        var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
-        $(must_hide).hide();
-        $(must_display).show();
-    })
-    .on('click', '.action-focus-at-region', function(){
-        // клик на ссылке в списке регионов
-        var id_region = $(this).data('region-id');
-        var id_layer = find_RegionInLayers(id_region);
 
-        console.log('Сделан клик на ссылке в списке регионов');
-        console.log("Запрошен регион: " + id_region + " принадлежащий слою: " + id_layer );
+    toggleRegionsBox(this);
 
-        do_RegionFocus({
-            action: 'focus',
-            layer: id_layer,
-            id_region: id_region
-        }, polymap);
+}).on('click', '#actor-viewbox-toggle', function (el) {
 
-        window.location.hash = "#focus=[" + id_layer + '|' + id_region + "]";
-        return false;
-    })
-    .on('click', '#actor-edit', function(){
-        var region_id = $(this).data('region-id');
-        document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
-    });
+    toggleInfoBox(this);
+
+}).on('click', "#actor-backward-toggle", function (el) {
+
+    toggle_BackwardBox(this);
+
+}).on('change', "#sort-select", function(e){
+
+    var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+    var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+    $(must_hide).hide();
+    $(must_display).show();
+
+}).on('change', "#sort-select", function(e){
+
+    var must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+    var must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+    $(must_hide).hide();
+    $(must_display).show();
+
+}).on('click', '.action-focus-at-region', function(){
+    // клик на ссылке в списке регионов
+    var id_region = $(this).data('region-id');
+    console.log("'click', '.action-focus-at-region' -> " + id_region);
+
+    onclick_FocusRegion(id_region);
+    manageInfoBox('show', id_region);
+
+
+    window.location.hash = "#view=[" + id_region + "]";
+    return false;
+
+}).on('click', '#actor-section-infobox-toggle', function(){
+
+    manageInfoBox('hide', null);
+
+});
