@@ -36,12 +36,11 @@ $(function(){
     // биндим к каждому объекту функцию, показывающую информацию
     Object.keys( polymap ).forEach(function(id_region){
         polymap[id_region].on('click', function(){
-
+            // обернуть в функцию и отрефакторить
             if (current_infobox_region_id == id_region) {
                 manageInfoBox('toggle', id_region);
             } else {
                 manageInfoBox('show', id_region);
-                window.location.hash = "#view=[" + id_region + "]";
             }
             current_infobox_region_id = id_region;
 

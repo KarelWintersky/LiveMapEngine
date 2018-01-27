@@ -91,18 +91,29 @@ manageInfoBox = function(event, id_region) {
         case 'show': {
             do_LoadContent(id_region);
 
+            window.location.hash = "#view=[" + id_region + "]";
+
             current_infobox_visible_state = true;
+
             $infobox.show();
             break;
         }
         case 'hide': {
             current_infobox_visible_state = false;
+
             history.pushState('', document.title, window.location.pathname);
+
             $infobox.hide();
             break;
         }
         case 'toggle': {
-            current_infobox_visible_state = !current_infobox_visible_state;
+            if (current_infobox_visible_state) {
+                history.pushState('', document.title, window.location.pathname);
+                current_infobox_visible_state = false;
+            } else {
+                current_infobox_visible_state = true;
+                window.location.hash = "#view=[" + id_region + "]";
+            }
             $infobox.toggle();
             break;
         }
