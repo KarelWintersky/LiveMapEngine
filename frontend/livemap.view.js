@@ -66,6 +66,9 @@ do_LoadContent = function(id_region) {
 
         $.get(url, function(){}).done(function(data){
             if (IS_DEBUG) console.log('data loaded, length ' + data.length);
+
+            current_infobox_region_id = id_region;
+
             $("#section-infobox-content").html(data);
         });
     }
@@ -81,8 +84,8 @@ manageInfoBox = function(event, id_region) {
     let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
     var current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
 
-    if (IS_DEBUG) console.log("Event: " + event + " for region " + id_region);
-    if (IS_DEBUG) console.log('Current infobox visibility state: ' + current_infobox_visible_state);
+    // if (IS_DEBUG) console.log("Event: " + event + " for region " + id_region);
+    // if (IS_DEBUG) console.log('Current infobox visibility state: ' + current_infobox_visible_state);
 
     switch (event) {
         case 'show': {
@@ -110,25 +113,48 @@ manageInfoBox = function(event, id_region) {
 
 /* ==================================================== end: show content ============================================ */
 
+do_HighlightRegion = function(id_region) {
+
+}
+
+
+
+
 /* ==================================================== begin: focus ================================================= */
 onclick_FocusRegion = function(id_region){
     var id_layer = theMap['regions'][id_region]['layer'];
     var is_visible = LGS[id_layer].visible;
     var bounds;
 
-    if (IS_DEBUG) console.log("onclick_FocusRegion -> layer " + id_layer + " is_visible " + is_visible);
-    if (IS_DEBUG) console.log( LGS[id_layer].actor );
+    // if (IS_DEBUG) console.log("onclick_FocusRegion -> layer " + id_layer + " is_visible " + is_visible);
+    // if (IS_DEBUG) console.log( LGS[id_layer].actor );
+
+    // сохраняем оригинальный стиль региона
+    var old_style = polymap[id_region].options['fillColor'];
 
     if (!is_visible) {
         map.setZoom( theMap['layers'][id_layer]['zoom'], {
             animate: false
         } );
         bounds = polymap[id_region].getBounds();
+
+        polymap[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
+
         map.panTo( bounds.getCenter(), { animate: true, duration: 1, noMoveStart: true});
     } else {
         bounds = polymap[id_region].getBounds();
+
+        polymap[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
+
         map.panTo( bounds.getCenter(), { animate: true, duration: 1, noMoveStart: true});
     }
+
+    // восстанавливаем по таймауту
+    setTimeout(function(){
+        polymap[id_region].setStyle({fillColor: old_style});
+    }, focus_timeout);
+
+
 };
 
 wlh_FocusRegion = function(id_region){

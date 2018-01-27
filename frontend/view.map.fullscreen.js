@@ -1,10 +1,13 @@
+var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
+var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
+var focus_timeout = theMap['display']['focus_timeout'] || 1500;
 var current_infobox_region_id = '';
 var map;
 var LGS = Object.create(null);
 var polymap = Object.create(null);
 var base_map_bounds;
 var __InfoBox = null;
-var IS_DEBUG = false;
+var IS_DEBUG = true;
 
 $(function(){
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
@@ -159,11 +162,11 @@ $(function(){
 }).on('click', '.action-focus-at-region', function(){
     // клик на ссылке в списке регионов
     var id_region = $(this).data('region-id');
-    if (IS_DEBUG) console.log("'click', '.action-focus-at-region' -> " + id_region);
+    if (IS_DEBUG) console.log("CLICK action-focus-at-region' -> " + id_region);
+    console.log("current_infobox_region_id = " + current_infobox_region_id);
 
     onclick_FocusRegion(id_region);
     manageInfoBox('show', id_region);
-
 
     window.location.hash = "#view=[" + id_region + "]";
     return false;
