@@ -50,6 +50,7 @@ var theMap = {
             "zoom" : {*layers:zoom*},
             "zoom_min" : {*layers:zoom_min*},
             "zoom_max" : {*layers:zoom_max*},
+/*
             "regions": {
             {%*layers:regions*}
                 "{*layers:regions:id*}": {
@@ -70,6 +71,7 @@ var theMap = {
                 },
             {%}
             }
+*/
         },
     {%}
     },

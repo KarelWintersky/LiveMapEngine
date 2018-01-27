@@ -4,6 +4,7 @@ var LGS = Object.create(null);
 var polymap = Object.create(null);
 var base_map_bounds;
 var __InfoBox = null;
+var IS_DEBUG = false;
 
 $(function(){
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
@@ -86,10 +87,12 @@ $(function(){
         map.addControl( new L.Control.Backward() );
     }
 
+    // показываем список регионов только если он не пуст
     if (regions_with_content_ids.length) {
         map.addControl( new L.Control.RegionsBox() );
     }
 
+    // анализируем window.location.hash
     if (true) {
         var wlh_options = wlhBased_GetAction(polymap);
         if (wlh_options) {
@@ -102,9 +105,10 @@ $(function(){
         }
     }
 
+    // отлавливаем зум
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
-        console.log("zoom at zoomend -> " + currentZoom);
+        if (IS_DEBUG) console.log("zoom at zoomend -> " + currentZoom);
 
         Object.keys( LGS ).forEach(function(lg){
             var zmin = LGS[lg].zoom_min;
@@ -155,7 +159,7 @@ $(function(){
 }).on('click', '.action-focus-at-region', function(){
     // клик на ссылке в списке регионов
     var id_region = $(this).data('region-id');
-    console.log("'click', '.action-focus-at-region' -> " + id_region);
+    if (IS_DEBUG) console.log("'click', '.action-focus-at-region' -> " + id_region);
 
     onclick_FocusRegion(id_region);
     manageInfoBox('show', id_region);
@@ -165,6 +169,10 @@ $(function(){
     return false;
 
 }).on('click', '#actor-section-infobox-toggle', function(){
+
+    manageInfoBox('hide', null);
+
+}).escape(function(){
 
     manageInfoBox('hide', null);
 

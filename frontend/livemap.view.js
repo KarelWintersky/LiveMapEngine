@@ -12,6 +12,17 @@ Number.prototype.inbound = function(a, b) {
     return this >= min && this <= max;
 };
 
+$.fn.escape = function (callback) {
+    return this.each(function () {
+        $(document).on("keydown", this, function (e) {
+            var keycode = ((typeof e.keyCode !='undefined' && e.keyCode) ? e.keyCode : e.which);
+            if (keycode === 27) {
+                callback.call(this, e);
+            };
+        });
+    });
+};
+
 /* ==================================================== show content ================================================= */
 
 /**
@@ -48,13 +59,13 @@ do_LoadContent = function(id_region) {
         return false;
     }
 
-    console.log("Called do_LoadContent for " + id_region);
+    if (IS_DEBUG) console.log("Called do_LoadContent for " + id_region);
 
     if (current_infobox_region_id != id_region) {
         let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region;
 
         $.get(url, function(){}).done(function(data){
-            console.log('data loaded, length ' + data.length);
+            if (IS_DEBUG) console.log('data loaded, length ' + data.length);
             $("#section-infobox-content").html(data);
         });
     }
@@ -70,8 +81,8 @@ manageInfoBox = function(event, id_region) {
     let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
     var current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
 
-    // console.log("Event: " + event + " for region " + id_region);
-    // console.log('Current infobox visibility state: ' + current_infobox_visible_state);
+    if (IS_DEBUG) console.log("Event: " + event + " for region " + id_region);
+    if (IS_DEBUG) console.log('Current infobox visibility state: ' + current_infobox_visible_state);
 
     switch (event) {
         case 'show': {
@@ -105,8 +116,8 @@ onclick_FocusRegion = function(id_region){
     var is_visible = LGS[id_layer].visible;
     var bounds;
 
-    // console.log("onclick_FocusRegion -> layer " + id_layer + " is_visible " + is_visible);
-    // console.log( LGS[id_layer].actor );
+    if (IS_DEBUG) console.log("onclick_FocusRegion -> layer " + id_layer + " is_visible " + is_visible);
+    if (IS_DEBUG) console.log( LGS[id_layer].actor );
 
     if (!is_visible) {
         map.setZoom( theMap['layers'][id_layer]['zoom'], {
@@ -126,18 +137,18 @@ wlh_FocusRegion = function(id_region){
     var is_visible = LGS[id_layer].visible;
     var bounds;
 
-    console.log("Текущий зум: ", map.getZoom());
-    console.log("Запрашиваемый регион: " , id_region);
-    console.log("принадлежит группе слоёв " , id_layer);
-    console.log("Видимость группы слоёв с регионом: " , is_visible);
-    console.log("Описание группы слоёв: ", LGS[id_layer]);
+    if (IS_DEBUG) console.log("Текущий зум: ", map.getZoom());
+    if (IS_DEBUG) console.log("Запрашиваемый регион: " , id_region);
+    if (IS_DEBUG) console.log("принадлежит группе слоёв " , id_layer);
+    if (IS_DEBUG) console.log("Видимость группы слоёв с регионом: " , is_visible);
+    if (IS_DEBUG) console.log("Описание группы слоёв: ", LGS[id_layer]);
 
 
     var zmin = LGS[id_layer].zoom_min;
     var zmax = LGS[id_layer].zoom_max;
 
-    console.log("Зум слоя (из инфо карты)", theMap['layers'][id_layer]['zoom']);
-    console.log("Зум слоя (из layergroup)", LGS[id_layer]['zoom']);
+    if (IS_DEBUG) console.log("Зум слоя (из инфо карты)", theMap['layers'][id_layer]['zoom']);
+    if (IS_DEBUG) console.log("Зум слоя (из layergroup)", LGS[id_layer]['zoom']);
 
     var currentZoom = map.getZoom();
 
@@ -161,7 +172,7 @@ wlh_FocusRegion = function(id_region){
     // удаляем все невидные слои
     Object.keys( LGS ).forEach(function(lg){
         if (!(theMap['layers'][id_layer]['zoom'].inbound(zmin, zmax))) {
-            console.log('Надо скрыть слой ' + lg);
+            if (IS_DEBUG) console.log('Надо скрыть слой ' + lg);
 
             map.removeLayer( LGS[id_layer].actor );
             LGS[id_layer].visible = false;
@@ -331,8 +342,6 @@ buildPolymap = function(theMap) {
     return polymap;
 }
 
-
-
 /* ==================================================== end: create map regions ====================================== */
 
 /* ==================================================== Window Location Hash based =================================== */
@@ -368,20 +377,35 @@ wlhBased_GetAction = function(polymap) {
     return options;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* ===================================== РЕФАКТОРИНГ ============================ */
 
 
 do_ManageRegionContent = function(id_region) {
 
+}
+
+/* === DEPRECATED AND UNUSED CODE === */
+
+if (false) {
+    // id="bind-actor-click-inside-colorbox"
+// обрабатываем клик по ссылке внутри попап окна
+// (на самом деле надо проверять, это ссылка на ту же карту или нет?)
+//@todo: протестировать, отладить!
+    $(document).on('click', '#cboxLoadedContent a', function(){ // здесь другой элемент ловит событие!
+        var href = $(this).attr('href');
+        var wlh = window.location.href;
+
+        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
+            var href_params = href.match(/view=\[(.*)\]/);
+            if (href_params != null) {
+                history.pushState('', document.title, window.location.pathname + href);
+                toggleContentViewBox(href_params[1], '');
+            }
+        } else {
+            window.location.assign(href);
+            window.location.reload(true);
+        }
+
+        return false;
+    });
 }
