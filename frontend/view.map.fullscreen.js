@@ -3,31 +3,22 @@ var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff00
 var focus_timeout = theMap['display']['focus_timeout'] || 1500;
 var current_infobox_region_id = '';
 var map;
-var LGS = Object.create(null);
-var polymap = Object.create(null);
 var base_map_bounds;
 var __InfoBox = null;
-var IS_DEBUG = true;
+var IS_DEBUG = false;
+var LGS = Object.create(null);
+var polymap = Object.create(null);
 
-$(function(){
+
+;$(function(){
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
-    map = L.map('map', {
-        crs: L.CRS.Simple,
-        minZoom: theMap['display']['zoom_min'],
-        maxZoom: theMap['display']['zoom_max'],
-        preferCanvas: true,
-        renderer: L.canvas(),
-        zoomControl: false,
-    });
-    map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+    map = setup_MapCreate('map', theMap);
 
-    base_map_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
-    var image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
-    if (theMap['maxbounds']) {
-        var mb = theMap['maxbounds'];
-        map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
-    }
+    base_map_bounds = setup_MapSetMaxBounds(map, theMap);
+
+    var image = setup_MapCreateOverlay(map, theMap, base_map_bounds);
+
     map.setZoom( theMap['display']['zoom'] );
 
     // строим массив всех регионов

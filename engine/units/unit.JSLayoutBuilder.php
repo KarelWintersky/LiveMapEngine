@@ -289,7 +289,7 @@ class JSLayoutBuilder extends UnitPrototype {
                     'zoom'      =>  $layer_config->zoom ?? $json->display->zoom,
                     'zoom_min'  =>  $layer_config->zoom_min ?? -100,
                     'zoom_max'  =>  $layer_config->zoom_max ?? 100,
-                    'regions'   =>  $paths_at_layer
+                    // 'regions'   =>  $paths_at_layer
                 ];
 
                 $paths_data += $paths_at_layer;
@@ -319,6 +319,7 @@ class JSLayoutBuilder extends UnitPrototype {
 
         $this->template->set('/map', [
             'title'         =>  $json->title,
+            'type'          =>  $json->type,
             'alias'         =>  $this->map_alias,
             'imagefile'     =>  $json->image->file,
             'width'         =>  $image_info['width'],

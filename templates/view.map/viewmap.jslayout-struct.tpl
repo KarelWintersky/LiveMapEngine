@@ -2,12 +2,22 @@ var theMap = {
     {?*JSBuilderError*}"error": "{*JSBuilderError*}",{?}
     "map": {
         "title"             :   "{*map.title*}",
+        "type"              :   "{*map.type*}",
         "imagefile"         :   "/storage/{*map.alias*}/{*map.imagefile*}",
         "width"             :   {*map.width*},
         "height"            :   {*map.height*},
         "orig_x"            :   {*map.ox*},
         "orig_y"            :   {*map.oy*},
     },
+    {?*source_image*}
+    "image": {
+        "file"              :   "/storage/{*map.alias*}/{*source_image.file*}",
+        "width"             :   {*source_image.width*},
+        "height"            :   {*source_image.height*},
+        "orig_x"            :   {*source_image.ox*},
+        "orig_y"            :   {*source_image.oy*},
+    },
+    {?}
     "display": {
         "zoom"              :   {*display.zoom*},
         "zoom_min"          :   {*display.zoom_min*},

@@ -22,6 +22,85 @@ $.fn.escape = function (callback) {
         });
     });
 };
+/* ==================================================== create map =================================================== */
+setup_MapCreate = function(target, theMap) {
+    var map = null;
+
+    switch (theMap.map.type) {
+        case 'bitmap': {
+            map = L.map(target, {
+                crs: L.CRS.Simple,
+                minZoom: theMap['display']['zoom_min'],
+                maxZoom: theMap['display']['zoom_max'],
+                preferCanvas: true,
+                renderer: L.canvas(),
+                zoomControl: false,
+            });
+            map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+
+            break;
+        }
+        case 'vector': {
+            map = L.map(target, {
+                crs: L.CRS.Simple,
+                minZoom: theMap['display']['zoom_min'],
+                maxZoom: theMap['display']['zoom_max'],
+                preferCanvas: true,
+                renderer: L.canvas(),
+                zoomControl: false,
+            });
+            map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+
+            break;
+        }
+        case 'tileset': {
+            break;
+        }
+    }
+
+    return map;
+}
+
+setup_MapSetMaxBounds = function(map, theMap) {
+    var base_map_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
+    if (theMap['maxbounds']) {
+        var mb = theMap['maxbounds'];
+        map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
+    }
+    return base_map_bounds;
+}
+
+setup_MapCreateOverlay = function(map, theMap, bounds) {
+    var image = null;
+
+    switch (theMap.map.type) {
+        case 'bitmap': {
+            image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
+
+            break;
+        }
+        case 'vector': {
+            image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
+
+
+            break;
+        }
+        case 'tileset': {
+            L.tileLayer('eso/{z}/{x}/{y}.jpg', {
+                minZoom: theMap['display']['zoom_min'],
+                maxZoom: theMap['display']['zoom_max'],
+                attribution: 'ESO/INAF-VST/OmegaCAM',
+                tms: true
+            }).addTo(map);
+
+            break;
+        }
+    }
+
+    return image;
+
+};
+
 
 /* ==================================================== show content ================================================= */
 
@@ -70,6 +149,7 @@ do_LoadContent = function(id_region) {
             current_infobox_region_id = id_region;
 
             $("#section-infobox-content").html(data);
+            document.getElementById('section-infobox-content').scrollTop = 0; // scroll box to top
         });
     }
 }
