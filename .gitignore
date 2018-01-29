@@ -1,3 +1,4 @@
+.idea
 .todo
 config.ini
 db.ini
@@ -5,3 +6,6 @@ phpauth.ini
 .config/config.ini
 .config/db.ini
 .config/phpauth.ini
+storage.tiles
+storage
+test
