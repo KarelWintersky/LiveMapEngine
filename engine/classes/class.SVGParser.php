@@ -326,11 +326,15 @@ class SVGParser {
         // получаем атрибут fillColor
         if (preg_match('#fill:([\#\d\w]{7})#', $path_style, $path_style_fillColor) ) {
             $data['fillColor'] = $path_style_fillColor[1];
+        } else {
+            $data['fillColor'] = null;
         };
 
         // получаем атрибут fillOpacity
         if (preg_match('#fill-opacity:([\d]?\.[\d]{0,8})#', $path_style, $path_style_fillOpacity) ) {
             $data['fillOpacity'] = round($path_style_fillOpacity[1] , self::ROUND_PRECISION);
+        } else {
+            $data['fillOpacity'] = null;
         };
 
         // получаем атрибут fillRule
@@ -338,6 +342,8 @@ class SVGParser {
             if ($path_style_fillRule[1] !== 'evenodd') {
                 $data['fillRule'] = $path_style_fillRule[1];
             }
+        } else {
+            $data['fillRule'] = null;
         };
 
         // кастомные значения для пустых регионов

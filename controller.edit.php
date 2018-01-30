@@ -25,7 +25,7 @@ switch ($edit_what) {
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
         $user_id = $userinfo['uid'];
-        $can_edit = $lm_engine->checkACL_Role($user_id, $edit_map_alias, 'edit');
+        $can_edit = $lm_engine->ACL_checkRole($user_id, $edit_map_alias, 'edit');
 
         if (!$can_edit) {
             die('Hacking attempt!');

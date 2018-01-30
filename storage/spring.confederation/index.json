@@ -42,7 +42,7 @@
   },
   "layers": {
     "Stars&Channels": {
-      "hint" : "Все пути",
+      "hint" : "Звездные системы",
       "zoom" : 0,
       "zoom_min" : -100,
       "zoom_max" : 100,
@@ -66,7 +66,7 @@
       }
     },
     "CLOutline": {
-      "hint" : "Все пути",
+      "hint" : "Гиперканалы",
       "zoom" : 0,
       "zoom_min" : -100,
       "zoom_max" : 100,

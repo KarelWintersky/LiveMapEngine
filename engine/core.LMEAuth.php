@@ -8,6 +8,8 @@ class LMEAuth
 
     public static $is_logged = false;
 
+    public static $uid      = null;
+
     public static $userinfo = null;
 
     public static function init(\PHPAuth\Auth $auth) {
@@ -17,6 +19,10 @@ class LMEAuth
             self::$is_logged = $auth->isLogged();
 
             self::$userinfo = $auth->getCurrentSessionInfo();
+
+            if (self::$userinfo) {
+                self::$uid = (int)self::$userinfo['uid']; // ? == $auth->getCurrentUID();
+            }
         }
     }
 

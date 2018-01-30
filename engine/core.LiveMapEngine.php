@@ -11,11 +11,15 @@ class LiveMapEngine
     /**
      * @param DBConnectionLite $dbi
      */
+    //@todo: создаваться инстанс должен на map_alias, а коннект получаем из конфига
+
     public function __construct(\DBConnectionLite $dbi) {
         $this->dbi = $dbi;
         $this->table_prefix = $dbi->get_table_prefix();
-    }
 
+
+        // $role = $this->ACL_getRole($map_alias);
+    }
 
     /**
      * Простая проверка роли
@@ -26,9 +30,11 @@ class LiveMapEngine
      * @param string $role
      * @return bool
      */
-    public function checkACL_Role($user_id, $map_alias, $role = 'edit') {
+    public function ACL_checkRole($user_id, $map_alias, $role = 'edit') {
 
-        if ($user_id == 1) return true; //@todo: HARDCODE, userid 1 can EVERYTHING
+        if ($user_id == 1) return true;         //@todo: HARDCODE, userid 1 can EVERYTHING
+        if ($user_id === null) return false;
+        if ($user_id === false) return false;
 
         $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/settings_acl');
 
@@ -41,10 +47,50 @@ class LiveMapEngine
         return ($sth && $sth->fetchColumn() == 'Y') ? true : false;
     }
 
-    public function ACL_getRoleCurrent($map_alias) {
-        $query  = "";
 
-        
+    public function ACL_getRole($map_alias) {
+
+        // if (LMEAuth::$uid === 1) return 'ROOT'; //@todo: Пользователь 1 имеет права root
+
+        if (!LMEAuth::$is_logged) return 'ANYONE';
+
+        $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/settings_acl');
+
+        $query = "
+        SELECT user_id, owner, edit, view FROM {$table} WHERE `user_id` = :user_id AND `map_alias` = :map_alias
+        ";
+        $sth = $this->dbi->getconnection()->prepare($query);
+        $sth->execute([
+            'user_id'   =>  LMEAuth::$uid,
+            'map_alias' =>  $map_alias
+        ]);
+
+        $acl = $sth->fetch();
+
+        if (!$acl) return 'ANYONE';
+
+        if ($acl['owner'] == 'Y') return 'OWNER';
+
+        if ($acl['edit'] == 'Y') return 'EDITOR';
+
+        if ($acl['view'] == 'Y') return 'VISITOR';
+
+        return 'ANYONE';
+    }
+
+    public function ACL_isValidRole($first_role, $second_role) {
+        $ROLE_TO_POWER = array(
+            'ANYONE'        =>  0,
+            'VISITOR'       =>  1,
+            'EDITOR'        =>  2,
+            'OWNER'         =>  3,
+            'ROOT'          =>  4
+        );
+
+        if (!array_key_exists($first_role, $ROLE_TO_POWER)) return false;
+        if (!array_key_exists($second_role, $ROLE_TO_POWER)) return false;
+
+        return ( $ROLE_TO_POWER[$first_role] >= $ROLE_TO_POWER[$second_role] );
     }
 
     /**
@@ -73,6 +119,7 @@ class LiveMapEngine
         $query = "
     SELECT
     `id_region`, `title`, `edit_date`,
+    `is_publicity`, `is_excludelists`,
 
     `region_stroke` AS `stroke`,
     `region_border_color` AS `borderColor`,
@@ -92,6 +139,7 @@ class LiveMapEngine
       ORDER BY `edit_date` DESC
     ) AS t1 GROUP BY `id_region`
         ";
+
         $all_regions = array();
         try {
             $sth = $this->dbi->getconnection()->prepare($query);
@@ -99,9 +147,18 @@ class LiveMapEngine
                 'alias_map'        =>  $map_alias
             ));
 
+            $current_role = $this->ACL_getRole($map_alias);
+
             //@HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
-            array_map(function($item) use (&$all_regions) {
-                $all_regions[ $item['id_region'] ] = $item;
+            array_map(function($row) use (&$all_regions, $current_role) {
+                // проверка прав: может ли текущий пользователь иметь инфу по этому региону?
+
+                if ($this->ACL_isValidRole($current_role, $row['is_publicity'])) {
+                    $all_regions[ $row['id_region'] ] = $row;
+                }
+
+                // $all_regions[ $row['id_region'] ] = $row; // старое поведение
+
             }, $sth->fetchAll());
 
         } catch (\PDOException $e) {
@@ -122,6 +179,9 @@ class LiveMapEngine
     }
 
     /**
+     * Здесь же надо проверить права доступа к региону
+     *
+     *
      * @param $map_alias
      * @param $id_region
      * @return array
@@ -129,9 +189,15 @@ class LiveMapEngine
     public function getMapRegionData($map_alias, $id_region) {
         $table = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
 
+        $role = $this->ACL_getRole($map_alias);
+
+        $role_can_edit = $this->ACL_isValidRole( $role, 'EDITOR');
+
+        $info = array();
+
         try {
             $query = "
-            SELECT title, content, edit_date
+            SELECT title, content, edit_date, is_publicity
             FROM {$table}
             WHERE
                 id_region     = :id_region
@@ -139,6 +205,7 @@ class LiveMapEngine
             ORDER BY edit_date DESC
             LIMIT 1
             ";
+
             $sth = $this->dbi->getconnection()->prepare($query);
             $sth->execute(array(
                 'id_region'     =>  $id_region,
@@ -147,17 +214,30 @@ class LiveMapEngine
             $row = $sth->fetch();
 
             if ($row) {
-                $info = array(
-                    'is_present'    =>  1,
-                    'content'       =>  $row['content'],
-                    'title'         =>  $row['title'],
-                    'edit_date'     =>  $row['edit_date']
-                );
+
+                if ($this->ACL_isValidRole( $role, $row['is_publicity'] )) {
+                    $info = array(
+                        'is_present'    =>  1,
+                        'content'       =>  $row['content'],
+                        'title'         =>  $row['title'],
+                        'edit_date'     =>  $row['edit_date'],
+                        'can_edit'      =>  $role_can_edit
+                    );
+                } else {
+                    $info = array(
+                        'is_present'    =>  1,
+                        'content'       =>  'Limited access',       //@todo: move to map config
+                        'title'         =>  $row['title'],          //@todo: move to map config
+                        'edit_date'     =>  $row['edit_date'],
+                        'can_edit'      =>  $role_can_edit
+                    );
+                }
             } else {
                 $info = array(
                     'is_present'    =>  0,
                     'title'         =>  $id_region,
-                    'content'       =>  ''
+                    'content'       =>  '',
+                    'can_edit'      =>  $role_can_edit
                 );
             }
 
@@ -182,7 +262,7 @@ SELECT
   table_data.edit_date AS edit_date,
   table_users.username AS edit_name,
   INET_NTOA(`edit_ipv4`) AS ipv4,
-  title,
+  table_data.title AS title,
   table_data.edit_comment AS edit_comment
 FROM
   {$table_data} AS table_data,
@@ -206,11 +286,6 @@ ORDER BY edit_date ;
         }
         return $all_revisions;
 
-
-    }
-
-
-    public function getTileRevisions( $alias_map, $id_region ) {
 
     }
 

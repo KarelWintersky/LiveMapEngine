@@ -12,10 +12,6 @@ require_once (__ROOT__ . '/engine/units/unit.MapsListRender.php');
 $main_template = new Template('index.html', '$/templates');
 $main_template->set('autoactivation', LMEConfig::get_mainconfig()->get('auth/auto_activation'));
 
-$main_template->set('is_logged', LMEAuth::$is_logged);
-$main_template->set('is_logged_user', LMEAuth::$userinfo['email']);
-$main_template->set('is_logged_user_ip', LMEAuth::$userinfo['ip']);
-
 $main_template->set('authinfo', [
     'is_logged' =>  LMEAuth::$is_logged,
     'email'     =>  LMEAuth::$userinfo['email'],

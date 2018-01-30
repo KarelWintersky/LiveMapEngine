@@ -28,7 +28,7 @@
             <li>
                 <a aria-expanded="#">Действия</a>
                 <ul class="list-unstyled" id="pageActionsSubmenu">
-                    {?!*is_logged*}
+                    {?!*authinfo.is_logged*}
                     <li>
                         <a id="actor-auth" href="#">Вход</a>
                     </li>
@@ -37,7 +37,7 @@
                     </li>
                     {?}
 
-                    {?*is_logged*}
+                    {?*authinfo.is_logged*}
                     <li>
                         <a href="/auth/profile">Настройки аккаунта</a>
                     </li>
@@ -62,7 +62,7 @@
 
 
         <small>
-            {?*is_logged*}{*is_logged_user*}<br/> ({*is_logged_user_ip*}){*is_logged*?}
+            {?*authinfo.is_logged*}{*authinfo.email*} <br/> ({*authinfo.ip*}) {?}
         </small>
     </nav>
 

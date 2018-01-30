@@ -218,74 +218,76 @@ class JSLayoutBuilder extends UnitPrototype {
                 $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
                 $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
 
-                foreach ($paths_at_layer_filled as $path) {
-                    $id_region = $path['id_region'];
+                foreach ($paths_at_layer_filled as $path_present) {
+                    $id_region = $path_present['id_region'];
 
                     // если конфиг слоя определен
                     if ($layer_config) {
 
+                        // это лишние данные, которые можно передать в настройках слоя
+
                         // если определены параметры заполнения региона
                         if ($layer_config->present->fill && $layer_config->present->fill == 1) {
 
-                            if (!$path['fillColor'] && $layer_config->present->fillColor) {
-                                $path['fillColor'] = $layer_config->present->fillColor;
+                            if (!$path_present['fillColor'] && $layer_config->present->fillColor) {
+                                $path_present['fillColor'] = $layer_config->present->fillColor;
                             }
 
-                            if (!$path['fillOpacity'] && $layer_config->present->fillOpacity) {
-                                $path['fillOpacity'] = $layer_config->present->fillOpacity;
+                            if (!$path_present['fillOpacity'] && $layer_config->present->fillOpacity) {
+                                $path_present['fillOpacity'] = $layer_config->present->fillOpacity;
                             }
                         }
 
                         // если определены параметры кастомной отрисовки границ региона
                         if ($layer_config->present->stroke && $layer_config->present->stroke == 1) {
 
-                            if (!$path['borderColor'] && $layer_config->present->borderColor) {
-                                $path['borderColor'] = $layer_config->present->borderColor;
+                            if (!$path_present['borderColor'] && $layer_config->present->borderColor) {
+                                $path_present['borderColor'] = $layer_config->present->borderColor;
                             }
 
-                            if (!$path['borderWidth'] && $layer_config->present->borderWidth) {
-                                $path['borderWidth'] = $layer_config->present->borderWidth;
+                            if (!$path_present['borderWidth'] && $layer_config->present->borderWidth) {
+                                $path_present['borderWidth'] = $layer_config->present->borderWidth;
                             }
 
-                            if (!$path['borderOpacity'] && $layer_config->present->borderOpacity) {
-                                $path['borderOpacity'] = $layer_config->present->borderOpacity;
+                            if (!$path_present['borderOpacity'] && $layer_config->present->borderOpacity) {
+                                $path_present['borderOpacity'] = $layer_config->present->borderOpacity;
                             }
                         }
 
                     } else {
                         // иначе, конфиг слоя не определен, используются глобальные дефолтные значения
 
-                        if (!$path['fillColor']) {
-                            $path['fillColor'] = $json->display_defaults->present->fillColor;
+                        if (!$path_present['fillColor']) {
+                            $path_present['fillColor'] = $json->display_defaults->present->fillColor;
                         }
 
-                        if (!$path['fillOpacity']) {
-                            $path['fillOpacity'] = $json->display_defaults->present->fillOpacity;
+                        if (!$path_present['fillOpacity']) {
+                            $path_present['fillOpacity'] = $json->display_defaults->present->fillOpacity;
                         }
 
-                        if (!$path['borderColor']) {
-                            $path['borderColor'] = $json->display_defaults->present->borderColor;
+                        if (!$path_present['borderColor']) {
+                            $path_present['borderColor'] = $json->display_defaults->present->borderColor;
                         }
 
-                        if (!$path['borderWidth']) {
-                            $path['borderWidth'] = $json->display_defaults->present->borderWidth;
+                        if (!$path_present['borderWidth']) {
+                            $path_present['borderWidth'] = $json->display_defaults->present->borderWidth;
                         }
 
-                        if (!$path['borderOpacity']) {
-                            $path['borderOpacity'] = $json->display_defaults->present->borderOpacity;
+                        if (!$path_present['borderOpacity']) {
+                            $path_present['borderOpacity'] = $json->display_defaults->present->borderOpacity;
                         }
 
                     }
 
-                    $path['title'] = htmlspecialchars($path['title'], ENT_QUOTES | ENT_HTML5);
-                    unset($path['edit_date']);
+                    $path_present['title'] = htmlspecialchars($path_present['title'], ENT_QUOTES | ENT_HTML5);
+                    unset($path_present['edit_date']);
 
-                    $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path);
+                    $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path_present);
                 }
 
                 $LAYERS[] = [
                     'id'        =>  $layer,
-                    'hint'      =>  $layer_config->hint,
+                    'hint'      =>  htmlspecialchars($layer_config->hint, ENT_QUOTES | ENT_HTML5),
                     'zoom'      =>  $layer_config->zoom ?? $json->display->zoom,
                     'zoom_min'  =>  $layer_config->zoom_min ?? -100,
                     'zoom_max'  =>  $layer_config->zoom_max ?? 100,

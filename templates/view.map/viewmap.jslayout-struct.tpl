@@ -57,31 +57,10 @@ var theMap = {
     {%*layers*}
         "{*layers:id*}": {
             "id" : "{*layers:id*}",
+            "hint" : "{*layers:hint*}",
             "zoom" : {*layers:zoom*},
             "zoom_min" : {*layers:zoom_min*},
             "zoom_max" : {*layers:zoom_max*},
-/*
-            "regions": {
-            {%*layers:regions*}
-                "{*layers:regions:id*}": {
-                    "id"        : "{*layers:regions:id*}",
-                    "type"      : "{*layers:regions:type*}",
-                    "coords"    : {*layers:regions:js*},
-                    {?*layers:regions:fillColor*}"fillColor" : "{*layers:regions:fillColor*}", {?}
-                    {?*layers:regions:fillOpacity*}"fillOpacity": {*layers:regions:fillOpacity*}, {?}
-                    {?*layers:regions:fillRule*}"fillRule": "{*layers:regions:fillRule*}", {?}
-
-                    {?*layers:regions:borderColor*}"borderColor": "{*layers:regions:borderColor*}", {?}
-                    {?*layers:regions:borderWidth*}"borderWidth": "{*layers:regions:borderWidth*}", {?}
-                    {?*layers:regions:borderOpacity*}"borderOpacity": "{*layers:regions:borderOpacity*}", {?}
-
-                    {?*layers:regions:title*}"title": "{*layers:regions:title*}", {?}
-                    {?*layers:regions:desc*}"desc": "{*layers:regions:desc*}", {?}
-                    {?*layers:regions:radius*}"radius": {*layers:regions:radius*},{?}
-                },
-            {%}
-            }
-*/
         },
     {%}
     },
@@ -102,8 +81,10 @@ var theMap = {
             {?*regions:borderOpacity*}"borderOpacity": "{*regions:borderOpacity*}", {?}
 
             {?*regions:title*}"title": "{*regions:title*}", {?}
+            {?*regions:edit_date*}"edit_date" : "{*regions:edit_date*}",{?}
             {?*regions:desc*}"desc": "{*regions:desc*}", {?}
             {?*regions:radius*}"radius": {*regions:radius*},{?}
+            {?*regions:is_excludelists*}"exclude": "{*regions:is_excludelists*}",{?}
         },
         {%}
     },
