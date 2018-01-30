@@ -12,16 +12,16 @@ require_once (__ROOT__ . '/engine/units/unit.MapsListRender.php');
 $main_template = new Template('index.html', '$/templates');
 $main_template->set('autoactivation', LMEConfig::get_mainconfig()->get('auth/auto_activation'));
 
-// is logged
-$auth = LMEConfig::get_auth();
-$is_logged = $auth->isLogged();
+$main_template->set('is_logged', LMEAuth::$is_logged);
+$main_template->set('is_logged_user', LMEAuth::$userinfo['email']);
+$main_template->set('is_logged_user_ip', LMEAuth::$userinfo['ip']);
 
-if ($is_logged) {
-    $userinfo = $auth->getCurrentSessionInfo();
-    $main_template->set('is_logged', $is_logged);
-    $main_template->set('is_logged_user', $userinfo['email']);
-    $main_template->set('is_logged_user_ip', $userinfo['ip']);
-}
+$main_template->set('authinfo', [
+    'is_logged' =>  LMEAuth::$is_logged,
+    'email'     =>  LMEAuth::$userinfo['email'],
+    'ip'        =>  LMEAuth::$userinfo['ip']
+]);
+
 
 // maps
 $all_maps = new MapsListRender('');

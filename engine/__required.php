@@ -23,6 +23,8 @@ require_once(__ROOT__ . '/engine/thirdparty/websun.php');
 
 // Classes
 require_once (__ROOT__ . '/engine/core.LMEConfig.php');
+require_once (__ROOT__ . '/engine/core.LMEAuth.php');
+
 require_once (__ROOT__ . '/engine/classes/class.INI_Config.php');
 require_once (__ROOT__ . '/engine/classes/class.DBConnectionLite.php');
 require_once (__ROOT__ . '/engine/classes/class.SVGParser.php');
@@ -55,6 +57,10 @@ if ($main_config->get('auth/phpauth_enabled')) {
     LMEConfig::set_auth(
         new PHPAuth\Auth( LMEConfig::get_dbi()->getconnection(), LMEConfig::get_authconfig() )
     );
+
+    // PHPAuth NEW
+    LMEAuth::set_config( new PHPAuth\Config( PATH_CONFIG . 'phpauth.ini' ));
+    LMEAuth::init( new PHPAuth\Auth( LMEConfig::get_dbi()->getconnection(), LMEConfig::get_authconfig() ) );
 }
 
 // LiveMap Engine

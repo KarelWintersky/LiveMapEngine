@@ -41,6 +41,12 @@ class LiveMapEngine
         return ($sth && $sth->fetchColumn() == 'Y') ? true : false;
     }
 
+    public function ACL_getRoleCurrent($map_alias) {
+        $query  = "";
+
+        
+    }
+
     /**
 
      *
