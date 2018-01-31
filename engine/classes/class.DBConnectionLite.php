@@ -22,7 +22,7 @@ class DBConnectionLite extends \PDO
      * Конфиг может быть передан как:
      * * массив параметров (результат загрузки из определенной секции конфига)
      * * инстанс INI_Config класса
-     * * NULL означает, что в проекте используется StatiConfig
+     * * NULL означает, что в проекте используется StaticConfig
      */
     public function __construct($key_connection, $config_argv = NULL)
     {

@@ -106,7 +106,7 @@ switch ($_GET['action']) {
             $template_file = 'auth.callback.instant_to_root.html';
             redirect('/');
         } else {
-            $template_data['strong_password'] = LMEConfig::get_authconfig()->verify_password_strong_requirements;
+            $template_data['strong_password'] = LMEAuth::get_config()->verify_password_strong_requirements;
             $template_file = 'auth/form.register.html';
         }
         break;
@@ -196,9 +196,6 @@ switch ($_GET['action']) {
 
             if (!$auth_result['error']) {
                 setcookie(LMEAuth::get_config()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
-
-                // setcookie(LMEConfig::get_authconfig()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
-
                 unsetcookie( LMEConfig::get_config()->get('cookies/new_registred_username') );
 
                 $html_callback = '/';
@@ -221,7 +218,7 @@ switch ($_GET['action']) {
             $auth_result = $auth->logout( $session_hash );
 
             if ($auth_result) {
-                unsetcookie( LMEConfig::get_authconfig()->__get('cookie_name') );
+                unsetcookie( LMEAuth::get_config()->cookie_name );
                 setcookie( LMEConfig::get_config()->get('cookies/last_logged_user') , $userinfo['email']);
                 $html_callback = '/';
             }

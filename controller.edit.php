@@ -6,14 +6,12 @@
 define('__ROOT__', __DIR__);
 require_once (__ROOT__ . '/engine/__required.php');
 
-$auth = LMEConfig::get_auth();
+$lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
-if (! $auth->isLogged() ) {
-    die('Hacking attempt!');
-}
-$userinfo = $auth->getCurrentSessionInfo();
+$userinfo = LMEAuth::$userinfo;
 
 $edit_what = $_GET['editwhat'] ?? NULL;
+
 switch ($edit_what) {
     case 'region': {
         $edit_map_alias = $_GET['map'] ?? NULL;
@@ -24,14 +22,14 @@ switch ($edit_what) {
         // проверяем права редактирования
         $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
 
-        $user_id = $userinfo['uid'];
-        $can_edit = $lm_engine->ACL_checkRole($user_id, $edit_map_alias, 'edit');
+        $current_role = $lm_engine->ACL_getRole($edit_map_alias);
+        $can_edit = $lm_engine->ACL_isValidRole($current_role, 'EDITOR');
 
         if (!$can_edit) {
-            die('Hacking attempt!');
+            die('Not enough access rights for update info!');
         }
 
-        setcookie( LMEConfig::get_config()->get('cookies/filemanager_storage_path'), $edit_map_alias, 0, '/'); // see original livemap
+        setcookie( LMEConfig::get_config()->get('cookies/filemanager_storage_path'), $edit_map_alias, 0, '/');
         setcookie( LMEConfig::get_config()->get('cookies/filemanager_current_map'), $edit_map_alias, 0, '/');
 
         // $map_data    = $lm_engine->getMapData( $edit_map_alias );
@@ -131,7 +129,6 @@ switch ($edit_what) {
 
         break;
     }
-
 
 
 } // switch

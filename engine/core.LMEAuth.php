@@ -45,7 +45,15 @@ class LMEAuth
         return self::$instance;
     }
 
+    public static function get_instance(): \PHPAuth\Auth {
+        return self::$instance;
+    }
+
     public static function set(\PHPAuth\Auth $instance) {
+        self::$instance = $instance;
+    }
+
+    public static function set_instance(\PHPAuth\Auth $instance) {
         self::$instance = $instance;
     }
 

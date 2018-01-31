@@ -222,7 +222,7 @@ class LiveMapEngine
                         'title'         =>  $row['title'],
                         'edit_date'     =>  $row['edit_date'],
                         'can_edit'      =>  $role_can_edit,
-                        'is_exludelists'=>  $row['is_exludelists'],
+                        'is_exludelists'=>  $row['is_excludelists'],
                         'is_publicity'  =>  $row['is_publicity']
                     );
                 } else {
@@ -232,7 +232,7 @@ class LiveMapEngine
                         'title'         =>  $row['title'],          //@todo: move to map config
                         'edit_date'     =>  $row['edit_date'],
                         'can_edit'      =>  $role_can_edit,
-                        'is_exludelists'=>  $row['is_exludelists'],
+                        'is_exludelists'=>  $row['is_excludelists'],
                         'is_publicity'  =>  $row['is_publicity']
                     );
                 }
@@ -259,7 +259,7 @@ class LiveMapEngine
      */
     public function getRegionRevisions($map_alias, $id_region) {
         $table_data     = $this->table_prefix . LMEConfig::get_mainconfig()->get('tables/map_data_regions');
-        $table_users    = LMEConfig::get_authconfig()->table_users;
+        $table_users    = LMEAuth::get_config()->table_users;
         $query = "
 SELECT
   table_data.id_region AS id_region,
