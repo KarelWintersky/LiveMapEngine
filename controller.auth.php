@@ -6,9 +6,10 @@
 define('__ROOT__', __DIR__);
 
 require_once (__ROOT__ . '/engine/__required.php');
-$auth = LMEConfig::get_auth();
 
-$is_logged_in = $auth->isLogged(); // true if logged-in
+$auth = LMEAuth::get();
+
+$is_logged_in = LMEAuth::$is_logged;
 
 $template_file = '';
 $template_data = array();
@@ -17,11 +18,10 @@ switch ($_GET['action']) {
     case 'loginform': {
         $template_file = 'auth/form.auth.ajax.html';
 
-        $is_logged = $auth->isLogged();
-        if ($is_logged) {
-            $userinfo = $auth->getCurrentSessionInfo();
+        if ($is_logged_in) {
+            $userinfo = LMEAuth::$userinfo;
             $template_data = array_merge($template_data, array(
-                'is_logged'             =>  $is_logged,
+                'is_logged'             =>  $is_logged_in,
                 'is_logged_user'        =>  $userinfo['email'],
                 'is_logged_user_ip'     =>  $userinfo['ip']
             ));
@@ -33,13 +33,15 @@ switch ($_GET['action']) {
         $auth_result = $auth->login(
             $_POST["auth:data:login"],
             $_POST["auth:data:password"],
-            at($_POST, "auth:data:remember_me", 0) );
+            ($_POST["auth:data:remember_me"] ?? 0)
+            //at($_POST, "auth:data:remember_me", 0)
+        );
 
         $template_data['error'] = $auth_result['error'];
 
         if (!$auth_result['error']) {
-            setcookie(LMEConfig::get_authconfig()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
-            unsetcookie('kw_livemap_new_registred_username');
+            setcookie(LMEAuth::get_config()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
+            unsetcookie(LMEConfig::get_mainconfig()->get('cookies/new_registred_username'));
             $html_callback = '/';
         } else {
             $html_callback = '/auth/login';
@@ -65,8 +67,10 @@ switch ($_GET['action']) {
             $auth_result = $auth->logout($session_hash);
 
             if ($auth_result) {
-                unsetcookie( LMEConfig::get_authconfig()->__get('cookie_name') );
-                setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_last_logged_user') , $userinfo['email']);
+                unsetcookie( LMEAuth::get_config()->__get('cookie_name'));
+
+                setcookie( LMEConfig::get_config()->get('cookies/last_logged_user'), LMEAuth::$userinfo['email']);
+
                 $template_data['error_messages'] = 'Мы успешно вышли из системы.';
                 $html_callback = '/';
             } else {
@@ -89,7 +93,7 @@ switch ($_GET['action']) {
             $template_file = 'auth.callback.instant_to_root.html';
             redirect('/');
         } else {
-            $template_data['new_username'] = $_COOKIE[ LMEConfig::get_mainconfig()->get('auth/cookie_last_logged_user') ] ?? '';
+            $template_data['new_username'] = $_COOKIE[ LMEConfig::get_mainconfig()->get('cookies/last_logged_user') ] ?? '';
             $template_data['autoactivation'] = ! LMEConfig::get_mainconfig()->get('auth/auto_activation');
             $template_file = 'auth/form.login.html';
         }
@@ -123,16 +127,14 @@ switch ($_GET['action']) {
     //+ profile
     case 'profile': {
         if ($is_logged_in) {
-            // загрузить в переменные значения из базы и вставить их в темплейт
-            $userid = $auth->getSessionUID( $auth->getSessionHash() );
-            $userdata = $auth->getUser($userid);
+            $userinfo = LMEAuth::$userinfo;
 
             $template_data = array(
-                'username'      =>  $userdata['username'],
-                'gender'        =>  $userdata['gender'],
-                'city'          =>  $userdata['city'],
-                'current_email' =>  $userdata['email'],
-                'strong_password'=> LMEConfig::get_authconfig()->verify_password_strong_requirements
+                'username'      =>  $userinfo['username'],
+                'gender'        =>  $userinfo['gender'],
+                'city'          =>  $userinfo['city'],
+                'current_email' =>  $userinfo['email'],
+                'strong_password'=> LMEAuth::get_config()->__get('verify_password_strong_requirements'),
             );
 
 
@@ -193,8 +195,12 @@ switch ($_GET['action']) {
             );
 
             if (!$auth_result['error']) {
-                setcookie(LMEConfig::get_authconfig()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
-                unsetcookie('kw_livemap_new_registred_username');
+                setcookie(LMEAuth::get_config()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
+
+                // setcookie(LMEConfig::get_authconfig()->__get('cookie_name'), $auth_result['hash'], time()+$auth_result['expire'], "/");
+
+                unsetcookie( LMEConfig::get_config()->get('cookies/new_registred_username') );
+
                 $html_callback = '/';
             } else {
                 $html_callback = '/auth/login';
@@ -209,13 +215,14 @@ switch ($_GET['action']) {
     //+
     case 'action:logout': {
         if ($is_logged_in) {
-            $userinfo = $auth->getCurrentSessionInfo();
+            $userinfo = LMEAuth::$userinfo;
+
             $session_hash = $auth->getSessionHash();
             $auth_result = $auth->logout( $session_hash );
 
             if ($auth_result) {
                 unsetcookie( LMEConfig::get_authconfig()->__get('cookie_name') );
-                setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_last_logged_user') , $userinfo['email']);
+                setcookie( LMEConfig::get_config()->get('cookies/last_logged_user') , $userinfo['email']);
                 $html_callback = '/';
             }
         } else {
@@ -243,17 +250,13 @@ switch ($_GET['action']) {
 
         if (!$auth_result['error']) {
             // no errors
-            setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_last_logged_user') , $_POST['register:data:email'],  time()+60*60*5, "/" );
+            setcookie( LMEConfig::get_config()->get('cookies/last_logged_user') , $_POST['register:data:email'],  time()+60*60*5, "/" );
 
-            $html_callback = LMEConfig::get_mainconfig()->get('auth/auto_activation') ? '/auth/login' : '/auth/activateaccount';
+            $html_callback = LMEConfig::get_config()->get('auth/auto_activation') ? '/auth/login' : '/auth/activateaccount';
         } else {
             $html_callback = '/auth/register';
         }
         redirect($html_callback);
-
-
-
-
 
         break;
     }
@@ -277,8 +280,6 @@ if ($template_file === '*json') {
 } else {
     $html = '';
 }
-
-// $html = websun_parse_template_path($template_data, $template_file, '$/templates');
 
 echo $html;
  

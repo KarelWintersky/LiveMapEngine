@@ -24,15 +24,12 @@ switch ($_GET['source']) {
 
         $region_data = $lm_engine->getMapRegionData( $map_alias , $id_region ); //+
 
-        // $can_edit = $lm_engine->ACL_checkRole( LMEAuth::$uid, $map_alias, 'edit' );
-
         $TEMPLATE_DATA = array(
             'is_present'        =>  $region_data['is_present'],
 
             'region_id'         =>  $id_region,
             'region_title'      =>  $region_data['title'],
             'region_text'       =>  $region_data['content'],
-            // 'can_edit'          =>  $can_edit
             'can_edit'          =>  $region_data['can_edit']
         );
         $TEMPLATE_PATH = PATH_TEMPLATES . 'view.region/';
@@ -86,5 +83,3 @@ if ($render_type == 'text' || $render_type == 'raw') {
 } elseif ($render_type === 'json') {
     echo json_encode( $content );
 } else echo null;
-
-// echo $content;

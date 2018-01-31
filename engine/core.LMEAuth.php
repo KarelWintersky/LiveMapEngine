@@ -4,7 +4,10 @@ class LMEAuth
 {
     private static $config = null;
 
-    private static $instance = null;
+    /**
+     * @param \PHPAuth\Auth null
+     */
+    public static $instance = null;
 
     public static $is_logged = false;
 
@@ -30,17 +33,20 @@ class LMEAuth
         return self::$instance;
     }
 
-
-
-
-
-
     public static function set_config(\PHPAuth\Config $config) {
         self::$config = $config;
     }
 
     public static function get_config(): \PHPAuth\Config {
         return self::$config;
+    }
+
+    public static function get(): \PHPAuth\Auth {
+        return self::$instance;
+    }
+
+    public static function set(\PHPAuth\Auth $instance) {
+        self::$instance = $instance;
     }
 
 

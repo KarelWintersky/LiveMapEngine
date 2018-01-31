@@ -19,13 +19,8 @@ $auth   = new PHPAuth\Auth($dbh, $config, $lang);
 */
 
 /*
- * @todo: project settings
  * но рациональнее получать путь к проекту из куки
 */
-/*$lme_project
-    = isset($_COOKIE['kwlme_filemanager_storagepath'])
-    ? $_COOKIE['kwlme_filemanager_storagepath']
-    : '';*/
 
 $lme_map = $_COOKIE['kw_livemap_filemanager_storagepath'] ?? '';
 

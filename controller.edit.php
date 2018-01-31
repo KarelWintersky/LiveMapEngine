@@ -31,8 +31,8 @@ switch ($edit_what) {
             die('Hacking attempt!');
         }
 
-        setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_filemanager_storage_path'), $edit_map_alias, 0, '/'); // see original livemap
-        setcookie( LMEConfig::get_mainconfig()->get('auth/cookie_filemanager_current_map'), $edit_map_alias, 0, '/');
+        setcookie( LMEConfig::get_config()->get('cookies/filemanager_storage_path'), $edit_map_alias, 0, '/'); // see original livemap
+        setcookie( LMEConfig::get_config()->get('cookies/filemanager_current_map'), $edit_map_alias, 0, '/');
 
         // $map_data    = $lm_engine->getMapData( $edit_map_alias );
 
@@ -40,6 +40,9 @@ switch ($edit_what) {
 
         // читаем шаблоны из json-файла конфигурации карты (а должны из БД, таблица settings_project_edit_templates с наследованием settings_project_edit_templates)
         // и это должно быть в модели!
+
+        // это должно быть в конфиге карты, который грузится через new LMEMapEngine
+
         $filename = PATH_STORAGE . $edit_map_alias . '/index.json';
         if (!is_file($filename)) {
             die('Incorrect path: ' . PATH_STORAGE . $edit_map_alias);
@@ -106,8 +109,7 @@ switch ($edit_what) {
             'is_logged_user'    =>  $userinfo['email'],
             'is_logged_user_ip' =>  $userinfo['ip'],
 
-            'edit_templates'    =>  $edit_templates, // странно, если эту строку закомментировать - все равно все работает,
-                                                    // смотри https://github.com/1234ru/websun/issues/2
+            'edit_templates'    =>  $edit_templates,
             'edit_templates_options' => $edit_templates_options,
 
             // copyright
@@ -115,6 +117,9 @@ switch ($edit_what) {
 
             // revisions
             'region_revisions'  =>  $lm_engine->getRegionRevisions( $edit_map_alias, $edit_region_id),
+
+            'is_exludelists'    =>  $region_data['is_exludelists'] ?? 'N',
+            'is_publicity'      =>  $region_data['is_publicity'] ?? 'ANYONE',
         );
 
         $template_file = 'edit.region.page.html';
@@ -122,7 +127,7 @@ switch ($edit_what) {
 
         $html = websun_parse_template_path($template_data, $template_file, $template_path);
 
-        echo $html;
+        echo preg_replace('/^\h*\v+/m', '', $html);
 
         break;
     }

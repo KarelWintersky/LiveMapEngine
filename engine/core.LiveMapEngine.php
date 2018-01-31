@@ -197,7 +197,7 @@ class LiveMapEngine
 
         try {
             $query = "
-            SELECT title, content, edit_date, is_publicity
+            SELECT title, content, edit_date, is_publicity, is_excludelists
             FROM {$table}
             WHERE
                 id_region     = :id_region
@@ -221,7 +221,9 @@ class LiveMapEngine
                         'content'       =>  $row['content'],
                         'title'         =>  $row['title'],
                         'edit_date'     =>  $row['edit_date'],
-                        'can_edit'      =>  $role_can_edit
+                        'can_edit'      =>  $role_can_edit,
+                        'is_exludelists'=>  $row['is_exludelists'],
+                        'is_publicity'  =>  $row['is_publicity']
                     );
                 } else {
                     $info = array(
@@ -229,7 +231,9 @@ class LiveMapEngine
                         'content'       =>  'Limited access',       //@todo: move to map config
                         'title'         =>  $row['title'],          //@todo: move to map config
                         'edit_date'     =>  $row['edit_date'],
-                        'can_edit'      =>  $role_can_edit
+                        'can_edit'      =>  $role_can_edit,
+                        'is_exludelists'=>  $row['is_exludelists'],
+                        'is_publicity'  =>  $row['is_publicity']
                     );
                 }
             } else {
@@ -295,7 +299,7 @@ ORDER BY edit_date ;
      * @param $region_data
      * @return array
      */
-    public function storeMapRegionData($region_data) {
+    public function storeMapRegionData($data) {
         $success = array(
             'state'     =>  FALSE,
             'message'   =>  ''
@@ -304,21 +308,12 @@ ORDER BY edit_date ;
 
         $query = "
         INSERT INTO {$table_data}
-         (id_map, alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment)
+         (id_map, alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment, is_excludelists, is_publicity)
          VALUES
-         (:id_map, :alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment)
+         (:id_map, :alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment, :is_excludelists, :is_publicity)
         ";
 
-        $data = array(
-            'id_map'        =>  $region_data['id_map'],
-            'alias_map'     =>  $region_data['alias_map'],
-            'edit_whois'    =>  $region_data['edit_whois'],
-            'edit_ipv4'     =>  $this->getIP(),
-            'id_region'     =>  $region_data['id_region'],
-            'title'         =>  $region_data['title'],
-            'content'       =>  $region_data['content'],
-            'edit_comment'  =>  $region_data['edit_comment']
-        );
+        $data['edit_ipv4'] = $this->getIP();
 
         try {
             $sth = $this->dbi->getconnection()->prepare($query);

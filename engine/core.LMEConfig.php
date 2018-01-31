@@ -9,6 +9,20 @@ class LMEConfig {
     private static $config_main;
     private static $config_phpauth;
 
+    public static function set_config(\INI_Config $config, $config_type = 'main') {
+        self::$config_main = $config;
+    }
+
+    public static function get_config($type = 'main'):\INI_Config {
+        switch ($type) {
+            case 'main': {
+                return self::$config_main;
+                break;
+            }
+        }
+    }
+
+
     public static function set_mainconfig(\INI_Config $config) {
         self::$config_main = $config;
     }

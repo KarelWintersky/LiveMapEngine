@@ -42,12 +42,12 @@
             },
             paste_as_text       : true,
 
-            templates           : [{?*$edit_templates*}{%*$edit_templates*}
+            templates           : [{?*edit_templates*}{%*edit_templates*}
                 {
-                    "title"         :   "{*$edit_templates:title*}",
-                    "description"   :   "{*$edit_templates:desc*}",
-                    "url"           :   "{*$edit_templates:url*}"
-                },{*$edit_templates*%}{*$edit_templates*?}
+                    "title"         :   "{*edit_templates:title*}",
+                    "description"   :   "{*edit_templates:desc*}",
+                    "url"           :   "{*edit_templates:url*}"
+                },{*edit_templates*%}{*edit_templates*?}
             ],
 
         {?*edit_templates_options*}
@@ -131,13 +131,42 @@
     <input type="hidden" name="edit:html_callback" value="{*html_callback*}" />
     <input type="hidden" name="edit:layout:type" value="svg">
 
-    <fieldset class="fields_area">
-        <div class="field">
-            <label for="title">Название региона:</label>
-            <input type="text" name="edit:region:title" id="title" size="90" value="{*region_title*}" tabindex="1" required />
-            <span class="mark-required">*</span>
-        </div>
-    </fieldset>
+    <table width="100%" style="text-align: left" border="1">
+        <tr>
+            <td>
+                <fieldset class="fields_area">
+                    <div class="field">
+                        <label for="title">Название региона:</label>
+                        <input type="text" name="edit:region:title" id="title" size="90" value="{*region_title*}" tabindex="1" required />
+                        <span class="mark-required">*</span>
+                    </div>
+                </fieldset>
+            </td>
+            <td>
+                <label>
+                    В списках:
+                    <select name="edit:is:excludelists">
+                        <option value="N"{?*is_exludelists="N"*} selected{?}>Во всех</option>
+                        <option value="F"{?*is_exludelists="F"*} selected{?}>Только слоя</option>
+                        <option value="A"{?*is_exludelists="A"*} selected{?}>Нигде</option>
+                    </select>
+                </label>
+            </td>
+            <td>
+                <label>
+                    Видимость:
+                    <select name="edit:is:publicity">
+                        <option value="ANYONE"{?*is_publicity="ANYONE"*} selected{?}>Всем</option>
+                        <option value="VISITOR"{?*is_publicity="VISITOR"*} selected{?}>Участникам</option>
+                        <option value="EDITOR"{?*is_publicity="EDITOR"*} selected{?}>Редакторам</option>
+                        <option value="OWNER"{?*is_publicity="OWNER"*} selected{?}>Владельцу</option>
+                    </select>
+                </label>
+            </td>
+        </tr>
+    </table>
+
+
 
     <label for="edit-textarea" class="label_textarea label_fullwidth">
         <textarea name="edit:region:content" id="edit-textarea" cols="10" tabindex="2">{*region_text*}</textarea>
@@ -173,10 +202,10 @@
             <small>{*region_revisions:edit_comment*}</small>
             {?}
         </li>
-        {*region_revisions*%}
+        {%}
     </ul>
 </fieldset>
-{*region_revisions*?}
+{?}
 <div class="clear"></div>
 <hr>
 <small style="float: left">Logged as <strong>{*is_logged_user*}</strong> from <strong>{*is_logged_user_ip*}</strong></small>
