@@ -1,6 +1,10 @@
 {
   "maps": [
     {
+      "alias" : "sandbox.fallout_classic",
+      "title": "Песочница - Fallout I & II"
+    },
+    {
       "alias" : "sandbox.trollfjorden",
       "title": "Песочница - Троллячьи фьорды"
     },

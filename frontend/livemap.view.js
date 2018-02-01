@@ -148,7 +148,7 @@ do_LoadContent = function(id_region) {
 
             current_infobox_region_id = id_region;
 
-            $("#section-infobox-content").html(data);
+            $("#section-infobox-content").html('').html(data);
             document.getElementById('section-infobox-content').scrollTop = 0; // scroll box to top
         });
     }

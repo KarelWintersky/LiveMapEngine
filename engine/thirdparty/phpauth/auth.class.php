@@ -369,7 +369,30 @@ class Auth
 
 		$data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
-		$query = $this->dbh->prepare("INSERT INTO {$this->config->table_sessions} (uid, hash, expiredate, ip, agent, cookie_crc) VALUES (?, ?, ?, ?, ?, ?)");
+		$query = $this->dbh->prepare("
+		INSERT INTO {$this->config->table_sessions}
+		(uid, hash, expiredate, ip, agent, cookie_crc)
+		VALUES
+		(?, ?, ?, ?, ?, ?)
+		");
+
+		/*$query = $this->dbh->prepare("
+		INSERT INTO {$this->config->table_sessions}
+		(uid, hash, expiredate, ip, agent, cookie_crc)
+		VALUES
+		(:uid, :hash, :expire, INET_ATON(:ip), :agent, :cookie_crc)
+		");*/
+
+		/*if (!$query->execute([
+			'uid'			=>	$uid,
+			'hash'			=>	$data['hash'],
+			'expire'		=>	$data['expire'],
+			'ip'			=>	$ip,
+			'agent'			=>	$agent,
+			'cookie_crc'	=>	$data['cookie_crc']
+		])) {
+			return false;
+		}*/
 
 		if(!$query->execute(array($uid, $data['hash'], $data['expire'], $ip, $agent, $data['cookie_crc']))) {
 			return false;
@@ -1230,30 +1253,6 @@ class Auth
 
         $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (?, ?)");
         return $query->execute(array($ip, $attempt_expiredate));
-
-        /* old code
-        $ip = $this->getIp();
-
-        $query = $this->dbh->prepare("SELECT count FROM {$this->config->table_attempts} WHERE ip = ?");
-        $query->execute(array($ip));
-
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
-
-        $attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
-
-        if (!$row) {
-            $attempt_count = 1;
-
-            $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, count, expiredate) VALUES (?, ?, ?)");
-            return $query->execute(array($ip, $attempt_count, $attempt_expiredate));
-        }
-
-        $attempt_count = $row['count'] + 1;
-
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_attempts} SET count=?, expiredate=? WHERE ip=?");
-        return $query->execute(array($attempt_count, $attempt_expiredate, $ip));
-
-        */
 	}
 
     /**
@@ -1321,7 +1320,8 @@ class Auth
 				return $client_ip;
 			}
 		}
-		return $_SERVER['REMOTE_ADDR'];
+
+		return filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ? $_SERVER['REMOTE_ADDR'] : NULL;
 	}
 	
 	/**

@@ -32,6 +32,15 @@
             toolbar1        : "undo redo | bold italic underline subscript superscript strikethrough | fontsizeselect styleselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | ",
             toolbar2        : "responsivefilemanager image | template table charmap | link unlink anchor | pastetext removeformat | preview",
 
+            // charmap https://www.tinymce.com/docs/plugins/charmap/
+            // https://stackoverflow.com/a/22156412/5127037
+            charmap_append: [
+                ["0x27f7", 'LONG LEFT RIGHT ARROW'],
+                ["0x27fa", 'LONG LEFT RIGHT DOUBLE ARROW'],
+                ["0x2600", 'sun'],
+                ["0x2601", 'cloud']
+            ],
+
             // responsive filemanager
             relative_urls       : false,
             document_base_url   : "/",

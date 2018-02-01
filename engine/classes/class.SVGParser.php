@@ -319,6 +319,25 @@ class SVGParser {
 
                 break;
             }
+            case 'ellipse': {
+                $data['type'] = 'circle';
+
+                //@todo: rx, ry existance check
+
+                $data['radius'] = round( ( (float)$element->attributes()->{'rx'} + (float)$element->attributes()->{'ry'} ) /2 , self::ROUND_PRECISION);
+
+                // SVG Element to coords
+                $coords = $this->convert_SVGElement_to_Circle( $element );
+                if (!$coords) return FALSE;
+
+                // сдвиг координат и преобразрвание в CRS-модель
+                $coords = $this->translate_knot_from_XY_to_CRS( $coords );
+
+                $data['coords'] = $coords;
+                $data['js'] = $this->convert_knotCRS_to_JSstring( $data['coords'] );
+
+                break;
+            }
         }
 
         // получем информацию об атрибутах региона из SVG-разметки
@@ -392,7 +411,7 @@ class SVGParser {
             $data['desc'] = htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
         }
 
-        $data['layer'] = $this->layer_name; //@todo: сейчас мы передаем имя слоя так, но в будущем нам понадобится многоуровневая структура слой->данные
+        $data['layer'] = $this->layer_name;
 
         return $data;
     }
@@ -445,6 +464,13 @@ class SVGParser {
             if ($element) $all_paths[ $path_id ] = $element;
         }
 
+        foreach ($this->layer_elements->{'ellipse'} as $path) {
+            $path_id    = (string)$path->attributes()->{'id'};
+            $element    = $this->parseAloneElement($path, 'ellipse');
+            if ($element) $all_paths[ $path_id ] = $element;
+        }
+
+
         return $all_paths;
     }
 
@@ -477,6 +503,16 @@ class SVGParser {
     public function getCircles() {
         return $this->getElementsByType('circle');
     }
+
+    /**
+     * Получаем все элементы типа ELLIPSE
+     * @return array
+     */
+    public function getEllipses() {
+        return $this->getElementsByType('ellipse');
+    }
+
+
     // ====================================================================================================
 
     // применяет трансформацию к узлу. Если не заданы опции трансформации - используются данные для трансформации слоя
