@@ -54,6 +54,7 @@ switch ($_GET['target']) {
 
             'title'         =>  $_POST['edit:region:title'],
             'content'       =>  $_POST['edit:region:content'],
+            'content_restricted' => $_POST['edit:region:content_restricted'],
             'edit_comment'  =>  $_POST['edit:region:comment'],
 
             // настройки видимости регионов

@@ -218,6 +218,9 @@ class JSLayoutBuilder extends UnitPrototype {
                 $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
                 $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
 
+                // фильтруем по доступности пользователю (is_publicity)
+                $paths_at_layer_filled = $lm_engine->checkRegionsVisibleByUser($paths_at_layer_filled, $this->map_alias);
+
                 foreach ($paths_at_layer_filled as $path_present) {
                     $id_region = $path_present['id_region'];
 

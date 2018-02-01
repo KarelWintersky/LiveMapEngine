@@ -93,12 +93,38 @@ class LiveMapEngine
         return ( $ROLE_TO_POWER[$first_role] >= $ROLE_TO_POWER[$second_role] );
     }
 
-    /**
 
+    /**
+     * Временная функция, фильтрующая массив регионов с данными.
+     * Фильтр не проходят регионы, имеющие is_excludelists отличный от NEVER
      *
+     * На самом деле фильтрацию должна выполнять js-функция на фронте (равно как и рисовать списки с регионами)
+     *
+     * @param $regions_list
+     * @return array
+     */
+    public function removeExcludedFromRegionsList($regions_list) {
+        return array_filter($regions_list, function($row) {
+            return !!($row['is_excludelists'] == 'N');
+        });
+    }
+
+    /**
+     * Проходит по массиву регионов и провеяет доступность региона для текущего пользователя.
+     *
+     * @param $regions_list
      * @param $map_alias
      * @return array
      */
+    public function checkRegionsVisibleByUser($regions_list, $map_alias) {
+        $current_role = $this->ACL_getRole($map_alias);
+
+        return array_filter($regions_list, function($row) use ($current_role) {
+            return !!( $this->ACL_isValidRole( $current_role, $row['is_publicity'] ) );
+        });
+    }
+
+
     /**
      * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
      * Входные параметры: алиас проекта и алиас карты
@@ -147,9 +173,13 @@ class LiveMapEngine
                 'alias_map'        =>  $map_alias
             ));
 
-            $current_role = $this->ACL_getRole($map_alias);
-
             //@HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
+            array_map(function($row) use (&$all_regions) {
+                $all_regions[ $row['id_region'] ] = $row;
+            }, $sth->fetchAll());
+
+
+            /*$current_role = $this->ACL_getRole($map_alias);
             array_map(function($row) use (&$all_regions, $current_role) {
                 // проверка прав: может ли текущий пользователь иметь инфу по этому региону?
 
@@ -157,9 +187,9 @@ class LiveMapEngine
                     $all_regions[ $row['id_region'] ] = $row;
                 }
 
-                // $all_regions[ $row['id_region'] ] = $row; // старое поведение
+                $all_regions[ $row['id_region'] ] = $row;
 
-            }, $sth->fetchAll());
+            }, $sth->fetchAll());*/
 
         } catch (\PDOException $e) {
         }
@@ -197,7 +227,7 @@ class LiveMapEngine
 
         try {
             $query = "
-            SELECT title, content, edit_date, is_publicity, is_excludelists
+            SELECT `title`, `content`, `content_restricted`, `edit_date`, `is_publicity`, `is_excludelists`
             FROM {$table}
             WHERE
                 id_region     = :id_region
@@ -219,6 +249,7 @@ class LiveMapEngine
                     $info = array(
                         'is_present'    =>  1,
                         'content'       =>  $row['content'],
+                        'content_restricted'    =>  $row['content_restricted'],
                         'title'         =>  $row['title'],
                         'edit_date'     =>  $row['edit_date'],
                         'can_edit'      =>  $role_can_edit,
@@ -228,8 +259,9 @@ class LiveMapEngine
                 } else {
                     $info = array(
                         'is_present'    =>  1,
-                        'content'       =>  'Limited access',       //@todo: move to map config
-                        'title'         =>  $row['title'],          //@todo: move to map config
+                        'content'       =>  $row['content_restricted'] ?? "Доступ ограничен", // брать из конфига карты/слоя
+                        'content_restricted'    =>  $row['content_restricted'],
+                        'title'         =>  $row['title'],
                         'edit_date'     =>  $row['edit_date'],
                         'can_edit'      =>  $role_can_edit,
                         'is_exludelists'=>  $row['is_excludelists'],
@@ -308,9 +340,17 @@ ORDER BY edit_date ;
 
         $query = "
         INSERT INTO {$table_data}
-         (id_map, alias_map, edit_whois, edit_ipv4, id_region, title, content, edit_comment, is_excludelists, is_publicity)
+         (
+         `id_map`, `alias_map`, `edit_whois`, `edit_ipv4`,
+         `id_region`, `title`, `content`, `content_restricted`,
+         `edit_comment`, `is_excludelists`, `is_publicity`
+         )
          VALUES
-         (:id_map, :alias_map, :edit_whois, INET_ATON(:edit_ipv4), :id_region, :title, :content, :edit_comment, :is_excludelists, :is_publicity)
+         (
+         :id_map, :alias_map, :edit_whois, INET_ATON(:edit_ipv4),
+         :id_region, :title, :content, :content_restricted,
+         :edit_comment, :is_excludelists, :is_publicity
+         )
         ";
 
         $data['edit_ipv4'] = $this->getIP();

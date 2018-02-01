@@ -77,7 +77,16 @@ class MapRender extends UnitPrototype
         $this->template->set('/html/title', $this->map_config->title);
         $this->template->set('/html_callback', '/');
 
+        // извлекаетм все регионы с информацией
         $this->map_regions_with_info = $this->lme->getRegionsWithInfo( $this->map_alias );
+
+        // фильтруем по доступности пользователю (is_publicity)
+        $this->map_regions_with_info = $this->lme->checkRegionsVisibleByUser($this->map_regions_with_info, $this->map_alias);
+
+        // фильтруем по visibility
+        $this->map_regions_with_info = $this->lme->removeExcludedFromRegionsList($this->map_regions_with_info);
+
+
 
         $this->template->set('/regions_with_content_ids', $this->lme->convertRegionsWithInfo_to_IDs_String($this->map_regions_with_info));
 

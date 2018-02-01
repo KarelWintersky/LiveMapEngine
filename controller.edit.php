@@ -98,8 +98,9 @@ switch ($edit_what) {
 
             'html_callback'     =>  "/map/{$edit_map_alias}",
 
-            'region_title'      =>  ($region_data['is_present'] == 1) ? htmlspecialchars($region_data['title']) : '',
+            'region_title'      =>  ($region_data['is_present'] == 1) ? htmlspecialchars($region_data['title'],  ENT_QUOTES | ENT_HTML5) : '',
             'region_text'       =>  $region_data['content'],
+            'region_restricted' =>  htmlspecialchars($region_data['content_restricted'], ENT_QUOTES | ENT_HTML5),
 
 
             'is_present'        =>  $region_data['is_present'],      // 1 - регион существует, 0 - новый регион
@@ -118,6 +119,7 @@ switch ($edit_what) {
 
             'is_exludelists'    =>  $region_data['is_exludelists'] ?? 'N',
             'is_publicity'      =>  $region_data['is_publicity'] ?? 'ANYONE',
+
         );
 
         $template_file = 'edit.region.page.html';
