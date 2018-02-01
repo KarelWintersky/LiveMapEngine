@@ -35,6 +35,10 @@ var polymap = Object.create(null);
             }
             current_infobox_region_id = id_region;
 
+        }).on('mouseover', function(){
+            polymap[id_region].setStyle({stroke: true, color: '#00ff00', weight: 3, opacity: 0.1}); //@todo: это нужно брать из конфига!
+        }).on('mouseout', function(){
+            polymap[id_region].setStyle({stroke: false});
         });
     });
 
@@ -101,6 +105,7 @@ var polymap = Object.create(null);
     // отлавливаем зум
     map.on('zoomend', function() {
         var currentZoom = map.getZoom();
+        console.log("Current zoom: " + currentZoom);
         if (IS_DEBUG) console.log("zoom at zoomend -> " + currentZoom);
 
         Object.keys( LGS ).forEach(function(lg){

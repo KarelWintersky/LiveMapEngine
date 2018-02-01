@@ -59,5 +59,5 @@ if ($main_config->get('auth/phpauth_enabled')) {
 // LiveMap Engine
 require_once (__ROOT__ . '/engine/core.LiveMapEngine.php');
 
-LMEConfig::get_mainconfig()->set('copyright/title', 'LiveMap Engine, version 0.6.12 "Astolfo"');
+LMEConfig::get_mainconfig()->set('copyright/title', 'LiveMap Engine, version 0.6.13 "Astolfo"');
 

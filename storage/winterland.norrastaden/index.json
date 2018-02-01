@@ -30,11 +30,11 @@
     }
   },
   "files" : {
-    "image"       : "norrastaden.png",
+    "image"       : "norrastaden_bw.png",
     "layout"      : "norrastaden.svg"
   },
   "image" : {
-    "file"  : "norrastaden.png",
+    "file"  : "norrastaden_bw.png",
     "width" : 6765,
     "height": 4761,
     "ox"    : 0,
@@ -42,14 +42,14 @@
   },
   "layout": {
     "file"   : "norrastaden.svg",
-    "layers" : [ "Paths" ]
+    "layers" : [ "Homesites", "Districts", "Squares" ]
   },
   "layers": {
-    "Paths": {
-      "hint" : "Все пути",
-      "zoom" : -2,
-      "zoom_min" : -100,
-      "zoom_max" : 100,
+    "Homesites": {
+      "hint" : "Дома",
+      "zoom" : -1,
+      "zoom_min" : 100,
+      "zoom_max" : -1,
       "empty": {
         "stroke": 0,
         "borderColor" : "#000000",
@@ -67,6 +67,54 @@
         "fill": 1,
         "fillColor": "#00ff00",
         "fillOpacity": 0.1
+      }
+    },
+    "Districts": {
+      "hint" : "Районы",
+      "zoom" : -3,
+      "zoom_min" : -2,
+      "zoom_max" : -3,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#ff0000",
+        "borderWidth" : 1,
+        "borderOpacity": 1,
+        "fill": 1,
+        "fillColor": "#fff882",
+        "fillOpacity": 0.4
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#ff0000",
+        "borderWidth" : 1,
+        "borderOpacity": 1,
+        "fill": 1,
+        "fillColor": "#caff75",
+        "fillOpacity": 0.4
+      }
+    },
+    "Squares": {
+      "hint" : "Площади",
+      "zoom" : -3,
+      "zoom_min" : -2,
+      "zoom_max" : -3,
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#ffd59b",
+        "fillOpacity": 0.4
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#e9baff",
+        "fillOpacity": 0.4
       }
     }
   }
