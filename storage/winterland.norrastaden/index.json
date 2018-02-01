@@ -77,19 +77,19 @@
       "empty": {
         "stroke": 0,
         "borderColor" : "#ff0000",
-        "borderWidth" : 1,
-        "borderOpacity": 1,
+        "borderWidth" : 0,
+        "borderOpacity": 0,
         "fill": 1,
         "fillColor": "#fff882",
-        "fillOpacity": 0.4
+        "fillOpacity": 0.2
       },
       "present": {
         "stroke": 0,
         "borderColor" : "#ff0000",
-        "borderWidth" : 1,
-        "borderOpacity": 1,
+        "borderWidth" : 0,
+        "borderOpacity": 0,
         "fill": 1,
-        "fillColor": "#caff75",
+        "fillColor": "#fff882",
         "fillOpacity": 0.4
       }
     },

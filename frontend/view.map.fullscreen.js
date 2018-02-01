@@ -26,8 +26,10 @@ var polymap = Object.create(null);
 
     // биндим к каждому объекту функцию, показывающую информацию
     Object.keys( polymap ).forEach(function(id_region){
+        // обернуть в функцию и отрефакторить
+
         polymap[id_region].on('click', function(){
-            // обернуть в функцию и отрефакторить
+
             if (current_infobox_region_id == id_region) {
                 manageInfoBox('toggle', id_region);
             } else {
@@ -38,7 +40,7 @@ var polymap = Object.create(null);
         }).on('mouseover', function(){
             polymap[id_region].setStyle({stroke: true, color: '#00ff00', weight: 3, opacity: 0.1}); //@todo: это нужно брать из конфига!
         }).on('mouseout', function(){
-            polymap[id_region].setStyle({stroke: false});
+            polymap[id_region].setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
         });
     });
 
