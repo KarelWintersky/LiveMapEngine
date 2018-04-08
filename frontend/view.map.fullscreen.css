@@ -26,7 +26,7 @@ button {
     color: #000000;
 }
 
-/* === Section Regions */
+/* === Section Region Viewbox  === */
 .section-regions-viewbox {
     padding: 8px 8px;
     background: white;
@@ -42,6 +42,8 @@ button {
     font-size: 140%;
     color: #0088cc;
 }
+
+/* ===  Section Regions List  === */
 .section-regions-content {
     margin: 10px 0 0 0;
     font-size: 140%;
@@ -71,7 +73,6 @@ button {
 .section-infobox-button-toggle-visibility {
     width: 100%;
 }
-
 .section-infobox-content {
     margin: 10px 5px 10px 5px;
     font-size: 140%;

@@ -324,7 +324,7 @@ createControl_RegionTitle = function(position){
 };
 
 /**
- * Создает в объекте L Control-элемент: список регионов (только создает
+ * Создает в объекте L Control-элемент: список регионов
  */
 createControl_RegionsBox = function() {
     L.Control.RegionsBox = L.Control.extend({
