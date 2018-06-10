@@ -1,0 +1,114 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/frontend/leaflet/leaflet.css" />
+    <script src="/frontend/leaflet/leaflet.js"></script>
+    <script type="text/javascript" src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
+    <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css" />
+
+    <style>
+        html, body, #map {
+            height:100%;
+            width:100%;
+            padding:0px;
+            margin:0px;
+        }
+    </style>
+</head>
+<body>
+<div tabindex="0" class="leaflet-container leaflet-fade-anim leaflet-grab leaflet-touch-drag" id="map"></div>
+
+<!--
+<div id="map" style="width: 700px; height: 500px"></div>
+-->
+
+<script type="text/javascript">
+    /* var norrastaden = {
+        width: 6765,
+        height: 4761,
+        zoom: 5,
+        zoom_min: 2,
+        zoom_max: 5,
+        url: '/storage.tiles/norrastaden/{z}/{x}/{y}.png'
+    };  */
+
+    var deadland = {
+        width: 6600,
+        height: 5183,
+        zoom: 0,
+        zoom_min: 0,
+        zoom_max: 5,
+        url: '/storage.tiles/deadland/{z}/{x}/{y}.png',
+    };
+
+    initMap = function (options) {
+        var setViewBounds = [0, 0];
+
+        var map = L.map('map', {
+            crs: L.CRS.Simple,
+
+            maxZoom: options.zoom_max,
+            minZoom: options.zoom_min,
+
+            zoomControl: false,
+        }).setView(setViewBounds, options.zoom);
+
+        map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+
+        // тайлы генерятся niene/gdal2tiles-leaflet с зумом 0-5
+        // все дело в этом грёбаном минусе!!!!!!!!!
+
+/*
+        // вот так границы карты шире, но логично грузятся лишние тайлы
+        var mapBounds = new L.LatLngBounds(
+                map.unproject([-1 * options.width, 1.5 * options.width], options.zoom_max /!*- 1*!/) ,
+                map.unproject([1.5 * options.height, -1 * options.height], options.zoom_max /!*- 1*!/)
+        );
+*/
+
+        // вот так сделаны границы карты ровно по карте, но она упорно хочет влезть на экран
+        // и при этом все равно пытаются загрузиться несуществующие тайлы
+        var mapBounds = new L.LatLngBounds(
+                map.unproject([0, options.width], options.zoom_max) ,
+                map.unproject([options.height, 0], options.zoom_max)
+        );
+
+        map.fitBounds(mapBounds);
+
+        console.log(mapBounds);
+
+        var tiles = L.tileLayer(options.url, {
+            crs: L.CRS.Simple,
+            attribution: 'Map data',
+            // errorTileUrl: '',
+            minZoom: options.zoom_min,
+            maxZoom: options.zoom_max,
+
+            bounds: mapBounds,
+            noWrap: false,
+
+            // tms: true,
+        });
+        tiles.addTo(map);
+
+        map.setMaxBounds(mapBounds);
+
+        return map;
+    }
+
+    conv_xy_to_latlng = function(map, coords){
+        return map.unproject(coords, map.getMaxZoom());
+    }
+
+
+    var map = initMap(deadland);
+
+    map.on('zoomend', function() {
+        console.log( map.getZoom() );
+    });
+
+
+
+
+</script>
+</body>
+</html>
