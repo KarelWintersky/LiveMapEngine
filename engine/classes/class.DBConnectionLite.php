@@ -40,9 +40,13 @@ class DBConnectionLite extends \PDO
         } elseif (get_class($config_argv) === 'INI_Config') {
             // Конфиг передан как инстанс класса INI_Config
 
-            $section_name = empty($key_connection) ? '' : ':' . $config_argv->get( "connection/{$key_connection}" );
-            $database_settings_section_name = $config_argv->get('host/server') . $section_name;
+            $section_name = empty($key_connection) ? '' : $config_argv->get( "connection/suffix" );
+            // $database_settings_section_name = $config_argv->get('global/server') . $section_name;
+
+            $database_settings_section_name = 'database:' . $section_name ;
+
             $database_settings = $config_argv->get( $database_settings_section_name );
+
             $this->table_prefix = $config_argv->get(
                 $database_settings_section_name . '/table_prefix'
             );
