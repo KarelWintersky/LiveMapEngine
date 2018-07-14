@@ -55,4 +55,10 @@ function filter_array_for_allowed($input_array, $required_key, $allowed_values, 
             : $default_value;
 }
 
-
+function var_dd($message, $arg)
+{
+    var_dump($message);
+    echo '<br>';
+    var_dump($arg);
+    echo '<hr>';
+}

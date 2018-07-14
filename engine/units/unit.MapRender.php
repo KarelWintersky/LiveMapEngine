@@ -87,7 +87,6 @@ class MapRender extends UnitPrototype
         $this->map_regions_with_info = $this->lme->removeExcludedFromRegionsList($this->map_regions_with_info);
 
 
-
         $this->template->set('/regions_with_content_ids', $this->lme->convertRegionsWithInfo_to_IDs_String($this->map_regions_with_info));
 
         switch ($viewmode) {

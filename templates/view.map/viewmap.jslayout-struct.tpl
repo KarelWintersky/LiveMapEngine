@@ -1,5 +1,5 @@
 var theMap = {
-    {?*JSBuilderError*}"error": "{*JSBuilderError*}",{?}
+    {?*JSBuilderError*}"JSBuilderError": "{*JSBuilderError*}",{?}
     "map": {
         "title"             :   "{*map.title*}",
         "type"              :   "{*map.type*}",
@@ -23,7 +23,9 @@ var theMap = {
         "zoom_min"          :   {*display.zoom_min*},
         "zoom_max"          :   {*display.zoom_max*},
         "background_color"  :   "{*display.background_color*}",
-        {?*display.custom_css*}"custom_css" : "{*display.custom_css*}",{?}
+        {?*display.custom_css*}
+        "custom_css" : "{*display.custom_css*}",
+        {?}
         {?*maxbounds*}
         "maxbounds" : {
         {%*maxbounds*}
@@ -31,9 +33,18 @@ var theMap = {
         {%}
         },
         {?}
-        {?*focus_animate_duration*}"focus_animate_duration": {*focus_animate_duration*}, {?}
-        {?*focus_highlight_color*}"focus_highlight_color": "{*focus_highlight_color*}",{?}
-        {?*focus_timeout*}"focus_timeout": {*focus_timeout*}, {?}
+
+        {?*focus_animate_duration*}
+        "focus_animate_duration": {*focus_animate_duration*},
+        {?}
+
+        {?*focus_highlight_color*}
+        "focus_highlight_color": "{*focus_highlight_color*}",
+        {?}
+
+        {?*focus_timeout*}
+        "focus_timeout": {*focus_timeout*},
+        {?}
     },
     "region_defaults_empty" : {
         "stroke" : {*region_defaults_empty.stroke*},
@@ -72,19 +83,49 @@ var theMap = {
             "coords"    : {*regions:js*},
             "layer"     : "{*regions:layer*}",
 
-            {?*regions:fillColor*}"fillColor" : "{*regions:fillColor*}", {?}
-            {?*regions:fillOpacity*}"fillOpacity": {*regions:fillOpacity*}, {?}
-            {?*regions:fillRule*}"fillRule": "{*regions:fillRule*}", {?}
+            {?*regions:fillColor*}
+            "fillColor" : "{*regions:fillColor*}",
+            {?}
 
-            {?*regions:borderColor*}"borderColor": "{*regions:borderColor*}", {?}
-            {?*regions:borderWidth*}"borderWidth": "{*regions:borderWidth*}", {?}
-            {?*regions:borderOpacity*}"borderOpacity": "{*regions:borderOpacity*}", {?}
+            {?*regions:fillOpacity*}
+            "fillOpacity": {*regions:fillOpacity*},
+            {?}
 
-            {?*regions:title*}"title": "{*regions:title*}", {?}
-            {?*regions:edit_date*}"edit_date" : "{*regions:edit_date*}",{?}
-            {?*regions:desc*}"desc": "{*regions:desc*}", {?}
-            {?*regions:radius*}"radius": {*regions:radius*},{?}
-            {?*regions:is_excludelists*}"exclude": "{*regions:is_excludelists*}",{?}
+            {?*regions:fillRule*}
+            "fillRule": "{*regions:fillRule*}",
+            {?}
+
+            {?*regions:borderColor*}
+            "borderColor": "{*regions:borderColor*}",
+            {?}
+
+            {?*regions:borderWidth*}
+            "borderWidth": "{*regions:borderWidth*}",
+            {?}
+
+            {?*regions:borderOpacity*}
+            "borderOpacity": "{*regions:borderOpacity*}",
+            {?}
+
+            {?*regions:title*}
+            "title": "{*regions:title*}",
+            {?}
+
+            {?*regions:edit_date*}
+            "edit_date" : "{*regions:edit_date*}",
+            {?}
+
+            {?*regions:desc*}
+            "desc": "{*regions:desc*}",
+            {?}
+
+            {?*regions:radius*}
+            "radius": {*regions:radius*},
+            {?}
+
+            {?*regions:is_excludelists*}
+            "exclude": "{*regions:is_excludelists*}",
+            {?}
         },
         {%}
     },

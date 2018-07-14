@@ -1,5 +1,7 @@
 <?php
 
+const DEBUG = false;
+
 /**
  * Class LiveMapEngine
  */
@@ -124,7 +126,6 @@ class LiveMapEngine
         });
     }
 
-
     /**
      * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
      * Входные параметры: алиас проекта и алиас карты
@@ -133,17 +134,44 @@ class LiveMapEngine
      * @param string $ids_list
      * @return array
      */
-    public function getRegionsWithInfo($map_alias, $ids_list = '') {
+    public function getRegionsWithInfo($map_alias, $ids_list = '')
+    {
         $table = $this->table_prefix . 'map_data_regions';
-
         if ($ids_list != '') {
-            $in_subquery = "AND `id_region` IN ({$ids_list})";
+            $in_subquery = "AND `id_region` IN ({$ids_list}) ";
         } else {
             $in_subquery = '';
         }
 
-        $query = "
-    SELECT
+        $query_get_id = "
+ SELECT id
+ FROM `{$table}` AS `mdr1`
+ WHERE `alias_map` = :alias_map AND
+ `id` = ( SELECT MAX(id)
+          FROM `{$table}` AS `mdr2`
+          WHERE `mdr1`.`id_region` = `mdr2`.`id_region`
+        )
+ {$in_subquery}
+ ORDER BY id_region
+        ";
+
+        if (DEBUG) var_dd('getRegionsWithInfo -> $query_get_id', $query_get_id);
+
+        $all_ids = [];
+        $sth = $this->dbi->getconnection()->prepare($query_get_id);
+        $sth->execute(array(
+            'alias_map'        =>  $map_alias
+        ));
+        $all_ids = $sth->fetchAll(\PDO::FETCH_COLUMN);
+
+        if (empty($all_ids)) return [];
+
+        if (DEBUG) var_dd('getRegionsWithInfo : $all_ids', $all_ids);
+
+        $all_ids_string = implode(', ', $all_ids);
+
+        $query_data = "
+SELECT
     `id_region`, `title`, `edit_date`,
     `is_publicity`, `is_excludelists`,
 
@@ -155,31 +183,26 @@ class LiveMapEngine
     `region_fill` AS `fill`,
     `region_fill_color` AS `fillColor`,
     `region_fill_opacity` AS `fillOpacity`
-    FROM
-    (
-	  SELECT *
-	  FROM {$table}
-	  WHERE
-    	`alias_map` = :alias_map
-    	{$in_subquery}
-      ORDER BY `edit_date` DESC
-    ) AS t1 GROUP BY `id_region`
+    FROM {$table}
+    WHERE `id` IN ({$all_ids_string})
         ";
 
-        $all_regions = array();
-        try {
-            $sth = $this->dbi->getconnection()->prepare($query);
-            $sth->execute(array(
-                'alias_map'        =>  $map_alias
-            ));
+        if (DEBUG) var_dd('getRegionsWithInfo -> $query_data', $query_data);
 
-            //@HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
-            array_map(function($row) use (&$all_regions) {
-                $all_regions[ $row['id_region'] ] = $row;
-            }, $sth->fetchAll());
+        $all_regions = [];
+
+        //@HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
+        $sth = $this->dbi->getconnection()->prepare($query_data);
+        $sth->execute(array(
+            'alias_map'        =>  $map_alias
+        ));
+
+        array_map(function($row) use (&$all_regions) {
+            $all_regions[ $row['id_region'] ] = $row;
+        }, $sth->fetchAll());
 
 
-            /*$current_role = $this->ACL_getRole($map_alias);
+        /*$current_role = $this->ACL_getRole($map_alias);
             array_map(function($row) use (&$all_regions, $current_role) {
                 // проверка прав: может ли текущий пользователь иметь инфу по этому региону?
 
@@ -191,10 +214,10 @@ class LiveMapEngine
 
             }, $sth->fetchAll());*/
 
-        } catch (\PDOException $e) {
-        }
+
         return $all_regions;
     }
+
 
     /**
      * Выделяет из массива регионов
@@ -244,30 +267,23 @@ class LiveMapEngine
             $row = $sth->fetch();
 
             if ($row) {
+                $info = [
+                    'is_present'        =>  1,
+                    'title'             =>  $row['title'],
+                    'edit_date'         =>  $row['edit_date'],
+                    'can_edit'          =>  $role_can_edit,
+                    'is_exludelists'    =>  $row['is_excludelists'],
+                    'is_publicity'      =>  $row['is_publicity'],
+                    'content'           =>  '',
+                    'content_restricted'    =>  $row['content_restricted']
+                ];
 
-                if ($this->ACL_isValidRole( $role, $row['is_publicity'] )) {
-                    $info = array(
-                        'is_present'    =>  1,
-                        'content'       =>  $row['content'],
-                        'content_restricted'    =>  $row['content_restricted'],
-                        'title'         =>  $row['title'],
-                        'edit_date'     =>  $row['edit_date'],
-                        'can_edit'      =>  $role_can_edit,
-                        'is_exludelists'=>  $row['is_excludelists'],
-                        'is_publicity'  =>  $row['is_publicity']
-                    );
+                if ( $this->ACL_isValidRole( $role, $row['is_publicity'] ) ) {
+                    $info['content'] = $row['content'];
                 } else {
-                    $info = array(
-                        'is_present'    =>  1,
-                        'content'       =>  $row['content_restricted'] ?? "Доступ ограничен", // брать из конфига карты/слоя
-                        'content_restricted'    =>  $row['content_restricted'],
-                        'title'         =>  $row['title'],
-                        'edit_date'     =>  $row['edit_date'],
-                        'can_edit'      =>  $role_can_edit,
-                        'is_exludelists'=>  $row['is_excludelists'],
-                        'is_publicity'  =>  $row['is_publicity']
-                    );
+                    $info['content'] = $row['content_restricted'] ?? "Доступ ограничен"; // "Доступ ограничен" - брать из конфига карты/слоя
                 }
+                
             } else {
                 $info = array(
                     'is_present'    =>  0,

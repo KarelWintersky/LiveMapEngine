@@ -210,12 +210,16 @@ class JSLayoutBuilder extends UnitPrototype {
                 $paths_at_layer = $sp->getElementsAll();
 
                 // теперь нам нужны айдишники этих элементов на слое. Их надо проверить в БД и заполнить значениями кастомных полей из БД
+
+
                 $paths_at_layers_ids = implode(", ", array_map(function($item){
                     return "'{$item}'";
                 }, array_keys($paths_at_layer)));
 
                 // запросим БД на предмет кастомных значений и заполненности регионов
                 $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
+
+                // технически в функцию надо отдавать МАССИВ, а превращать его в строку внутри функции
                 $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
 
                 // фильтруем по доступности пользователю (is_publicity)
@@ -314,13 +318,17 @@ class JSLayoutBuilder extends UnitPrototype {
         } catch (\Exception $e) {
             $this->ERROR = TRUE;
             $this->ERROR_MESSAGE = $e->getMessage();
+            // if (DEBUG) var_dd($e);
         }
 
         // теперь генерируем подстановочные значения для шаблона
         $this->template = new Template($this->template_file, $this->template_path);
 
-        if ($this->ERROR)
+        if ($this->ERROR) {
             $this->template->set('/JSBuilderError', $this->ERROR_MESSAGE);
+        }
+
+
 
         $this->template->set('/map', [
             'title'         =>  $json->title,
@@ -357,8 +365,9 @@ class JSLayoutBuilder extends UnitPrototype {
      */
     public function content()
     {
-        if (method_exists($this->template, 'render'))
-            return $this->template->render();
+        return method_exists($this->template, 'render')
+            ? $this->template->render()
+            : NULL;
     }
 
 
