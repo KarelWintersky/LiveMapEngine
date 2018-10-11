@@ -1,5 +1,6 @@
 {
     "name": "karelwintersky/livemap",
+    "license": "MIT",
     "type": "project",
     "authors": [
         {
@@ -7,21 +8,18 @@
             "email": "karel.wintersky@gmail.com"
         }
     ],
-    "require": {
-        "pecee/simple-router": "3.4.10.1",
-        "monolog/monolog": "^1.23",
-        "google/recaptcha": "^1.1",
-        "robmorgan/phinx": "^0.9.2",
-        "phpmailer/phpmailer": "^6.0"
-    },
     "autoload": {
         "files": [
         ],
         "psr-4": {
-            "Arris\\"           : "engine/Arris",
-            "Arris\\Websun\\"   : "engine/Arris/Websun",
-            "Livemap\\"           : "engine/Livemap"
+            "Arris\\"   : "engine/ArrisFramework",
+            "Livemap\\" : "engine/Livemap"
         }
+    },
+    "require": {
+        "pecee/simple-router": "4.2.0.5",
+        "monolog/monolog": "^1.23",
+        "google/recaptcha": "^1.2",
+        "robmorgan/phinx": "^0.10.6"
     }
-
 }

@@ -1,5 +1,6 @@
 .idea
 .todo
+vendor
 .config/config.ini
 .config/db.ini
 .config/phpauth.ini

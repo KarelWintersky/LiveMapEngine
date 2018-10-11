@@ -4,6 +4,34 @@
  * Date: 24.09.2017, time: 14:52
  */
 
+require_once 'vendor/autoload.php';
+require_once 'engine/routing.helpers.php';
+
+require_once 'engine/routing.rules.php';
+
+use Pecee\SimpleRouter\SimpleRouter;
+
+
+$config = [
+    'adapter'   =>  'mysql',
+    'hostname'  =>  'localhost',
+    'username'  =>  'phpauthdemo',
+    'password'  =>  'password',
+    'database'  =>  'phpauthdemo',
+    'charset'   =>  'utf8',
+    'port'      =>  3306
+];
+
+DB::init(NULL, $config);
+SimpleRouter::start();
+
+
+
+die;
+
+
+
+
 define('__ROOT__', __DIR__);
 
 require_once (__ROOT__ . '/engine/__required.php');
