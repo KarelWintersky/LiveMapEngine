@@ -6,6 +6,7 @@
  
 use Pecee\SimpleRouter\SimpleRouter;
 use Arris\Template;
+use Arris\Auth;
 
 SimpleRouter::get('/', function () {
     return (new Template('index.html', '$/templates'))->render();
@@ -13,28 +14,44 @@ SimpleRouter::get('/', function () {
 
 SimpleRouter::group(['prefix' => '/auth'], function (){
 
+    //+ Form: register
     SimpleRouter::get('/register', function (){
-        return (new Template('form.register.html', '$/templates/auth'))->render();
-    });
-    SimpleRouter::post('/action:register', function (){
-        // registration process
+        $t = new Template('form.register.html', '$/templates/auth');
+        $t->set('strong_password_required', Auth::get('password_min_score'));
+        return $t->render();
     });
 
-    // аякс-форма логина
+    // registration process
+    SimpleRouter::post('/action:register', function (){
+    });
+
+    //+ Form/Ajax: login
     SimpleRouter::get('/login', function (){
-        return (new Template('ajax.login.html', '$/templates/auth'))->render();
+
+        $t = new Template('ajax.login.html', '$/templates/auth');
+        $t->set('last_login', $_COOKIE[ \Arris\Config::get('auth/cookies/last_logged_user') ] ?? '');
+        return $t->render();
+
     });
     SimpleRouter::post('/ajax:login', function (){
         // login process
     });
+
+
     SimpleRouter::get('/profile', function (){
         $t = new Template('form.profile.html', '$/templates/auth');
 
 
     });
+
+    // Form: logout
     SimpleRouter::get('/logout', function (){
 
     });
+    SimpleRouter::post('/action:logout', function (){
+
+    });
+
 });
 
 SimpleRouter::get('/map/{map}', function ($map_alias){

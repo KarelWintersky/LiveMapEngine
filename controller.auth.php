@@ -15,20 +15,6 @@ $template_file = '';
 $template_data = array();
 
 switch ($_GET['action']) {
-    case 'loginform': {
-        $template_file = 'auth/form.auth.ajax.html';
-
-        if ($is_logged_in) {
-            $userinfo = LMEAuth::$userinfo;
-            $template_data = array_merge($template_data, array(
-                'is_logged'             =>  $is_logged_in,
-                'is_logged_user'        =>  $userinfo['email'],
-                'is_logged_user_ip'     =>  $userinfo['ip']
-            ));
-        }
-
-        break;
-    }
     case 'ajax:login': {
         $auth_result = $auth->login(
             $_POST["auth:data:login"],
@@ -82,21 +68,6 @@ switch ($_GET['action']) {
         }
         redirect('/');
         $template_file = '*json';
-        break;
-    }
-
-
-    //+ форма входа
-    case 'login': {
-
-        if ($is_logged_in) {
-            $template_file = 'auth.callback.instant_to_root.html';
-            redirect('/');
-        } else {
-            $template_data['new_username'] = $_COOKIE[ LMEConfig::get_mainconfig()->get('cookies/last_logged_user') ] ?? '';
-            $template_data['autoactivation'] = ! LMEConfig::get_mainconfig()->get('auth/auto_activation');
-            $template_file = 'auth/form.login.html';
-        }
         break;
     }
 

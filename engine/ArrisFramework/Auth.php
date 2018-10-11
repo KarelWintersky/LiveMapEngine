@@ -8,6 +8,7 @@ namespace Arris;
  * Class Auth
  *
  * Date: 20.09.2018, time: 12:55
+ * Date: 11.10.2018, time: 12:15
  */
 use PHPAuth\Config as PHPAuthConfig;
 use PHPAuth\Auth as PHPAuth;
@@ -20,6 +21,10 @@ use PHPAuth\Auth as PHPAuth;
  */
 class Auth
 {
+    const VERSION = '1.1/ArrisFramework';
+
+    const GLUE = '/';
+
     private static $_instance;
 
     private static $_config;
@@ -79,6 +84,42 @@ class Auth
         } else {
             throw new \Exception( "Static method {$name} not exists in class " . get_class(self::getInstance() ) );
         }
+    }
+
+    /**
+     * @param $setting
+     * @param null $default_value
+     * @return array|mixed|null
+     */
+    public static function get($setting, $default_value = null)
+    {
+        if ($setting === '') {
+            return $default_value;
+        }
+
+        if (!is_array($setting)) {
+            $setting = explode(self::GLUE, $setting);
+        }
+
+        $ref = &self::$_config->config;
+
+        foreach ((array) $setting as $parent) {
+            if (is_array($ref) && array_key_exists($parent, $ref)) {
+                $ref = &$ref[$parent];
+            } else {
+                return $default_value;
+            }
+        }
+        return $ref;
+
+    }
+
+    public static function dd()
+    {
+        echo '<pre>';
+
+        var_dump(self::$_config->config);
+        die;
     }
 
 

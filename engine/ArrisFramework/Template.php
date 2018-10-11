@@ -11,7 +11,7 @@ namespace Arris;
  */
 class Template
 {
-    const VERSION = '1.3';
+    const VERSION = '1.4/ArrisFramework';
 
     const ALLOWED_RENDERS = array('html', 'json', 'null');
 
@@ -117,16 +117,16 @@ class Template
             }
             $cacheKey .= $part;
 
-            var_dump($cacheKey);
-
             if (!isset($root[$part]) && count($segs)) {
                 $root[$part] = array();
             }
             $root = &$root[$part];
+
             //Unset all old nested cache
             if (isset($this->cache[$cacheKey])) {
                 unset($this->cache[$cacheKey]);
             }
+
             //Unset all old nested cache in case of array
             if (count($segs) == 0) {
                 foreach ($this->cache as $cacheLocalKey => $cacheValue) {
@@ -204,8 +204,14 @@ class Template
         ]);
 
         var_dump($t->all());
+    }
 
+    public function dd()
+    {
+        echo '<pre>';
 
+        var_dump($this->template_data);
+        die;
     }
 
 
