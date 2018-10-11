@@ -13,13 +13,14 @@
         ],
         "psr-4": {
             "Arris\\"   : "engine/ArrisFramework",
-            "Livemap\\" : "engine/Livemap"
+            "Livemap\\" : "engine/LivemapFramework"
         }
     },
     "require": {
         "pecee/simple-router": "4.2.0.5",
         "monolog/monolog": "^1.23",
         "google/recaptcha": "^1.2",
-        "robmorgan/phinx": "^0.10.6"
+        "robmorgan/phinx": "^0.10.6",
+        "phpauth/phpauth": "^1.1"
     }
 }

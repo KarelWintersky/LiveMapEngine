@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Живые карты -- восстановление пароля</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+</head>
+<body>
+
+<h2>Восстановление пароля</h2>
+
+<form action="/auth/action:recoverpassword" method="post">
+    <div>
+        <label for="auth_email">Регистрационный E-Mail: </label>
+        <input type="email" size="15" id="auth_email" name="auth:recover_email" required>
+    </div>
+    <div>
+        <button name="auth:recover_password">Восстановить пароль</button>
+    </div>
+</form>
+
+<hr>
+
+<a href="/">На стартовую...</a>
+
+</body>
+</html>

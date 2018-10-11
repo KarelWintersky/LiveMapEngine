@@ -1,36 +1,39 @@
 <?php
 /**
- * User: Arris
+ * User: Karel Wintersky <karel.wintersky@gmail.com>
  * Date: 24.09.2017, time: 14:52
  */
+ini_set('pcre.backtrack_limit', 2*1024*1024); // 2 Mб
+ini_set('pcre.recursion_limit', 2*1024*1024);
 
-require_once 'vendor/autoload.php';
-require_once 'engine/routing.helpers.php';
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/engine/routing.helpers.php';
+require_once __DIR__ . '/engine/routing.rules.php';
+require_once __DIR__ . '/engine/websun.php';
 
-require_once 'engine/routing.rules.php';
+// legacy classes
+require_once (__DIR__ . '/engine/core.LMEAuth.php');
+
 
 use Pecee\SimpleRouter\SimpleRouter;
+use Arris\Config;
+use Arris\DB;
+use Arris\Template;
+use Arris\Auth;
+
+Config::init([
+    'config/config.php'
+]);
+
+DB::init(NULL, Config::get('database'));
+
+Auth::init( DB::getConnection());
 
 
-$config = [
-    'adapter'   =>  'mysql',
-    'hostname'  =>  'localhost',
-    'username'  =>  'phpauthdemo',
-    'password'  =>  'password',
-    'database'  =>  'phpauthdemo',
-    'charset'   =>  'utf8',
-    'port'      =>  3306
-];
-
-DB::init(NULL, $config);
 SimpleRouter::start();
 
 
-
 die;
-
-
-
 
 define('__ROOT__', __DIR__);
 
