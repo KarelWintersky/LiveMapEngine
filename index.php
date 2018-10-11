@@ -21,17 +21,29 @@ use Arris\DB;
 use Arris\Template;
 use Arris\Auth;
 
-Config::init([
-    'config/config.php'
-]);
+try {
+    Config::init([
+        'config/config.php'
+    ]);
 
-DB::init(NULL, Config::get('database'));
+    DB::init(NULL, Config::get('database'));
 
-Auth::init( DB::getConnection());
+    Auth::init( DB::getConnection());
+
+    SimpleRouter::start();
 
 
-SimpleRouter::start();
 
+
+
+
+
+
+
+
+} catch (Exception $e) {
+    die($e->getMessage());
+}
 
 die;
 

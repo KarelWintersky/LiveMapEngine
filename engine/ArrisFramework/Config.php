@@ -15,22 +15,14 @@ namespace Arris;
  * Class Config
  */
 class Config {
-    const VERSION = '1.1';
+    const VERSION = '1.3/ArrisFramework';
 
     const GLUE = '/';
     private static $config = [];
 
     /**
-     *
-     * @param $data
-     */
-    public static function init_once($data)
-    {
-        self::$config = $data;
-    }
-
-    /**
      * @param $configs_set
+     * @throws \Exception
      */
     public static function init($configs_set)
     {
@@ -47,23 +39,23 @@ class Config {
     }
 
     /**
-     * @param $parents
+     * @param $setting
      * @param null $default_value
      * @return array|mixed|null
      */
-    public static function get($parents, $default_value = null)
+    public static function get($setting, $default_value = null)
     {
-        if ($parents === '') {
+        if ($setting === '') {
             return $default_value;
         }
 
-        if (!is_array($parents)) {
-            $parents = explode(self::GLUE, $parents);
+        if (!is_array($setting)) {
+            $setting = explode(self::GLUE, $setting);
         }
 
         $ref = &self::$config;
 
-        foreach ((array) $parents as $parent) {
+        foreach ((array) $setting as $parent) {
             if (is_array($ref) && array_key_exists($parent, $ref)) {
                 $ref = &$ref[$parent];
             } else {
@@ -75,21 +67,29 @@ class Config {
     }
 
     /**
-     * @param $parents
+     * @param $setting
      * @param $value
      * @return bool
      */
-    public static function set($parents, $value)
+    public static function set($setting, $value)
     {
-        if (!is_array($parents)) {
-            $parents = explode(self::GLUE, (string) $parents);
-        }
+        // очищаем путь от лишних пробелов
+        $setting = trim($setting);
 
-        if (empty($parents)) return false;
+        // удаляем слэш в начале (то есть путь от корня '/' будет далее обрабатываться как вставка данных в корень конфига)
+        $setting = ltrim($setting, self::GLUE);
+
+        if (empty($setting)) {
+            $setting = [];
+        } else {
+            if (!is_array($setting)) {
+                $setting = explode(self::GLUE, (string) $setting);
+            }
+        }
 
         $ref = &self::$config;
 
-        foreach ($parents as $parent) {
+        foreach ($setting as $parent) {
             if (isset($ref) && !is_array($ref)) {
                 $ref = array();
             }
@@ -121,11 +121,16 @@ class Config {
 
 
     /**
+     *
      * @param $file
      * @param string $subpath
+     * @throws \Exception
      */
     public static function config_append($file, $subpath = '')
     {
+        if (!is_readable($file))
+            throw new \Exception("Config file {$file} not exists or not readable", 1);
+
         $new_config = include $file;
 
         if ($subpath == "" || $subpath == self::GLUE) {

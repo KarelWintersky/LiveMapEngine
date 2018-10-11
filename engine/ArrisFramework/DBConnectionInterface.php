@@ -13,7 +13,7 @@ interface DBConnectionInterface
      * @param null $suffix
      * @param $config
      */
-    public static function init($suffix, $config);
+    public static function init($suffix, Array $config);
 
     /**
      * Get connection config
@@ -26,16 +26,16 @@ interface DBConnectionInterface
     /**
      * Set connection config
      *
-     * @param $config
+     * @param array $config
      * @param null $suffix
      */
-    public static function setConfig($config, $suffix = NULL);
+    public static function setConfig(Array $config, $suffix = NULL);
 
     /**
      * Alias: get PDO connection
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getConnection($suffix = NULL): \PDO;
 
@@ -50,7 +50,7 @@ interface DBConnectionInterface
      * Get class instance == connection instance
      *
      * @param null $suffix
-     * @return PDO
+     * @return \PDO
      */
     public static function getInstance($suffix = NULL):\PDO;
 
@@ -60,13 +60,13 @@ interface DBConnectionInterface
      * @param null $suffix
      * @return null|string
      */
-    public static function getTablePrefix( $suffix = NULL );
+    public static function getTablePrefix($suffix = NULL);
 
     /**
      *
      * @param $query
      * @param null $suffix
-     * @return bool|\PDOStatement
+     * @return mixed
      */
     public static function query($query, $suffix = NULL);
 

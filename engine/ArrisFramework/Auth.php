@@ -12,6 +12,12 @@ namespace Arris;
 use PHPAuth\Config as PHPAuthConfig;
 use PHPAuth\Auth as PHPAuth;
 
+/**
+ * Class Auth
+ * Static wrapper over PHPAuth
+ *
+ * @package Arris
+ */
 class Auth
 {
     private static $_instance;
@@ -20,6 +26,10 @@ class Auth
 
     private static $_pdo;
 
+    /**
+     *
+     * @return PHPAuth
+     */
     public static function getInstance()
     {
         if (!self::$_instance) {
@@ -29,11 +39,18 @@ class Auth
         return self::$_instance;
     }
 
+    /**
+     *
+     * @return PHPAuthConfig
+     */
     public static function getConfig()
     {
         return self::$_config;
     }
 
+    /**
+     * @param $dbh
+     */
     public static function init($dbh)
     {
         self::$_pdo = $dbh;
@@ -47,12 +64,20 @@ class Auth
         self::$_instance = new PHPAuth($dbh, self::$_config);
     }
 
+    /**
+     * Static call for dynamic method
+     *
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws \Exception
+     */
     public static function __callStatic($name, $arguments)
     {
         if (method_exists(self::getInstance(), $name)) {
             return (self::getInstance())->{$name}(...$arguments);
         } else {
-            die("Static method {$name} not exists in class " . get_class(self::getInstance() ));
+            throw new \Exception( "Static method {$name} not exists in class " . get_class(self::getInstance() ) );
         }
     }
 
