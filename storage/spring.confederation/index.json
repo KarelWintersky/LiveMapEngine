@@ -30,14 +30,14 @@
     }
   },
   "image" : {
-    "file"  : "2018-07-14_conf2_navigation_map.svg",
+    "file"  : "2018-07-14_conf2_navigation_map_curves.svg",
     "width" : 2104,
     "height": 1488,
     "ox"    : 0,
     "oy"    : 0
   },
   "layout": {
-    "file"   : "2018-07-14_conf2_navigation_map.svg",
+    "file"   : "2018-07-14_conf2_navigation_map_curves.svg",
     "layers" : [ "Stars&Channels", "CLOutline" ]
   },
   "layers": {

@@ -29,7 +29,7 @@ class MapsListRender extends UnitPrototype {
         }
 
 
-        $dir_listing = scandir(PATH_STORAGE);
+        /*$dir_listing = scandir(PATH_STORAGE);
         unset($dir_listing[ array_search('.', $dir_listing) ]);
         unset($dir_listing[ array_search('..', $dir_listing) ]);
         unset($dir_listing[ array_search('list.json', $dir_listing) ]);
@@ -51,7 +51,7 @@ class MapsListRender extends UnitPrototype {
                     ];
                 }
             }
-        }
+        }*/
 
         // $this->template = new Template('maps.list.html', '$/templates');
         // $this->template->set('/maps_list', $maps_list);

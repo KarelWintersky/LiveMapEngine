@@ -29,6 +29,10 @@
       "title" : "Уинтерленд: Вестфьорд"
     },
     {
+    	"alias": "winterland.hicksville",
+    	"title": "Уинтерленд: Прилесье"
+    },
+    {
       "alias" : "pony",
       "title" : "Поняши"
     }
