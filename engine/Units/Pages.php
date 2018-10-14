@@ -13,9 +13,22 @@ namespace LME\Units;
 use Arris\Auth;
 use Arris\Template;
 
+/**
+ * Class Pages
+ * @package LME\Units
+ *
+ * Модель, реализует методы отрисовки статических страниц
+ *
+ */
 class Pages
 {
-    public function view_frontpage() {
+
+    /**
+     * Frontpage ( / )
+     *
+     * @return string
+     */
+    public function view_page_frontpage() {
         $auth = Auth::getInstance();
         $userinfo = $auth->getCurrentSessionUserInfo();
 
