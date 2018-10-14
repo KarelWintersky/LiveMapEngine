@@ -49,7 +49,7 @@ class ACL
      * @return bool
      * @throws \Exception
      */
-    public function checkRole($user_id, $map_alias, $role = 'edit')
+    public static function checkRole($user_id, $map_alias, $role = 'edit')
     {
         // Базовые проверки
         if (self::USERID_SUPERADMIN === $user_id) return true;
@@ -75,7 +75,7 @@ class ACL
      * @return string
      * @throws \Exception
      */
-    public function getRole($user_id, $map_alias)
+    public static function getRole($user_id, $map_alias)
     {
         if (self::USERID_SUPERADMIN === $user_id) return 'OWNER';
 
@@ -103,7 +103,7 @@ class ACL
         return 'ANYONE';
     }
 
-    public function isValidRole($first_role, $second_role)
+    public static function isValidRole($first_role, $second_role)
     {
         if (!array_key_exists($first_role, self::ROLE_TO_POWER)) return false;
         if (!array_key_exists($second_role, self::ROLE_TO_POWER)) return false;
