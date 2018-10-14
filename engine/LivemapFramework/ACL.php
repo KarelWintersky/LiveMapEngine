@@ -103,7 +103,7 @@ class ACL
         return 'ANYONE';
     }
 
-    public static function isValidRole($first_role, $second_role)
+    public static   function isValidRole($first_role, $second_role)
     {
         if (!array_key_exists($first_role, self::ROLE_TO_POWER)) return false;
         if (!array_key_exists($second_role, self::ROLE_TO_POWER)) return false;
