@@ -13,7 +13,8 @@
         ],
         "psr-4": {
             "Arris\\"   : "engine/ArrisFramework",
-            "Livemap\\" : "engine/LivemapFramework"
+            "Livemap\\" : "engine/LivemapFramework",
+            "LME\\"     : "engine/"
         }
     },
     "require": {

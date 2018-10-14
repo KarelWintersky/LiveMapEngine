@@ -8,41 +8,9 @@ use Pecee\SimpleRouter\SimpleRouter;
 use Arris\Template;
 use Arris\Auth;
 
-SimpleRouter::get('/', function () {
-    $auth = Auth::getInstance();
-    $userinfo = $auth->getCurrentSessionUserInfo();
+SimpleRouter::setDefaultNamespace('LME\Units');
 
-    $t = new Template('index.html', '$/templates');
-    $t->set('authinfo', [
-        'is_logged' =>  $auth->isLogged(),
-        'email'     =>  $userinfo['email'] ?? '',
-        'ip'        =>  $userinfo['ip'] ?? ''
-    ]);
-
-    {
-        $maps_list = [];
-        $indexfile = __ROOT__ . \Arris\Config::get('storage/maps') . '/list.json';
-
-        if (is_readable($indexfile)) {
-            $json = json_decode( file_get_contents( $indexfile ) );
-
-            foreach ($json->maps as $i => $map) {
-                $alias = $map->alias;
-                $title = $map->title;
-                $key = str_replace('.', '~', $alias);
-
-                $maps_list[ $key ] = [
-                    'alias' =>  $alias,
-                    'title' =>  $title
-                ];
-            }
-        }
-    }
-
-    $t->set('maps_list', $maps_list);
-
-    return $t->render();
-});
+SimpleRouter::get('/', 'Pages@view_frontpage');
 
 SimpleRouter::group(['prefix' => '/auth'], function (){
 
