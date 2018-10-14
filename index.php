@@ -11,9 +11,9 @@ require_once __DIR__ . '/engine/routing.helpers.php';
 require_once __DIR__ . '/engine/routing.rules.php';
 require_once __DIR__ . '/engine/websun.php';
 
-// legacy classes
-require_once (__DIR__ . '/engine/core.LMEAuth.php');
-
+$LME_ROOT = getenv( 'LME_INSTALL_PATH ');
+if ($LME_ROOT === false) $LME_ROOT = __DIR__;
+define('__ROOT__', $LME_ROOT);
 
 use Pecee\SimpleRouter\SimpleRouter;
 use Arris\Config;
@@ -26,6 +26,9 @@ try {
         'config/config.php'
     ]);
     //@todo HINT Получение данных из глобального конфига: Config::get('auth/cookies/new_registred_username');
+
+    define('PATH_STORAGE',  __ROOT__ . '/storage/');
+
 
     DB::init(NULL, Config::get('database'));
 

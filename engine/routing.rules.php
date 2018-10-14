@@ -19,7 +19,27 @@ SimpleRouter::get('/', function () {
         'ip'        =>  $userinfo['ip'] ?? ''
     ]);
 
-    $t->set('maps_list', []);
+    {
+        $maps_list = [];
+        $indexfile = __ROOT__ . \Arris\Config::get('storage/maps') . '/list.json';
+
+        if (is_readable($indexfile)) {
+            $json = json_decode( file_get_contents( $indexfile ) );
+
+            foreach ($json->maps as $i => $map) {
+                $alias = $map->alias;
+                $title = $map->title;
+                $key = str_replace('.', '~', $alias);
+
+                $maps_list[ $key ] = [
+                    'alias' =>  $alias,
+                    'title' =>  $title
+                ];
+            }
+        }
+    }
+
+    $t->set('maps_list', $maps_list);
 
     return $t->render();
 });
