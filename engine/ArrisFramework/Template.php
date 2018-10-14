@@ -8,10 +8,12 @@ namespace Arris;
  * Class Template
  *
  * Date: 19.09.2018, time: 20:41
+ *
+ * 1.5 : фиксы обработки "тип рендера"
  */
 class Template
 {
-    const VERSION = '1.4/ArrisFramework';
+    const VERSION = '1.5/ArrisFramework';
 
     const ALLOWED_RENDERS = array('html', 'json', 'null');
 
@@ -40,7 +42,8 @@ class Template
 
         $this->template_data = [];
         $this->http_status = 200;
-        $this->render_type = 'html';
+
+        $this->setRenderType($render_type);
     }
 
     public function setRenderType($type)
@@ -167,10 +170,8 @@ class Template
      * @param string $type
      * @return string
      */
-    public function render($type = 'html')
+    public function render()
     {
-        $this->render_type = $type;
-
         if ($this->render_type === 'json') {
             return json_encode( $this->template_data );
         }

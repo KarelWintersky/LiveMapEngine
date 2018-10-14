@@ -2,6 +2,7 @@
 
 vendor
 config
+composer.lock
 
 .config/config.ini
 .config/db.ini

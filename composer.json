@@ -21,6 +21,6 @@
         "monolog/monolog": "^1.23",
         "google/recaptcha": "^1.2",
         "robmorgan/phinx": "^0.10.6",
-        "phpauth/phpauth": "^1.1"
+        "phpauth/phpauth": "dev-master"
     }
 }

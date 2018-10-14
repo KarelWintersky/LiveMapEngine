@@ -20,7 +20,10 @@
             {?*authinfo.is_logged*}
             <a href="/auth/profile">Настройки аккаунта</a>
             &mdash;
-            <a id="action-logout" data-action="/auth/logout">Выход</a>
+            <a id="action-logout" href="#" data-action="/auth/logout">Выход</a>
+
+            <div style="float:right; display: inline">{*authinfo.email*} ({*authinfo.ip*})</div>
+
             {?}
         </td>
     </tr>

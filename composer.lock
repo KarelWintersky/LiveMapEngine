@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "73df0a475fa8609b083c1a3248be6a30",
+    "content-hash": "d5a4a665ded5142206ec12ce91304a62",
     "packages": [
         {
             "name": "bjeavons/zxcvbn-php",
@@ -777,16 +777,16 @@
         },
         {
             "name": "phpauth/phpauth",
-            "version": "1.1.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPAuth/PHPAuth.git",
-                "reference": "5125c1557ccc1f4103e7bf3250df1e21c9582041"
+                "reference": "7515f055544e1502136dd29588876a86d8c0221f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPAuth/PHPAuth/zipball/5125c1557ccc1f4103e7bf3250df1e21c9582041",
-                "reference": "5125c1557ccc1f4103e7bf3250df1e21c9582041",
+                "url": "https://api.github.com/repos/PHPAuth/PHPAuth/zipball/7515f055544e1502136dd29588876a86d8c0221f",
+                "reference": "7515f055544e1502136dd29588876a86d8c0221f",
                 "shasum": ""
             },
             "require": {
@@ -794,6 +794,9 @@
                 "google/recaptcha": "^1.1",
                 "php": ">=5.6.0",
                 "phpmailer/phpmailer": "^6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "6.*"
             },
             "type": "library",
             "autoload": {
@@ -812,7 +815,7 @@
                 "class",
                 "secure"
             ],
-            "time": "2018-04-19T13:43:27+00:00"
+            "time": "2018-10-14T10:06:24+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -1519,7 +1522,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "phpauth/phpauth": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
