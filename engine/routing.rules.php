@@ -27,8 +27,13 @@ SimpleRouter::group(['prefix' => '/auth'], function (){
 
 });
 
-SimpleRouter::get('/map/{map}', function ($map_alias){
-    return "Show map {$map_alias}";
-}, ['where' => ['map' => '[\w\d\.]+']]);
+SimpleRouter::group([ 'where' => ['map_alias' => '[\w\d\.]+']], function (){
+
+    SimpleRouter::get('/map/{map_alias}', 'MapView@view_map_fullscreen');
+
+    SimpleRouter::get('/map:iframe/{map_alias}', 'MapView@view_map_iframe');
+
+    SimpleRouter::get('/map:folio/{map_alias}', 'MapView@view_map_folio');
+});
 
 
