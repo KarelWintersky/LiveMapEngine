@@ -8,7 +8,7 @@
  * Date: 14.10.2018, time: 20:44
  */
 
-namespace LME\LivemapFramework;
+namespace LivemapFramework;
 
 use Arris\DB;
 use Arris\Auth;
