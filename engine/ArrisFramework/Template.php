@@ -10,10 +10,11 @@ namespace Arris;
  * Date: 19.09.2018, time: 20:41
  *
  * 1.5 : фиксы обработки "тип рендера"
+ * 1.6 : очистка от пустых строк
  */
 class Template
 {
-    const VERSION = '1.5/ArrisFramework';
+    const VERSION = '1.6/ArrisFramework';
 
     const ALLOWED_RENDERS = array('html', 'json', 'null');
 
@@ -184,27 +185,10 @@ class Template
                 return "[ERROR] : {$this->template_real_filepath} not readable ";
             }
 
-            return \websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path );
+            return preg_replace('/^\h*\v+/m', '', \websun_parse_template_path( $this->template_data, $this->template_file, $this->template_path ));
         }
 
         return false;
-    }
-
-    public function test()
-    {
-        $t = new Template('', '');
-
-        $t->set('/body', [
-            'a' =>  '1',
-            'b' =>  '2'
-        ]);
-
-        $t->set('head/meta', [
-            'c' =>  '3',
-            'd' =>  '4'
-        ]);
-
-        var_dump($t->all());
     }
 
     public function dd()

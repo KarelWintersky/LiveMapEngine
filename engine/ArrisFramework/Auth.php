@@ -9,6 +9,7 @@ namespace Arris;
  *
  * Date: 20.09.2018, time: 12:55
  * Date: 11.10.2018, time: 12:15
+ * Date: 15.10.2018, time: 08:00 (added static current user field)
  */
 use PHPAuth\Config as PHPAuthConfig;
 use PHPAuth\Auth as PHPAuth;
@@ -21,7 +22,7 @@ use PHPAuth\Auth as PHPAuth;
  */
 class Auth
 {
-    const VERSION = '1.1/ArrisFramework';
+    const VERSION = '1.1.1/ArrisFramework';
 
     const GLUE = '/';
 
@@ -30,6 +31,8 @@ class Auth
     private static $_config;
 
     private static $_pdo;
+
+    public static $_current_user = null;
 
     /**
      *
@@ -67,6 +70,11 @@ class Auth
         $dbh = self::$_pdo;
         self::$_config = new PHPAuthConfig($dbh);
         self::$_instance = new PHPAuth($dbh, self::$_config);
+    }
+
+    // ! helper
+    public static function getCurrentUser() {
+        return self::$_instance->getCurrentUser();
     }
 
     /**

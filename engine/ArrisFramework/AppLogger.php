@@ -84,18 +84,20 @@ class AppLogger
 
         self::$_log = new Logger($channel);
 
+        $log_level = $config['loglevel'] ?? Logger::WARNING;
+
         switch ($config['handler']) {
 
             case 'file': {
                 $path = str_replace('$/', $_SERVER['DOCUMENT_ROOT'], $config['filepath']);
                 $name = $channel . '.log';
 
-                self::$_log->pushHandler(new StreamHandler($path . $name, Logger::WARNING));
+                self::$_log->pushHandler(new StreamHandler($path . $name, $log_level));
 
                 break;
             }
             case 'mysql': {
-                $log_handler = new Monolog\KWPDOHandler( DB::getConnection(), $channel, [], [], Logger::INFO);
+                $log_handler = new Monolog\KWPDOHandler( DB::getConnection(), $channel, [], [], $log_level);
                 self::$_log->pushHandler($log_handler);
 
                 break;
