@@ -2,6 +2,11 @@
     "name": "karelwintersky/livemap",
     "license": "MIT",
     "type": "project",
+    "config": {
+        "platform": {
+            "php": ">=7.1.0"
+        }
+    },
     "authors": [
         {
             "name": "Karel Wintersky",
@@ -22,6 +27,7 @@
         "monolog/monolog": "^1.23",
         "google/recaptcha": "^1.2",
         "robmorgan/phinx": "^0.10.6",
+        "karelwintersky/monolog-pdo-handler": "^0.2.0",
         "phpauth/phpauth": "dev-master"
     }
 }

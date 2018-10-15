@@ -14,42 +14,39 @@ require_once __DIR__ . '/engine/websun.php';
 $LME_ROOT = getenv( 'LME_INSTALL_PATH ');
 if ($LME_ROOT === false) $LME_ROOT = __DIR__;
 define('__ROOT__', $LME_ROOT);
+define('PATH_STORAGE',  __ROOT__ . '/storage/');
 
 use Pecee\SimpleRouter\SimpleRouter;
 use Arris\Config;
 use Arris\DB;
 use Arris\Template;
 use Arris\Auth;
+use Arris\AppLogger;
+
+//@todo HINT Получение данных из глобального конфига: Config::get('auth/cookies/new_registred_username');
+//@todo HINT Получение данных из конфига PHPAuth делается так: Auth::get(setting)
 
 try {
+    // load Config
     Config::init([
         'config/config.php'
     ]);
-    //@todo HINT Получение данных из глобального конфига: Config::get('auth/cookies/new_registred_username');
 
-    define('PATH_STORAGE',  __ROOT__ . '/storage/');
-
-
+    // init DB
     DB::init(NULL, Config::get('database'));
 
+    // init Auth wrapper
     Auth::init( DB::getConnection());
-    //@todo HINT Получение данных из конфига PHPAuth делается так: Auth::get(setting)
 
+    // init monolog
+    AppLogger::init( Config::get('monolog' ));
+
+
+    // start routing
     SimpleRouter::start();
 
 
-
-
-} catch (Exception $e) {
+} catch (PDOException | Exception $e) {
     die($e->getMessage());
 }
 
-die;
-
-// maps
-$all_maps = new MapsListRender('');
-$maps_list = $all_maps->run();
-
-// finish
-$content = $main_template->render();
-echo $content;
