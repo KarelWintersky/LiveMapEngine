@@ -13,8 +13,10 @@ require_once __DIR__ . '/engine/websun.php';
 
 $LME_ROOT = getenv( 'LME_INSTALL_PATH ');
 if ($LME_ROOT === false) $LME_ROOT = __DIR__;
+
 define('__ROOT__', $LME_ROOT);
 define('PATH_STORAGE',  __ROOT__ . '/storage/');
+define('__DEBUG__', false);
 
 use Pecee\SimpleRouter\SimpleRouter;
 use Arris\Config;
@@ -41,12 +43,12 @@ try {
     // init monolog
     AppLogger::init( Config::get('monolog' ));
 
-
     // start routing
     SimpleRouter::start();
 
 
 } catch (PDOException | Exception $e) {
-    die($e->getMessage());
+    AppLogger::error($e->getMessage());
+    die;
 }
 

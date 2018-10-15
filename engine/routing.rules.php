@@ -34,6 +34,10 @@ SimpleRouter::group([ 'where' => ['map_alias' => '[\w\d\.]+']], function (){
     SimpleRouter::get('/map:iframe/{map_alias}', 'MapView@view_map_iframe');
 
     SimpleRouter::get('/map:folio/{map_alias}', 'MapView@view_map_folio');
-});
 
+
+    // document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
+    SimpleRouter::get('/edit/region/{map_alias}/{region_id}', 'Pages@view_page_edit_region');
+
+});
 

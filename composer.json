@@ -17,9 +17,9 @@
         "files": [
         ],
         "psr-4": {
+            "LME\\"     : "engine/",
             "Arris\\"   : "engine/ArrisFramework",
-            "Livemap\\" : "engine/LivemapFramework",
-            "LME\\"     : "engine/"
+            "Livemap\\" : "engine/LivemapFramework"
         }
     },
     "require": {

@@ -86,3 +86,28 @@ function csrf_token(): ?string
 
     return null;
 }
+
+/**
+ * return IP
+ * @return array|false|string
+ */
+function getIp()
+{
+    if (getenv('HTTP_CLIENT_IP')) {
+        $ipAddress = getenv('HTTP_CLIENT_IP');
+    } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+        $ipAddress = getenv('HTTP_X_FORWARDED_FOR');
+    } elseif (getenv('HTTP_X_FORWARDED')) {
+        $ipAddress = getenv('HTTP_X_FORWARDED');
+    } elseif (getenv('HTTP_FORWARDED_FOR')) {
+        $ipAddress = getenv('HTTP_FORWARDED_FOR');
+    } elseif (getenv('HTTP_FORWARDED')) {
+        $ipAddress = getenv('HTTP_FORWARDED');
+    } elseif (getenv('REMOTE_ADDR')) {
+        $ipAddress = getenv('REMOTE_ADDR');
+    } else {
+        $ipAddress = '127.0.0.1';
+    }
+
+    return $ipAddress;
+}
