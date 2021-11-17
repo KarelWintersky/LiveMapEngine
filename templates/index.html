@@ -1,106 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
     <title>Живые карты</title>
-
-    <!-- Bootstrap CSS CDN -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <!-- Our Custom CSS -->
-    <link rel="stylesheet" href="/frontend/bootstap.css/with_simple_sidebar.css">
-
     <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
-
 </head>
 <body>
+<table border="1" width="100%">
+    <tr>
+        <td colspan="2">
+            {?!*authinfo.is_logged*}
+            <a id="action-login" href="#" data-action="/auth/login">Вход</a>
+            &mdash;
+            <a href="/auth/register">Регистрация</a>
+            {?}
 
+            {?*authinfo.is_logged*}
+            <a href="/auth/profile">Настройки аккаунта</a>
+            &mdash;
+            <a id="action-logout" href="#" data-action="/auth/logout">Выход</a>
 
-<div class="wrapper">
-    <!-- Sidebar Holder -->
-    <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3>Livemap</h3>
-        </div>
-        <ul class="list-unstyled components">
-            <li>
-                <a aria-expanded="#">Действия</a>
-                <ul class="list-unstyled" id="pageActionsSubmenu">
-                    {?!*authinfo.is_logged*}
-                    <li>
-                        <a id="actor-auth" href="#">Вход</a>
-                    </li>
-                    <li>
-                        <a href="/auth/register">Регистрация</a>
-                    </li>
-                    {?}
+            <div style="float:right; display: inline">{*authinfo.email*} ({*authinfo.ip*})</div>
 
-                    {?*authinfo.is_logged*}
-                    <li>
-                        <a href="/auth/profile">Настройки аккаунта</a>
-                    </li>
-                    <li>
-                        <a id="actor-auth" old-href="/auth/logout">Выход</a>
-                    </li>
-                    {?}
-                </ul>
-            </li>
-        </ul>
+            {?}
+        </td>
+    </tr>
+    <tr>
+        <td width="20%" valign="top">
+            <ul>
+                {%*maps_list*}
+                <li><a href="/map/{*maps_list:alias*}">{*maps_list:title*}</a></li>
+                {%}
+            </ul>
+        </td>
+        <td>
+            <iframe src="/map:iframe/pony?view=iframe" width="100%" height="500px" scrolling="no" frameborder="1"></iframe>
+        </td>
+    </tr>
+</table>
 
-        <ul class="list-unstyled">
-            <li>
-                <a aria-expanded="#">Карты</a>
-                <ul class="list-unstyled">
-                    {%*maps_list*}
-                    <li><a href="/map/{*maps_list:alias*}">{*maps_list:title*}</a></li>
-                    {%}
-                </ul>
-            </li>
-        </ul>
-
-
-        <small>
-            {?*authinfo.is_logged*}{*authinfo.email*} <br/> ({*authinfo.ip*}) {?}
-        </small>
-    </nav>
-
-    <!-- Page Content Holder -->
-    <div id="content">
-        <iframe src="/map/pony?view=iframe" width="100%" height="500px" scrolling="no" frameborder="1">
-        </iframe>
-        <div class="line"></div>
-
-        <h2 id="maps">Карты</h2>
-        <p>
-        <ul class="components">
-            {%*maps_list*}
-            <li><a href="/map/{*maps_list:alias*}">{*maps_list:title*}</a></li>
-            {%}
-        </ul>
-        </p>
-
-
-        <div class="line"></div>
-
-    </div>
-</div>
 
 
 <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="/frontend/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" id="bind-auth">
     /* Auth bind */
-    $('#actor-auth').on('click', function(){
+    $('#action-login').on('click', function(){
         $.colorbox({
-            href: '/auth',
+            href: $(this).data('action'),
             width: '30%',
-            height: '30%',
+            height: '20%',
             title: 'Login form'
         });
     });
+    $('#action-logout').on('click', function(){
+        $.colorbox({
+            href: $(this).data('action'),
+            width: '30%',
+            height: '20%',
+            title: 'Logout'
+        });
+    });
+
+
 </script>
 <div style="display:none">
     <div id="colorboxed-view" style="padding:10px; background:#fff;">

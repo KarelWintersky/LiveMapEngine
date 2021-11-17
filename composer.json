@@ -1,27 +1,33 @@
 {
     "name": "karelwintersky/livemap",
+    "license": "MIT",
     "type": "project",
+    "config": {
+        "platform": {
+            "php": ">=7.1.0"
+        }
+    },
     "authors": [
         {
             "name": "Karel Wintersky",
             "email": "karel.wintersky@gmail.com"
         }
     ],
-    "require": {
-        "pecee/simple-router": "3.4.10.1",
-        "monolog/monolog": "^1.23",
-        "google/recaptcha": "^1.1",
-        "robmorgan/phinx": "^0.9.2",
-        "phpmailer/phpmailer": "^6.0"
-    },
     "autoload": {
         "files": [
         ],
         "psr-4": {
-            "Arris\\"           : "engine/Arris",
-            "Arris\\Websun\\"   : "engine/Arris/Websun",
-            "Livemap\\"           : "engine/Livemap"
+            "LME\\"     : "engine/",
+            "Arris\\"   : "engine/ArrisFramework",
+            "Livemap\\" : "engine/LivemapFramework"
         }
+    },
+    "require": {
+        "pecee/simple-router": "4.2.0.5",
+        "monolog/monolog": "^1.23",
+        "google/recaptcha": "^1.2",
+        "robmorgan/phinx": "^0.10.6",
+        "karelwintersky/monolog-pdo-handler": "^0.2.0",
+        "phpauth/phpauth": "dev-master"
     }
-
 }
