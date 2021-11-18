@@ -13,8 +13,6 @@ ini_set('pcre.backtrack_limit', 1024*1024);
 define('__PATH_ROOT__', dirname(__DIR__, 1));
 define('__PATH_CONFIG__', __PATH_ROOT__ . '/_config/');
 require_once __PATH_ROOT__ . '/vendor/autoload.php';
-require_once __PATH_ROOT__ . '/App/core.functions.php';
-require_once __PATH_ROOT__ . '/App/routing.helpers.php';
 
 try {
     Dotenv::create( __PATH_CONFIG__, 'common.conf' )->load();
@@ -80,6 +78,7 @@ try {
         SimpleRouter::get('/map:folio/{map_alias}', 'MapsController@view_map_folio');
 
         // получить информацию по региону
+        SimpleRouter::get('/api/getRegionData/{map_alias}/{region_id}', 'RegionsController@view_region_info');
 
         // получить JS-файл описания разметки
         SimpleRouter::get('/js/map/{map_alias}.js', 'MapsController@get_js_map_definition');

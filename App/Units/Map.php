@@ -138,7 +138,7 @@ ORDER BY edit_date {$query_limit};
     {
         $user_id = Auth::getCurrentUser()['uid'];
         $current_role = ACL::getRole($user_id, $map_alias);
-    
+        
         return array_filter($regions_list, static function ($row) use ($current_role){
             return (bool)ACL::isValidRole( $current_role, $row[ 'is_publicity' ] );
         });
@@ -191,22 +191,18 @@ ORDER BY edit_date {$query_limit};
     public function getRegionsWithInfo($map_alias, $ids_list = '')
     {
         $in_subquery = !empty($ids_list) ? " AND id_region IN ({$ids_list})" : "";
-        $query_get_id = "
- SELECT id
- FROM map_data_regions AS mdr1
- WHERE `alias_map` = :alias_map AND
- `id` = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
- {$in_subquery}
- ORDER BY id_region
-        ";
-    
         try {
-            $sth = $this->pdo->prepare($query_get_id);
-            $sth->execute([
-                'alias_map' =>  $map_alias
-            ]);
+            $query = "
+SELECT id FROM map_data_regions AS mdr1
+ WHERE `alias_map` = :alias_map
+   AND id = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
+  {$in_subquery}
+ ORDER BY id_region";
+            $sth = $this->pdo->prepare($query);
+            $sth->bindParam('alias_map', $map_alias, PDO::PARAM_STR);
+            $sth->execute();
             $all_ids = $sth->fetchAll(\PDO::FETCH_COLUMN);
-        
+            
             if (empty($all_ids)) {
                 return [];
             }
@@ -257,7 +253,7 @@ SELECT
 
             }, $sth->fetchAll());*/
         } catch (\Exception | \PDOException $e) {
-        
+            dd($e->getMessage());
         }
     
         return $all_regions;

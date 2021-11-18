@@ -10,6 +10,8 @@
     ],
     "autoload": {
         "files": [
+            "App/routing.helpers.php",
+            "App/core.functions.php"
         ],
         "psr-4": {
             "Livemap\\" : "App/"

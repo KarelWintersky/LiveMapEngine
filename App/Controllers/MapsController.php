@@ -52,23 +52,22 @@ class MapsController
         $viewmode = filter_array_for_allowed($_GET, 'viewmode', $this->valid_view_modes, $viewmode);
         $viewmode = filter_array_for_allowed($_GET, 'view',     $this->valid_view_modes, $viewmode);
         
-        $this->map_alias = $map_alias;
         $map_config = [];
         
         Template::assign('map_alias', $map_alias);
         
         if (!empty($this->map_config->display->custom_css)) {
-            Template::assign('custom_css', "/storage/{$this->map_alias}/styles/{$this->map_config->display->custom_css}");
+            Template::assign('custom_css', "/storage/{$map_alias}/styles/{$this->map_config->display->custom_css}");
         }
         Template::assign('panning_step', $this->map_config->display->panning_step ?? 70);
         Template::assign('html_title', $this->map_config->title);
         Template::assign('html_callback', '/');
         
         // извлекает все регионы с информацией
-        $this->map_regions_with_info = $this->unit->getRegionsWithInfo( $this->map_alias, []);
+        $this->map_regions_with_info = $this->unit->getRegionsWithInfo( $map_alias, []);
     
         // фильтруем по доступности пользователю (is_publicity)
-        $this->map_regions_with_info = Map::checkRegionsVisibleByCurrentUser($this->map_regions_with_info, $this->map_alias);
+        $this->map_regions_with_info = Map::checkRegionsVisibleByCurrentUser($this->map_regions_with_info, $map_alias);
     
         // фильтруем по visibility
         $this->map_regions_with_info = Map::removeExcludedFromRegionsList($this->map_regions_with_info);
@@ -231,22 +230,20 @@ class MapsController
                 $paths_at_layer = $sp->getElementsAll();
         
                 // теперь нам нужны айдишники этих элементов на слое. Их надо проверить в БД и заполнить значениями кастомных полей из БД
-        
-        
-                $paths_at_layers_ids = implode(", ", array_map(function($item){
+                $paths_at_layers_ids = implode(", ", array_map( static function($item){
                     return "'{$item}'";
                 }, array_keys($paths_at_layer)));
         
                 // запросим БД на предмет кастомных значений и заполненности регионов
                 // $lm_engine = new LiveMapEngine( LMEConfig::get_dbi() );
                 $lm_engine = new Map();
-        
+                
                 // технически в функцию надо отдавать МАССИВ, а превращать его в строку внутри функции
-                $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $this->map_alias, $paths_at_layers_ids);
+                $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $map_alias, $paths_at_layers_ids );
         
                 // фильтруем по доступности пользователю (is_publicity)
-                // $paths_at_layer_filled = $lm_engine->checkRegionsVisibleByUser($paths_at_layer_filled, $this->map_alias);
-                $paths_at_layer_filled = Map::checkRegionsVisibleByCurrentUser($paths_at_layer_filled, $this->map_alias);
+                // $paths_at_layer_filled = $lm_engine->checkRegionsVisibleByUser($paths_at_layer_filled, $map_alias);
+                $paths_at_layer_filled = Map::checkRegionsVisibleByCurrentUser($paths_at_layer_filled, $map_alias);
         
                 foreach ($paths_at_layer_filled as $path_present) {
                     $id_region = $path_present['id_region'];

@@ -4,9 +4,8 @@ vendor
 config
 composer.lock
 
-.config/config.ini
-.config/db.ini
-.config/phpauth.ini
+_config
+_cache
 
 storage.tiles
 storage
