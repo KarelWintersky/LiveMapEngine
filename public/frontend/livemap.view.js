@@ -113,8 +113,8 @@ setup_MapCreateOverlay = function(map, theMap, bounds) {
  * @global map_alias, colorbox_width, colorbox_height
  */
 showContentColorbox = function(id_region , title) {
-    var is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
-    var url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region + is_iframe;
+    let is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
+    let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region + is_iframe;
 
     $.get( url, function() {
     }).done(function(data) {
@@ -140,15 +140,17 @@ do_LoadContent = function(id_region) {
 
     if (IS_DEBUG) console.log("Called do_LoadContent for " + id_region);
 
-    if (current_infobox_region_id != id_region) {
+    if (current_infobox_region_id !== id_region) {
         let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region;
+
+        $("#section-infobox-content").html('');
 
         $.get(url, function(){}).done(function(data){
             if (IS_DEBUG) console.log('data loaded, length ' + data.length);
 
             current_infobox_region_id = id_region;
 
-            $("#section-infobox-content").html('').html(data);
+            $("#section-infobox-content").html(data);
             document.getElementById('section-infobox-content').scrollTop = 0; // scroll box to top
         });
     }

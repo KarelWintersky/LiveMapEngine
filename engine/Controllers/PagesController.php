@@ -2,9 +2,9 @@
 
 namespace Livemap\Controllers;
 
-use Livemap\Auth;
 use Arris\Path;
 use Livemap\Template as Template;
+use Livemap\Units\Auth;
 
 class PagesController
 {
@@ -14,12 +14,13 @@ class PagesController
 
     public function view_page_frontpage()
     {
-        // $auth = Auth::getInstance();
-        // $userinfo = $auth->getCurrentSessionUserInfo();
+        $auth = Auth::getInstance();
+        $userinfo = $auth->getCurrentSessionUserInfo();
 
         Template::setGlobalTemplate('index.tpl');
 
         Template::assign('authinfo', []);
+        Template::assign('copyright', getenv('COPYRIGHT'));
 
         $maps_list = [];
         $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json')->toString();

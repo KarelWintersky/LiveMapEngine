@@ -2,16 +2,14 @@
 
 use Arris\AppLogger;
 use Arris\DB;
-use Arris\Path;
 use Dotenv\Dotenv;
 use Livemap\App;
 use Livemap\Template;
+use Livemap\Units\Auth;
 use Pecee\SimpleRouter\SimpleRouter;
 
-ini_set('pcre.backtrack_limit', 1024*1024);
-
 define('__PATH_ROOT__', dirname(__DIR__, 1));
-define('__PATH_CONFIG__', __PATH_ROOT__ . '/_config/');
+define('__PATH_CONFIG__', __PATH_ROOT__ . '/config/');
 require_once __PATH_ROOT__ . '/vendor/autoload.php';
 
 try {
@@ -23,6 +21,7 @@ try {
         'default_logfile_path'      => __PATH_ROOT__ . 'logs/',
         'default_logfile_prefix'    => '/' . date_format(date_create(), 'Y-m-d') . '__'
     ] );
+    
     DB::init(NULL, [
         'hostname'          =>  getenv('DB.HOST'),
         'database'          =>  getenv('DB.NAME'),
@@ -32,17 +31,21 @@ try {
         'charset'           =>  'utf8mb4',
         'charset_collate'   =>  'utf8mb4_general_ci',
     ], AppLogger::scope('pdo'));
+    
     $app->set('pdo', DB::getConnection());
     $app->pdo = DB::getConnection();
+    
+    Auth::init($app->pdo);
 
     $SMARTY = new Smarty();
-    $SMARTY->setTemplateDir( Path::create( getenv('PATH.INSTALL'))->join('templates')->toString(true) );
-    $SMARTY->setCompileDir( Path::create( getenv('PATH.INSTALL'))->join('_cache')->toString(true) );
+    $SMARTY->setTemplateDir( getenv('PATH.SMARTY_TEMPLATES') );
+    $SMARTY->setCompileDir( getenv('PATH.SMARTY_CACHE') );
     $SMARTY->setForceCompile(true);
 
     Template::init( $SMARTY );
     
     //@todo: добавить логгирование
+    //@todo: добавить Auth + PHPAuth
 
     /*AppRouter::init(AppLogger::addScope('router'));
     AppRouter::setDefaultNamespace('\EcoParser');
@@ -89,5 +92,5 @@ try {
     SimpleRouter::start();
 
 } catch (Exception $e) {
-    die($e->getMessage());
+    dump($e->getMessage());
 }

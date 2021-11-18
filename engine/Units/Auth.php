@@ -5,11 +5,7 @@ namespace Livemap\Units;
 /**
  * User: Karel Wintersky <karel.wintersky@gmail.com>
  *
- * Class Auth
- *
- * Date: 20.09.2018, time: 12:55
- * Date: 11.10.2018, time: 12:15
- * Date: 15.10.2018, time: 08:00 (added static current user field)
+ * Class Auth over PHPAuth
  */
 
 use PHPAuth\Config as PHPAuthConfig;
@@ -23,8 +19,6 @@ use PHPAuth\Auth as PHPAuth;
  */
 class Auth
 {
-    const VERSION = '1.1.1/ArrisFramework';
-
     const GLUE = '/';
 
     private static $_instance;
@@ -77,7 +71,7 @@ class Auth
 
     // ! helper
     public static function getCurrentUser() {
-        return true;
+        // return true;
         return self::$_instance->getCurrentUser();
     }
 
@@ -93,9 +87,9 @@ class Auth
     {
         if (method_exists(self::getInstance(), $name)) {
             return (self::getInstance())->{$name}(...$arguments);
-        } else {
-            throw new \Exception( "Static method {$name} not exists in class " . get_class(self::getInstance() ) );
         }
+    
+        throw new \Exception( "Static method {$name} not exists in class " . get_class(self::getInstance() ) );
     }
 
     /**
@@ -126,19 +120,10 @@ class Auth
 
     }
 
-    public static function dd()
-    {
-        echo '<pre>';
-
-        var_dump(self::$_config->config);
-        die;
-    }
-
     public static function unsetcookie($cookie_name)
     {
         unset($_COOKIE[$cookie_name]);
         setcookie($cookie_name, null, -1, '/');
     }
-
 
 }

@@ -10,8 +10,8 @@
     ],
     "autoload": {
         "files": [
-            "App/routing.helpers.php",
-            "App/core.functions.php"
+            "engine/routing.helpers.php",
+            "engine/core.functions.php"
         ],
         "psr-4": {
             "Livemap\\" : "engine/"
@@ -31,7 +31,8 @@
         "spatie/regex": "^1.4",
         "pecee/simple-router": "4.2.0.5",
         "phpauth/phpauth": "dev-master",
-        "smarty/smarty": "^3.1"
+        "smarty/smarty": "^3.1",
+        "symfony/var-dumper": "^5.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"
