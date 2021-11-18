@@ -38,7 +38,8 @@ class MapConfig
         $this->config_type = $mode;
     }
     
-    public function loadConfig(){
+    public function loadConfig():self
+    {
         
         switch ($this->config_type) {
             case 'file' : {
@@ -54,6 +55,8 @@ class MapConfig
         if ($this->error) {
             die( $this->error_message );
         }
+        
+        return $this;
     }
     
     public function getConfig(){

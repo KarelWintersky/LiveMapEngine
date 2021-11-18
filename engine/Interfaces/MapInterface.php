@@ -45,7 +45,7 @@ interface MapInterface
      * @param string|array $ids_list
      * @return array
      */
-    public function getRegionsWithInfo($map_alias, $ids_list = '');
+    public static function getRegionsWithInfo($map_alias, $ids_list = '');
 
     /* === STATIC METHODS === */
 

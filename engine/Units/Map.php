@@ -188,8 +188,13 @@ ORDER BY edit_date {$query_limit};
         return $success;
     }
 
-    public function getRegionsWithInfo($map_alias, $ids_list = '')
+    public static function getRegionsWithInfo($map_alias, $ids_list = '')
     {
+        /**
+         * @var PDO $pdo
+         */
+        $pdo = App::factory()->pdo;
+        
         $in_subquery = !empty($ids_list) ? " AND id_region IN ({$ids_list})" : "";
         try {
             $query = "
@@ -198,7 +203,7 @@ SELECT id FROM map_data_regions AS mdr1
    AND id = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
   {$in_subquery}
  ORDER BY id_region";
-            $sth = $this->pdo->prepare($query);
+            $sth = $pdo->prepare($query);
             $sth->bindParam('alias_map', $map_alias, PDO::PARAM_STR);
             $sth->execute();
             $all_ids = $sth->fetchAll(\PDO::FETCH_COLUMN);
@@ -228,13 +233,13 @@ SELECT
         
             $all_regions = [];
         
-            $sth = $this->pdo->prepare($query_data);
+            $sth = $pdo->prepare($query_data);
             $sth->execute([
                 'alias_map' =>  $map_alias
             ]);
         
             //@todo: HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
-            array_map(function($row) use (&$all_regions) {
+            array_map( static function($row) use (&$all_regions) {
                 $all_regions[ $row['id_region'] ] = $row;
             }, $sth->fetchAll());
         

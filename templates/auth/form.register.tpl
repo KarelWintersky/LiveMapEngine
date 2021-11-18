@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <title>Живые карты -- регистрация нового пользователя</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -78,13 +78,13 @@
                 <input type="password" size="15" id="reg_password_again" name="register:data:password_again">
             </td>
         </tr>
-        {?*strong_password_required*}
+        {if $strong_password_required}
         <tr>
             <td colspan="2">
                 <span class="hint">В пароле должна быть хотя бы 1 цифра, 1 строчная и 1 прописная буква.</span>
             </td>
         </tr>
-        {?}
+        {/if}
         <tr>
             <td colspan="2">
                 <button name="register:action:doit" value="register">Регистрация >>> </button>

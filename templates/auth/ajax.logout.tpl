@@ -1,6 +1,6 @@
 <br/>
 <div style="display: block; padding-left: 2em;">
-    You are logged in as <strong>{*is_logged_user*}</strong> from <strong>{*is_logged_user_ip*}</strong>
+    You are logged in as <strong>{$is_logged_user}</strong> from <strong>{$is_logged_user_ip}</strong>
     <br/>
     <form action="/auth/action:logout" method="post" id="form-logout">
         <table width="40%">

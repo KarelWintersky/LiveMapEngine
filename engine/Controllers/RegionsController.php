@@ -27,6 +27,50 @@ class RegionsController
         $this->logger = AppLogger::scope('main');
     }
     
+    public function view_region_info()
+    {
+        $map_alias = $_GET['map']   ?? NULL;
+        $id_region = $_GET['id']    ?? NULL;
+        $template  = $_GET['resultType'] ?? 'html';
+    
+        $region_data = (new Map())->getMapRegionData($map_alias, $id_region);
+        
+        Template::assign('is_present', $region_data['is_present']);
+        Template::assign('region_id', $id_region);
+        Template::assign('region_title', $region_data['title']);
+        Template::assign('region_text', $region_data['content']);
+        Template::assign('is_can_edit', $region_data['can_edit']);
+    
+        switch ($template) {
+            case 'iframe': {
+                $content = Template::render('view.region/view.region.iframe.tpl');
+                break;
+            }
+        
+            /*case 'json' : {
+                $render_type = 'json';
+                $template_file = 'view.region.json.html';
+            
+                $content = [
+                    'content'   =>  websun_parse_template_path($TEMPLATE_DATA, $template_file, $TEMPLATE_PATH),
+                    'title'     =>  ($region_data['is_present']) ? $region_data['title'] : ''
+                ];
+                break;
+            }*/
+            case 'fieldset': {
+                $content = Template::render('view.region/view.region.fieldset.tpl');
+                break;
+            }
+            default     : {
+                $content = Template::render('view.region/view.region.html.tpl');
+                break;
+            }
+        } // switch ($template)
+        
+        return $content;
+        
+    }
+    
     /**
      * @throws \Exception
      */

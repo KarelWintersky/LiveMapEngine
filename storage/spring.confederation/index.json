@@ -7,7 +7,8 @@
     "zoom_max": 2,
     "background_color"  : "transparent",
     "maxbounds": [[-0.5, -1], [1.5, 2]],
-    "cursor": "pointer"
+    "cursor": "pointer",
+    "viewmode": "infobox>regionbox"
   },
   "display_defaults": {
     "empty": {

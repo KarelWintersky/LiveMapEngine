@@ -103,6 +103,8 @@ class Template
         self::$template_global_file = $options[0] ?? null;
 
         self::$title_delimeter = " " . setOption($options, 'title_delimeter', '&#8250;') . " ";
+        
+        self::$JSON = new Dot();
 
         self::$logger
             = $logger instanceof Logger
@@ -138,6 +140,7 @@ class Template
     public static function assign($keys, $value = null, $nocache = false)
     {
         self::$smarty->assign($keys, $value, $nocache);
+        self::$JSON[ $key ] = $value;
     }
 
     /**
@@ -168,9 +171,13 @@ class Template
             $return = self::$smarty->fetch( self::$template_global_file );*/
         }
 
-        if ($clean) self::$smarty->clear_all_assign();
+        if ($clean) {
+            self::$smarty->clear_all_assign();
+        }
 
-        if (self::$mime_type) header("Content-Type: " . self::$mime_type);
+        if (self::$mime_type) {
+            header( "Content-Type: ".self::$mime_type );
+        }
 
         return $return;
     }

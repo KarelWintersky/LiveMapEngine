@@ -14,7 +14,7 @@
             "App/core.functions.php"
         ],
         "psr-4": {
-            "Livemap\\" : "App/"
+            "Livemap\\" : "engine/"
         }
     },
     "require": {

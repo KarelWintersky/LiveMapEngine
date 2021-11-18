@@ -23,15 +23,79 @@ class MapsController
         'nw-resize', 'se-resize', 'sw-resize', 'nesw-resize', 'nwse-resize'
     ];
     private $valid_view_modes = [
-        'colorbox', 'tabled:colorbox', 'folio', 'iframe', 'iframe:colorbox', 'wide:infobox>regionbox', 'wide:regionbox>infobox'
+        'colorbox', 'tabled:colorbox',
+        'folio',
+        'iframe', 'iframe:colorbox',
+        'wide:infobox>regionbox', 'wide:regionbox>infobox',
+        'infobox>regionbox', 'regionbox>infobox'
     ];
+    
+    /**
+     * @var mixed
+     */
+    private $mapViewMode;
+    /**
+     * @var array
+     */
+    private $mapRegionsWithInfo;
+    
+    /**
+     * @var string
+     */
+    private $mapRegionsWithInfo_IDS;
+    
+    /**
+     * @var stdClass
+     */
+    private $mapConfig;
+    
+    /**
+     * @var array
+     */
+    private $mapRegionWithInfoOrderByTitle;
+    /**
+     * @var array
+     */
+    private $mapRegionWithInfoOrderByDate;
     
     public function __construct()
     {
         $this->unit = new Map();
         $this->template_path = 'templates/view.map/';
+    }
+    
+    private function prepareMapData($map_alias)
+    {
+        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
         
+        if (!empty($this->mapConfig->display->viewmode)) {
+            $viewmode = $this->mapConfig->display->viewmode;
+        }
+        $viewmode = filter_array_for_allowed($_GET, 'viewmode', $this->valid_view_modes, $viewmode);
+        $viewmode = filter_array_for_allowed($_GET, 'view',     $this->valid_view_modes, $viewmode);
         
+        $this->mapViewMode = $viewmode;
+        
+        // извлекаем все регионы с информацией
+        $this->mapRegionsWithInfo = Map::getRegionsWithInfo( $map_alias, []);
+        
+        // фильтруем по доступности пользователю (is_publicity)
+        $this->mapRegionsWithInfo = Map::checkRegionsVisibleByCurrentUser($this->mapRegionsWithInfo, $map_alias);
+    
+        // фильтруем по visibility
+        $this->mapRegionsWithInfo = Map::removeExcludedFromRegionsList($this->mapRegionsWithInfo);
+        
+        $this->mapRegionsWithInfo_IDS = Map::convertRegionsWithInfo_to_IDs_String($this->mapRegionsWithInfo);
+        
+        $this->mapRegionWithInfoOrderByTitle = $this->mapRegionsWithInfo;
+        usort($this->mapRegionWithInfoOrderByTitle, static function($value1, $value2){
+            return ($value1['title'] > $value2['title']);
+        });
+    
+        $this->mapRegionWithInfoOrderByDate = $this->mapRegionsWithInfo;
+        usort($this->mapRegionWithInfoOrderByDate, static function($value1, $value2){
+            return ($value1['edit_date'] > $value2['edit_date']);
+        });
     }
     
     /**
@@ -43,50 +107,29 @@ class MapsController
      */
     public function view_map_fullscreen($map_alias)
     {
-        // $viewmode = 'wide:infobox>regionbox';
-    
-        if (!empty($map_config->display->viewmode)) {
-            $viewmode = $map_config->display->viewmode;
+        $this->prepareMapData($map_alias);
+        
+        if (empty($this->mapViewMode)) {
+            $this->mapViewMode = 'wide:regionbox>infobox';
         }
-        // перекрываем его из $_GET
-        $viewmode = filter_array_for_allowed($_GET, 'viewmode', $this->valid_view_modes, $viewmode);
-        $viewmode = filter_array_for_allowed($_GET, 'view',     $this->valid_view_modes, $viewmode);
-        
-        $map_config = [];
-        
+    
         Template::assign('map_alias', $map_alias);
         
-        if (!empty($this->map_config->display->custom_css)) {
-            Template::assign('custom_css', "/storage/{$map_alias}/styles/{$this->map_config->display->custom_css}");
+        if (!empty($this->mapConfig->display->custom_css)) {
+            Template::assign('custom_css', "/storage/{$map_alias}/styles/{$this->mapConfig->display->custom_css}");
         }
-        Template::assign('panning_step', $this->map_config->display->panning_step ?? 70);
-        Template::assign('html_title', $this->map_config->title);
+        
+        Template::assign('panning_step', $this->mapConfig->display->panning_step ?? 70);
+        Template::assign('html_title', $this->mapConfig->title);
         Template::assign('html_callback', '/');
         
-        // извлекает все регионы с информацией
-        $this->map_regions_with_info = $this->unit->getRegionsWithInfo( $map_alias, []);
-    
-        // фильтруем по доступности пользователю (is_publicity)
-        $this->map_regions_with_info = Map::checkRegionsVisibleByCurrentUser($this->map_regions_with_info, $map_alias);
-    
-        // фильтруем по visibility
-        $this->map_regions_with_info = Map::removeExcludedFromRegionsList($this->map_regions_with_info);
-        Template::assign('regions_with_content_ids', Map::convertRegionsWithInfo_to_IDs_String($this->map_regions_with_info));
-    
-        $regions_with_data_order_by_title = $this->map_regions_with_info;
-        usort($regions_with_data_order_by_title, function($value1, $value2){
-            return ($value1['title'] > $value2['title']);
-        });
-        $regions_with_data_order_by_date = $this->map_regions_with_info;
-        usort($regions_with_data_order_by_date, function($value1, $value2){
-            return ($value1['edit_date'] < $value2['edit_date']);
-        });
+        Template::assign('regions_with_content_ids', $this->mapRegionsWithInfo_IDS);
         
-        Template::assign('map_regions_order_by_title', $regions_with_data_order_by_title);
-        Template::assign('map_regions_order_by_date', $regions_with_data_order_by_date);
-        Template::assign('map_regions_count', count($this->map_regions_with_info));
+        Template::assign('map_regions_order_by_title', $this->mapRegionWithInfoOrderByTitle);
+        Template::assign('map_regions_order_by_date', $this->mapRegionWithInfoOrderByDate);
+        Template::assign('map_regions_count', count($this->mapRegionsWithInfo));
         
-        if ($viewmode === 'wide:infobox>regionbox') {
+        if ($this->mapViewMode === 'wide:infobox>regionbox' || $this->mapViewMode === 'infobox>regionbox') {
             Template::assign('section', [
                 'infobox_control_position'      =>  'topleft',
                 'regionbox_control_position'    =>  'topright',
@@ -102,6 +145,24 @@ class MapsController
         
         return Template::render('view.map/view.map.fullscreen.tpl');
     }
+    
+    /**
+     * Отрисовывает in-folio карту - без информационных окон
+     *
+     * @param $map_alias
+     * @return string
+     * @throws Exception
+     */
+    public function view_map_folio($map_alias)
+    {
+        $this->prepareMapData($map_alias);
+    
+        Template::assign('map_alias', $map_alias);
+        Template::assign('html_title', $this->mapConfig->title);
+        Template::assign('html_callback', '/');
+        
+        return Template::render('view.map/view.map.fullscreen.tpl');
+    }
 
     /**
      * Отрисовывает карту в ифрейме: попап сделан через колорбокс посередине экрана
@@ -111,18 +172,13 @@ class MapsController
      */
     public function view_map_iframe($map_alias)
     {
-        return "Show iframe map <strong>{$map_alias}</strong> in IFRAME";
-    }
-
-
-    /**
-     * Отрисовывает in-folio карту - без информационных окон
-     *
-     * @param $map_alias
-     * @return string
-     */
-    public function view_map_folio($map_alias) {
-        return "Show folio map <strong>{$map_alias}</strong> as FOLIO";
+        $this->prepareMapData($map_alias);
+    
+        Template::assign('map_alias', $map_alias);
+        Template::assign('html_title', $this->mapConfig->title);
+        Template::assign('html_callback', '/');
+    
+        return Template::render('view.map/view.map.iframe_colorbox.tpl');
     }
     
     /**
@@ -171,7 +227,7 @@ class MapsController
             }
     
             $svg_content = file_get_contents( $svg_filename );
-            if (strlen($svg_content) == 0) {
+            if ($svg_content === '') {
                 throw new Exception( "[JS Builder] Layout file is empty" );
             }
             /* =============== Layout ============ */
@@ -239,7 +295,7 @@ class MapsController
                 $lm_engine = new Map();
                 
                 // технически в функцию надо отдавать МАССИВ, а превращать его в строку внутри функции
-                $paths_at_layer_filled = $lm_engine->getRegionsWithInfo( $map_alias, $paths_at_layers_ids );
+                $paths_at_layer_filled = Map::getRegionsWithInfo( $map_alias, $paths_at_layers_ids );
         
                 // фильтруем по доступности пользователю (is_publicity)
                 // $paths_at_layer_filled = $lm_engine->checkRegionsVisibleByUser($paths_at_layer_filled, $map_alias);

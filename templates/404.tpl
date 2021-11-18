@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title></title>
-    <style type="text/css">
-    </style>
+    <title>404</title>
 </head>
 <body>
-<h2>{*error_message*}</h2>
+<h2>{$error_message}</h2>
 
 <a href="/">Назад к списку карт</a>
 </body>
