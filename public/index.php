@@ -78,7 +78,9 @@ try {
         SimpleRouter::get('/map:folio/{map_alias}', 'MapsController@view_map_folio');
 
         // получить информацию по региону
-        SimpleRouter::get('/api/getRegionData/{map_alias}/{region_id}', 'RegionsController@view_region_info');
+        // SimpleRouter::get('/api/getRegionData/{map_alias}/{region_id}', 'RegionsController@view_region_info');
+        
+        SimpleRouter::get('/api/get/regiondata', 'RegionsController@view_region_info');
 
         // получить JS-файл описания разметки
         SimpleRouter::get('/js/map/{map_alias}.js', 'MapsController@get_js_map_definition');

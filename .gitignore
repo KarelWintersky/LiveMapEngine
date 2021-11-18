@@ -1,11 +1,11 @@
 .idea
 
-vendor
-config
-composer.lock
+./vendor
+./config
+./composer.lock
 
-_config
-_cache
+./_config
+./_cache
 
-storage.tiles
-storage
+./storage.tiles
+./storage
