@@ -1,3 +1,9 @@
+livemap (1.0.2) stable; urgency=medium
+
+  * [*] build fix
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Fri, 19 Nov 2021 03:43:53 +0300
+
 livemap (1.0.1) stable; urgency=medium
 
   * [*] version fix

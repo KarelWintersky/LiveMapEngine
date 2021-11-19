@@ -46,7 +46,6 @@ install: 	##@system Install package. Don't run it manually!!!
 	cp -r public $(PATH_PROJECT)
 	cp -r templates $(PATH_PROJECT)
 	cp -r composer.json $(PATH_PROJECT)
-	cp -r composer.lock $(PATH_PROJECT)
 	git rev-parse --short HEAD > $(PATH_PROJECT)/_version
 	git log --oneline --format=%B -n 1 HEAD | head -n 1 >> $(PATH_PROJECT)/_version
 	git log --oneline --format="%at" -n 1 HEAD | xargs -I{} date -d @{} +%Y-%m-%d >> $(PATH_PROJECT)/_version
