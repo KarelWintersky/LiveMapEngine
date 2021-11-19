@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <title>Карта {$title_map}, редактирование региона {$id_region}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    {include file="_common/favicon_defs.tpl"}
 
     <link rel="stylesheet" type="text/css" href="/frontend/edit.region.css" />
 
@@ -73,8 +75,7 @@
         {
             m = (typeof mode != 'undefined') ? mode : true;
             tinyMCE.settings = config;
-            m
-                    ? tinyMCE.execCommand('mceAddEditor', true, elem)
+            m       ? tinyMCE.execCommand('mceAddEditor', true, elem)
                     : tinyMCE.execCommand('mceRemoveEditor', false, elem);
         }
     </script>

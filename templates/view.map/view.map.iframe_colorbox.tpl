@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{$html_title}</title>
+
+    {include file="_common/favicon_defs.tpl"}
+
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="/frontend/view.map.fullscreen.css" />
     {if !empty($custom_css)}

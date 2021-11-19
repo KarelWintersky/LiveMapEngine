@@ -2,6 +2,9 @@
 <html lang="ru">
 <head>
     <title>Живые карты -- регистрация нового пользователя</title>
+
+    {include file="_common/favicon_defs.tpl"}
+
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
         .hint {
