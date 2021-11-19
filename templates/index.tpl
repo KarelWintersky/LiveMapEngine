@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,11 +10,11 @@
 
     <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/frontend/bootstap.css/with_simple_sidebar.css">
+    <link rel="stylesheet" href="/frontend/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/frontend/bootstrap/with_simple_sidebar.css">
 
-    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/frontend/jquery/jquery-1.12.0.min.js"></script>
+    <script src="/frontend/bootstrap/bootstrap.min.js"></script>
     <script src="/frontend/colorbox/jquery.colorbox-min.js"></script>
     <script type="text/javascript" id="bind-auth">
         $('#actor-auth').on('click', function(){
