@@ -140,7 +140,7 @@ class Template
     public static function assign($keys, $value = null, $nocache = false)
     {
         self::$smarty->assign($keys, $value, $nocache);
-        self::$JSON[ $key ] = $value;
+        self::$JSON[ $keys ] = $value;
     }
 
     /**

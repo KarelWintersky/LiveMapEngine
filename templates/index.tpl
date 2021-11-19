@@ -85,13 +85,13 @@
 
         <h2 id="maps">Карты</h2>
         <p>
-        <ul class="components">
-            {foreach $maps_list as $map}
-                <li>
-                    <a href="/map/{$map.alias}">{$map.title}</a>
-                </li>
-            {/foreach}
-        </ul>
+            <ul class="components">
+                {foreach $maps_list as $map}
+                    <li>
+                        <a href="/map/{$map.alias}">{$map.title}</a>
+                    </li>
+                {/foreach}
+            </ul>
         </p>
 
 

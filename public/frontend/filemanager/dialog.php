@@ -31,7 +31,6 @@ if (isset($_GET['fldr'])
     $subdir = urldecode(trim(strip_tags($_GET['fldr']),"/") ."/");
 else
     $subdir = '';
-    
 //remember last position
 setcookie('last_position',$subdir,time() + (86400 * 7)); 
 
