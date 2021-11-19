@@ -4,8 +4,6 @@
 ./config
 ./composer.lock
 
-./_config
-./_cache
-
 ./storage.tiles
 ./storage
+./public/storage

@@ -10,9 +10,13 @@ use Pecee\SimpleRouter\SimpleRouter;
 
 define('__PATH_ROOT__', dirname(__DIR__, 1));
 define('__PATH_CONFIG__', __PATH_ROOT__ . '/config/');
-require_once __PATH_ROOT__ . '/vendor/autoload.php';
 
 try {
+    if (!is_file(__PATH_ROOT__ . '/vendor/autoload.php')) {
+        throw new RuntimeException("[FATAL ERROR] No 3rd-party libraries installed.");
+    }
+    require_once __PATH_ROOT__ . '/vendor/autoload.php';
+    
     Dotenv::create( __PATH_CONFIG__, 'common.conf' )->load();
 
     $app = App::factory();
@@ -92,5 +96,9 @@ try {
     SimpleRouter::start();
 
 } catch (Exception $e) {
-    dump($e->getMessage());
+    if (function_exists('dump')) {
+        dump($e->getMessage());
+    } else {
+        die( $e->getMessage() );
+    }
 }
