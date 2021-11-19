@@ -43,6 +43,7 @@ setup_env:	##@localhost Setup environment at localhost
 install: 	##@system Install package. Don't run it manually!!!
 	@echo Installing...
 	install -d $(PATH_PROJECT)
+	cp -r admin.cron $(PATH_PROJECT)
 	cp -r engine $(PATH_PROJECT)
 	cp -r public $(PATH_PROJECT)
 	cp -r templates $(PATH_PROJECT)
