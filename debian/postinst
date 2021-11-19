@@ -1,0 +1,77 @@
+#!/bin/sh
+
+set -e
+ANSI_RED='\033[0;31m'
+ANSI_GREEN='\033[0;32m'
+ANSI_YELLOW='\033[1;33m'
+ANSI_RESET='\033[0m'
+
+PATH_PROJECT=/var/www/livemap
+PATH_STORAGE=/var/www/livemap.storage
+PATH_PUBLIC=/var/www/livemap/public
+PATH_CONFIG=${PATH_PROJECT}/config
+
+PATH_CACHE_SMARTY=/dev/shm/livemap_cache_smarty/
+PATH_CACHE_NGINX=/dev/shm/livemap_cache_fastcgi/
+
+case "$1" in
+    configure)
+        echo "\n ${ANSI_YELLOW} Running LIVEMAP post-install tasks... ${ANSI_RESET} \n"
+
+        echo "Checking _ENV config... "
+        if [ -e "${PATH_CONFIG}/common.conf" ]; then
+            echo "${ANSI_GREEN} COMMON.CONF file found ${ANSI_RESET}";
+        else
+            echo "${ANSI_RED} COMMON.CONF file not found! ${ANSI_RESET}" ;
+        fi
+
+        echo "Checking symlink from '${PATH_STORAGE}' to 'public/' directory"
+        if [ ! -L "${PATH_PUBLIC}/storage" ] ; then
+            ln -s ${PATH_STORAGE} ${PATH_PUBLIC}/storage ;
+            echo "${ANSI_YELLOW} Created. ${ANSI_RESET}"
+        else
+            echo "${ANSI_GREEN} Present. ${ANSI_RESET}"
+        fi
+
+        echo "Cleaning SMARTY Cache..."
+        if [ -d "${PATH_CACHE_SMARTY}" ]; then
+            rm -f ${PATH_CACHE_SMARTY}/*
+            echo "${ANSI_GREEN} Cleared. ${ANSI_RESET}"
+        fi
+
+        echo "Validating and clearing nginx cache..."
+        if [ ! -d "${PATH_CACHE_NGINX}" ]; then
+            mkdir -p ${PATH_CACHE_NGINX} ;
+            echo "${ANSI_YELLOW} Created. ${ANSI_RESET}"
+        else
+            rm -rf ${PATH_CACHE_NGINX}/*
+            echo "${ANSI_GREEN} Present and cleared. ${ANSI_RESET}"
+        fi
+        chown www-data:www-data ${PATH_CACHE_NGINX}
+
+        echo "Fixing access rights..."
+        chown -R www-data:www-data ${PATH_PROJECT}/public
+        chown -R www-data:www-data ${PATH_PROJECT}/logs
+        chown -R www-data:www-data ${PATH_PROJECT}/config
+        chown -R www-data:www-data ${PATH_PROJECT}/cache
+        chown -R www-data:www-data ${PATH_PROJECT}/storage
+        echo "${ANSI_GREEN} Ok. ${ANSI_RESET}"
+
+        echo
+        echo "${ANSI_YELLOW} ... post-install finished. ${ANSI_RESET}"
+        echo
+
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

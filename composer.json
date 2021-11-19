@@ -2,11 +2,6 @@
     "name": "karelwintersky/livemap",
     "license": "MIT",
     "type": "project",
-    "config": {
-        "platform": {
-            "php": ">=7.1.0"
-        }
-    },
     "authors": [
         {
             "name": "Karel Wintersky",
@@ -15,19 +10,31 @@
     ],
     "autoload": {
         "files": [
+            "engine/routing.helpers.php",
+            "engine/core.functions.php"
         ],
         "psr-4": {
-            "LME\\"     : "engine/",
-            "Arris\\"   : "engine/ArrisFramework",
-            "Livemap\\" : "engine/LivemapFramework"
+            "Livemap\\" : "engine/"
         }
     },
     "require": {
+        "php": ">=7.3",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-mbstring": "*",
+        "ext-libxml": "*",
+        "ext-simplexml": "*",
+        "vlucas/phpdotenv": "^3.3",
+        "karelwintersky/arris": "^1.65",
+        "karelwintersky/arris.helpers": "^0.4.0",
+        "psr/log": "^1.1",
+        "spatie/regex": "^1.4",
         "pecee/simple-router": "4.2.0.5",
-        "monolog/monolog": "^1.23",
-        "google/recaptcha": "^1.2",
-        "robmorgan/phinx": "^0.10.6",
-        "karelwintersky/monolog-pdo-handler": "^0.2.0",
-        "phpauth/phpauth": "dev-master"
+        "phpauth/phpauth": "dev-master",
+        "smarty/smarty": "^3.1",
+        "symfony/var-dumper": "^5.3"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
     }
 }

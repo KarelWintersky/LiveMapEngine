@@ -1,12 +1,9 @@
 .idea
 
-vendor
-config
-composer.lock
+./vendor
+./config
+./composer.lock
 
-.config/config.ini
-.config/db.ini
-.config/phpauth.ini
-
-storage.tiles
-storage
+./storage.tiles
+./storage
+./public/storage

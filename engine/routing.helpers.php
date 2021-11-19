@@ -20,26 +20,26 @@ use Pecee\Http\Request;
  * @param string|null $name
  * @param string|array|null $parameters
  * @param array|null $getParams
- * @return \Pecee\Http\Url
- * @throws \InvalidArgumentException
+ * @return Url
+ * @throws InvalidArgumentException
  */
-function url(?string $name = null, $parameters = null, ?array $getParams = null): Url
+function _url(?string $name = null, $parameters = null, ?array $getParams = null): Url
 {
     return Router::getUrl($name, $parameters, $getParams);
 }
 
 /**
- * @return \Pecee\Http\Response
+ * @return Response
  */
-function response(): Response
+function _response(): Response
 {
     return Router::response();
 }
 
 /**
- * @return \Pecee\Http\Request
+ * @return Request
  */
-function request(): Request
+function _request(): Request
 {
     return Router::request();
 }
@@ -51,33 +51,33 @@ function request(): Request
  * @param array ...$methods Default methods
  * @return \Pecee\Http\Input\InputHandler|array|string|null
  */
-function input($index = null, $defaultValue = null, ...$methods)
+function _input($index = null, $defaultValue = null, ...$methods)
 {
     if ($index !== null) {
-        return request()->getInputHandler()->value($index, $defaultValue, ...$methods);
+        return _request()->getInputHandler()->value($index, $defaultValue, ...$methods);
     }
 
-    return request()->getInputHandler();
+    return _request()->getInputHandler();
 }
 
 /**
  * @param string $url
  * @param int|null $code
  */
-function redirect(string $url, ?int $code = null): void
+function _redirect(string $url, ?int $code = null): void
 {
     if ($code !== null) {
-        response()->httpCode($code);
+        _response()->httpCode($code);
     }
 
-    response()->redirect($url);
+    _response()->redirect($url);
 }
 
 /**
  * Get current csrf-token
  * @return string|null
  */
-function csrf_token(): ?string
+function _csrf_token(): ?string
 {
     $baseVerifier = Router::router()->getCsrfVerifier();
     if ($baseVerifier !== null) {
@@ -87,27 +87,3 @@ function csrf_token(): ?string
     return null;
 }
 
-/**
- * return IP
- * @return array|false|string
- */
-function getIp()
-{
-    if (getenv('HTTP_CLIENT_IP')) {
-        $ipAddress = getenv('HTTP_CLIENT_IP');
-    } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-        $ipAddress = getenv('HTTP_X_FORWARDED_FOR');
-    } elseif (getenv('HTTP_X_FORWARDED')) {
-        $ipAddress = getenv('HTTP_X_FORWARDED');
-    } elseif (getenv('HTTP_FORWARDED_FOR')) {
-        $ipAddress = getenv('HTTP_FORWARDED_FOR');
-    } elseif (getenv('HTTP_FORWARDED')) {
-        $ipAddress = getenv('HTTP_FORWARDED');
-    } elseif (getenv('REMOTE_ADDR')) {
-        $ipAddress = getenv('REMOTE_ADDR');
-    } else {
-        $ipAddress = '127.0.0.1';
-    }
-
-    return $ipAddress;
-}
