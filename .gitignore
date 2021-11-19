@@ -7,3 +7,6 @@
 ./storage.tiles
 ./storage
 ./public/storage
+
+./debian/livemap/*
+./debian/livemap.debhelper.log
