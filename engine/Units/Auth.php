@@ -70,8 +70,8 @@ class Auth
     }
 
     // ! helper
-    public static function getCurrentUser() {
-        // return true;
+    public static function getCurrentUser()
+    {
         return self::$_instance->getCurrentUser();
     }
 

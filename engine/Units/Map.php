@@ -37,7 +37,11 @@ class Map implements MapInterface
      */
     public function getMapRegionData($map_alias, $id_region):array
     {
-        $user_id = Auth::getCurrentUser()['uid'];
+        $user_id = Auth::getCurrentUser();
+        $user_id
+            = $user_id
+            ? $user_id['uid']
+            : ACL::USERID_SUPERADMIN;
         $role = ACL::getRole($user_id, $map_alias);
 
         $role_can_edit = ACL::isValidRole( $role, 'EDITOR');
@@ -136,7 +140,12 @@ ORDER BY edit_date {$query_limit};
 
     public static function checkRegionsVisibleByCurrentUser($regions_list, $map_alias)
     {
-        $user_id = Auth::getCurrentUser()['uid'];
+        $user_id = Auth::getCurrentUser();
+        $user_id
+            = $user_id
+            ? $user_id['uid']
+            : ACL::USERID_SUPERADMIN;
+        
         $current_role = ACL::getRole($user_id, $map_alias);
         
         return array_filter($regions_list, static function ($row) use ($current_role){
