@@ -10,6 +10,7 @@ PATH_PROJECT=/var/www/livemap
 PATH_STORAGE=/var/www/livemap.storage
 PATH_PUBLIC=/var/www/livemap/public
 PATH_CONFIG=${PATH_PROJECT}/config
+PATH_STORAGE_LINKED=${PATH_PUBLIC}/storage
 
 PATH_CACHE_SMARTY=/dev/shm/livemap_cache_smarty/
 PATH_CACHE_NGINX=/dev/shm/livemap_cache_fastcgi/
@@ -25,9 +26,9 @@ case "$1" in
             echo "${ANSI_RED} COMMON.CONF file not found! ${ANSI_RESET}" ;
         fi
 
-        echo "Checking symlink from '${PATH_STORAGE}' to 'public/' directory"
-        if [ ! -L "${PATH_PUBLIC}/storage" ] ; then
-            ln -s ${PATH_STORAGE} ${PATH_PUBLIC}/storage ;
+        echo "Checking symlink from '${PATH_STORAGE}' to '${PATH_STORAGE_LINKED}' directory"
+        if [ ! -L "${PATH_STORAGE_LINKED}" ] ; then
+            ln -s ${PATH_STORAGE} ${PATH_STORAGE_LINKED} ;
             echo "${ANSI_YELLOW} Created. ${ANSI_RESET}"
         else
             echo "${ANSI_GREEN} Present. ${ANSI_RESET}"
@@ -50,11 +51,7 @@ case "$1" in
         chown www-data:www-data ${PATH_CACHE_NGINX}
 
         echo "Fixing access rights..."
-        chown -R www-data:www-data ${PATH_PROJECT}/public
-        chown -R www-data:www-data ${PATH_PROJECT}/logs
-        chown -R www-data:www-data ${PATH_PROJECT}/config
-        chown -R www-data:www-data ${PATH_PROJECT}/cache
-        chown -R www-data:www-data ${PATH_PROJECT}/storage
+        chown -R www-data:www-data ${PATH_PROJECT}/*
         echo "${ANSI_GREEN} Ok. ${ANSI_RESET}"
 
         echo
