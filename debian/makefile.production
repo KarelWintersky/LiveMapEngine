@@ -24,7 +24,7 @@ help:               ##@help Help :)
 
 backup:		##@backup Make backup immediatly
 	/bin/bash ./admin.cron/backup-db.sh
-	/bin/bash ./admin.cron/backup-site.sh
+	/bin/bash ./admin.cron/backup-files.sh
 
 
 # ------------------------------------------------
