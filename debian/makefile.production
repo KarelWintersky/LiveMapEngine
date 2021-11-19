@@ -22,6 +22,11 @@ help:               ##@help Help :)
 #	@sudo -u www-data php $(INSTALL_PATH)/admin.tools/tool.rebuild_rt_indexes.php
 #	@echo Ok.
 
+backup:		##@backup Make backup immediatly
+	/bin/bash ./admin.cron/backup-db.sh
+	/bin/bash ./admin.cron/backup-site.sh
+
+
 # ------------------------------------------------
 # Add the following 'help' target to your makefile, add help text after each target name starting with '\#\#'
 # A category can be added with @category

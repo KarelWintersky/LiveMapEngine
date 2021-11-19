@@ -7,4 +7,7 @@ Interactive wikimapia-like maps for tabletop roleplaying games and educational p
 ```shell
 ```
 
+# Cron tasks
+
+
 

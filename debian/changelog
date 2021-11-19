@@ -1,3 +1,11 @@
+livemap (1.0.6) stable; urgency=medium
+
+  * [+] backup scripts
+  * [+] cron task
+  * [+] readme for backup configs
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Fri, 19 Nov 2021 05:54:45 +0300
+
 livemap (1.0.5) stable; urgency=medium
 
   * [*] build fix
