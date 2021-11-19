@@ -7,5 +7,5 @@ Standards-Version: 3.9.8
 
 Package: livemap
 Architecture: all
-Depends: mysql-server | default-mysql-server, nginx-full, php-common, php-cli, php-curl, php-fpm, php-gd, php-json, php-mbstring, php-pdo
+Depends: mysql-server | default-mysql-server, nginx, php-common, php-cli, php-curl, php-fpm, php-gd, php-json, php-mbstring, php-pdo, php-xml
 Description: Livemap Engine
