@@ -85,7 +85,7 @@ class Map extends \Livemap\AbstractClass
         // $this->mapRegionsWithInfo = Map::checkRegionsVisibleByCurrentUser($this->mapRegionsWithInfo, $map_alias);
 
         // фильтруем по visibility ????
-        // $this->mapRegionsWithInfo = Map::removeExcludedFromRegionsList($this->mapRegionsWithInfo);
+        $this->mapRegionsWithInfo = Map::removeExcludedFromRegionsList($this->mapRegionsWithInfo);
 
         $this->mapRegionsWithInfo_IDS = self::convertRegionsWithInfo_to_IDs_String($this->mapRegionsWithInfo);
 
@@ -101,7 +101,8 @@ class Map extends \Livemap\AbstractClass
     }
 
     /**
-     * Возвращает список регионов с информацией ?
+     * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
+     * Входные параметры: алиас карты и список айдишников.
      *
      * @param $map_alias
      * @param $ids_list
@@ -180,6 +181,15 @@ SELECT
         return $all_regions;
     }
 
+    /**
+     * Проходит по массиву регионов и видимость региона для текущего пользователя на основе прав доступа к контенту
+     *
+     * Не реализовано
+     *
+     * @param $regions_list
+     * @param $map_alias
+     * @return mixed
+     */
     public static function checkRegionsVisibleByCurrentUser($regions_list, $map_alias)
     {
         /*$user_id = Auth::getCurrentUser();
@@ -197,6 +207,8 @@ SELECT
     }
 
     /**
+     * Временная функция, фильтрующая массив регионов с данными.
+     * Фильтр не проходят регионы, имеющие is_excludelists отличный от NEVER
      *
      * @param $regions_list
      * @return array
@@ -293,6 +305,14 @@ SELECT
         return $info;
     }
 
+    /**
+     * Сохраняет информацию по региону для карты со слоем разметки.
+     *
+     * @param string $map_alias
+     * @param string $region_id
+     * @param array $request
+     * @return Result
+     */
     public function storeMapRegionData(string $map_alias, string $region_id, array $request):Result
     {
         $result = new Result();
@@ -336,6 +356,8 @@ SELECT
     }
 
     /**
+     * Получает массив ревизий (версий контента) региона для карты
+     *
      * @todo: переделать
      *
      * @param $map_alias

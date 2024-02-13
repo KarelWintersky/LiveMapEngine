@@ -1,21 +1,15 @@
 <?php
 
+namespace Livemap\Units;
 
 use Livemap\App;
+use PDO;
 
-class ACL
+class ACL extends \Livemap\AbstractClass
 {
     const USERID_SUPERADMIN = 1;
 
     const ROLE_TO_POWER = [
-        /*
-        'ANYONE'        =>  0,
-        'VISITOR'       =>  1,
-        'EDITOR'        =>  2,
-        'OWNER'         =>  3,
-        'ROOT'          =>  4,
-        */
-
         'ANYONE'        =>  0,
         'VISITOR'       =>  1,
         'EDITOR'        =>  10,
@@ -101,7 +95,7 @@ class ACL
 
         return 'ANYONE';
     }
-    
+
     /**
      * @param $first_role
      * @param $second_role
@@ -112,13 +106,12 @@ class ACL
         if (!array_key_exists($first_role, self::ROLE_TO_POWER)) {
             return false;
         }
-        
+
         if (!array_key_exists($second_role, self::ROLE_TO_POWER)) {
             return false;
         }
 
         return ( self::ROLE_TO_POWER[$first_role] >= self::ROLE_TO_POWER[$second_role] );
     }
-
 
 }
