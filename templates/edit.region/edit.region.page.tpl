@@ -12,27 +12,30 @@
     <script type="text/javascript" src="/frontend/jquery/jquery-3.2.1_min.js"></script>
     <script type="text/javascript" src="/frontend/tinymce/tinymce.min.js"></script>
     <script type="text/javascript" id="define">
-        var tiny_config = {
-            theme               : "modern",
-            skin                : "lightgray",
-            language            : 'ru',
+        window.editor_config = {
+            success_edit_timeout: 1000
+        };
+        const tiny_config = {
+            theme: "modern",
+            skin: "lightgray",
+            language: 'ru',
 
-            forced_root_block   : "",
-            force_br_newlines   : true,
-            force_p_newlines    : false,
+            forced_root_block: "",
+            force_br_newlines: true,
+            force_p_newlines: false,
 
             height: 300,
 
-            plugins: [ "advlist lists autolink link image anchor responsivefilemanager charmap insertdatetime paste searchreplace contextmenu code textcolor template hr pagebreak table print preview wordcount visualblocks visualchars legacyoutput" ],
+            plugins: ["advlist lists autolink link image anchor responsivefilemanager charmap insertdatetime paste searchreplace contextmenu code textcolor template hr pagebreak table print preview wordcount visualblocks visualchars legacyoutput"],
             formats: {
-                strikethrough   : { inline : 'del' },
-                underline       : { inline : 'span', 'classes' : 'underline', exact : true}
+                strikethrough: {inline: 'del'},
+                underline: {inline: 'span', 'classes': 'underline', exact: true}
             },
 
             insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
-            contextmenu     : "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
-            toolbar1        : "undo redo | bold italic underline subscript superscript strikethrough | fontsizeselect styleselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | ",
-            toolbar2        : "responsivefilemanager image | template table charmap | link unlink anchor | pastetext removeformat | preview",
+            contextmenu: "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
+            toolbar1: "undo redo | bold italic underline subscript superscript strikethrough | fontsizeselect styleselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | ",
+            toolbar2: "responsivefilemanager image | template table charmap | link unlink anchor | pastetext removeformat | preview",
 
             // charmap https://www.tinymce.com/docs/plugins/charmap/
             // https://stackoverflow.com/a/22156412/5127037
@@ -44,31 +47,32 @@
             ],
 
             // responsive filemanager
-            relative_urls       : false,
-            document_base_url   : "/",
-            external_filemanager_path:  "/frontend/filemanager/",
-            filemanager_title   : "Responsive Filemanager" ,
-            external_plugins    : {
-                "filemanager"   : "/frontend/filemanager/plugin.js"
+            relative_urls: false,
+            document_base_url: "/",
+            external_filemanager_path: "/frontend/filemanager/",
+            filemanager_title: "Responsive Filemanager",
+            external_plugins: {
+                "filemanager": "/frontend/filemanager/plugin.js"
             },
-            paste_as_text       : true,
+            paste_as_text: true,
 
-            templates           : [
+            templates: [
                 {foreach $edit_templates as $template}
                 {
-                    "title"         :   "{$template.title}",
-                    "description"   :   "{$template.desc}",
-                    "url"           :   "{$template.url}"
-                }
+                    "title": "{$template.title}",
+                    "description": "{$template.desc}",
+                    "url": "{$template.url}"
+                },
                 {/foreach}
             ],
 
             {if $edit_templates_options}
-            template_popup_width    : {$edit_templates_options.template_popup_width},
-            template_popup_height   : {$edit_templates_options.template_popup_height},
-            content_css             : "{$edit_templates_options.content_css}"
+            template_popup_width: {$edit_templates_options.template_popup_width},
+            template_popup_height: {$edit_templates_options.template_popup_height},
+            content_css: "{$edit_templates_options.content_css}"
             {/if}
         };
+
         // add markdown and simple configs
 
         function tinify(config, elem, mode)
@@ -93,7 +97,7 @@
             });
             // Аякс-обработчик сохранения, спиннер, вывод результата. Не забываем на время обработки дизейблить кнопки, а при ошибке - энэйблить.
             $("#form-edit-region").on('submit', function(){
-                var url = $(this).attr('action');
+                let url = $(this).attr('action');
                 if (saving_in_progress) return false;
 
                 $.ajax({
@@ -106,26 +110,25 @@
                     beforeSend  : function(){
                         saving_in_progress = true;
                         $("#ajax-process").show();
+
                         // disable buttons
                         $("#actor-submit").prop('disabled', true);
                         $("#actor-back").prop('disabled', true);
                     },
-                    success     : function(result){
-                        if (result['state']) {
-                            // state = TRUE (saving successfull)
+                    success     : function(answer){
+                        if (answer['is_success']) {
                             $("#ajax-result").show();
                             setTimeout(function(){
                                 window.location.replace("{$html_callback}")
-                            }, 2000);
+                            }, window.editor_config.success_edit_timeout);
                         } else {
                             saving_in_progress = false;
-                            $("#ajax-result").show().html( result['message'] );
+                            $("#ajax-result").show().html( answer['message'] );
                             // enable buttons
                             $("#actor-submit").removeAttr('disabled');
                             $("#actor-back").removeAttr('disabled');
                         }
                     }
-
                 });
                 return false;
             });
@@ -136,7 +139,7 @@
 <body>
 <h3 style="margin-bottom: 1px">Регион {if $is_present}{$region_title}{else}{$id_region}{/if}</h3>
 
-<form action="/api/put/regiondata?map={$alias_map}&id={$id_region}" method="post" id="form-edit-region">
+<form {*action="/api/put/regiondata?map={$alias_map}&id={$id_region}"*} action="{$form_actor}" method="post" id="form-edit-region">
     <input type="hidden" name="edit:id:map"     value="{$id_map}">
     <input type="hidden" name="edit:id:region"  value="{$id_region}">
     <input type="hidden" name="edit:alias:map"  value="{$alias_map}">
@@ -160,7 +163,7 @@
                     <select name="edit:is:excludelists">
                         <option value="N"{if $is_exludelists eq "N"} selected{/if}>Во всех</option>
                         <option value="F"{if $is_exludelists eq "F"} selected{/if}>Только слоя</option>
-                        <option value="A"{if $is_exludelists eq"A"} selected{/if}>Нигде</option>
+                        <option value="A"{if $is_exludelists eq "A"} selected{/if}>Нигде</option>
                     </select>
                 </label>
             </td>
@@ -203,7 +206,7 @@
             <button type="submit" id="actor-submit" tabindex="7">Сохранить</button>
             <span id="ajax-process" style="display: none">
                 Сохраняю... &nbsp;
-                <img src="/frontend/images.spinners/21.svg" height="18"/>
+                <img src="/frontend/images.spinners/21.svg" height="18" alt="ready"/>
             </span>
             <span id="ajax-result" style="display: none;">Сохранение успешно! Через несколько секунд возвращаемся на карту.</span>
             <button type="button" id="actor-back" style="float:right" tabindex="8">Назад на карту</button>

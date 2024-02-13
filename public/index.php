@@ -1,104 +1,156 @@
 <?php
 
 use Arris\AppLogger;
-use Arris\DB;
+use Arris\AppRouter;
 use Dotenv\Dotenv;
 use Livemap\App;
-use Livemap\Template;
-use Livemap\Units\Auth;
-use Pecee\SimpleRouter\SimpleRouter;
 
 define('__PATH_ROOT__', dirname(__DIR__, 1));
-define('__PATH_CONFIG__', __PATH_ROOT__ . '/config/');
+define('__PATH_CONFIG__', '/etc/arris/livemap/');
+
+if (!session_id()) @session_start();
 
 try {
     if (!is_file(__PATH_ROOT__ . '/vendor/autoload.php')) {
         throw new RuntimeException("[FATAL ERROR] No 3rd-party libraries installed.");
     }
     require_once __PATH_ROOT__ . '/vendor/autoload.php';
-    
+
     Dotenv::create( __PATH_CONFIG__, 'common.conf' )->load();
 
     $app = App::factory();
 
-    AppLogger::init('Livemap', bin2hex(random_bytes(8)), [
-        'default_logfile_path'      => __PATH_ROOT__ . 'logs/',
-        'default_logfile_prefix'    => '/' . date_format(date_create(), 'Y-m-d') . '__'
-    ] );
-    
-    DB::init(NULL, [
-        'hostname'          =>  getenv('DB.HOST'),
-        'database'          =>  getenv('DB.NAME'),
-        'username'          =>  getenv('DB.USERNAME'),
-        'password'          =>  getenv('DB.PASSWORD'),
-        'port'              =>  getenv('DB.PORT'),
-        'charset'           =>  'utf8mb4',
-        'charset_collate'   =>  'utf8mb4_general_ci',
-    ], AppLogger::scope('pdo'));
-    
-    $app->set('pdo', DB::getConnection());
-    $app->pdo = DB::getConnection();
-    
-    Auth::init($app->pdo);
+    App::init();
 
-    $SMARTY = new Smarty();
-    $SMARTY->setTemplateDir( getenv('PATH.SMARTY_TEMPLATES') );
-    $SMARTY->setCompileDir( getenv('PATH.SMARTY_CACHE') );
-    $SMARTY->setForceCompile(true);
+    App::initErrorHandler();
 
-    Template::init( $SMARTY );
-    
-    //@todo: добавить логгирование
-    //@todo: добавить Auth + PHPAuth
+    App::initLogger();
 
-    /*AppRouter::init(AppLogger::addScope('router'));
-    AppRouter::setDefaultNamespace('\EcoParser');
-    AppRouter::dispatch();*/
+    App::initTemplate();
 
-    SimpleRouter::setDefaultNamespace('Livemap\Controllers');
-    SimpleRouter::get('/', 'PagesController@view_page_frontpage')->name('page.frontpage');
+    App::initMobileDetect();
 
-    SimpleRouter::group(['middleware' => \Livemap\Middlewares\AuthAvailableForGuests::class], function (){
-        SimpleRouter::get('/auth/register', 'UsersController@view_page_register');
-        SimpleRouter::post('/auth/action:register', 'UsersController@callback_action_register');
+    App::initDBConnection();
 
-        SimpleRouter::get('/auth/login', 'UsersController@view_ajax_login');
-        SimpleRouter::post('/auth/ajax:login', 'UsersController@callback_action_login');
-    });
+    App::initAuth();
 
-    SimpleRouter::group(['middleware' => \Livemap\Middlewares\AuthAvailableForLogged::class], function (){
-        SimpleRouter::get('/auth/logout', 'UsersController@view_ajax_logout');
-        SimpleRouter::post('/auth/action:logout', 'UsersController@callback_action_logout');
+    /**
+     * End bootstrap
+     * Routing
+     */
 
-        SimpleRouter::get('/auth/profile', 'UsersController@view_page_profile');
+    AppRouter::init(AppLogger::addScope('router'));
+    AppRouter::setDefaultNamespace('\Livemap\Controllers');
 
-        SimpleRouter::get('/edit/region/{map_alias}/{region_id}', 'RegionsController@view_page_edit_region');
-        SimpleRouter::post('/edit/region/{map_alias}/{region_id}', 'RegionsController@callback_page_edit_region');
-    });
+    /**********
+     * ROUTES *
+     *********/
 
-    SimpleRouter::group([
-        'where'     =>  ['map_alias' => '[\w\d\.]+'],
-        'middleware'=>  \Livemap\Middlewares\MapIsAccessibleMiddleware::class
-    ], function (){
-        SimpleRouter::get('/map/{map_alias}', 'MapsController@view_map_fullscreen');
+    // публичный показ карты
 
-        SimpleRouter::get('/map:iframe/{map_alias}', 'MapsController@view_map_iframe');
+    AppRouter::get('/', 'PagesController@view_frontpage', 'page.frontpage');
+    AppRouter::get('/map/{id:[\w\.]+}[/]', 'MapsController@view_map_fullscreen', 'view.map.fullscreen');
+    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]', 'MapsController@view_iframe', 'view.map.iframe');
+    AppRouter::get('/map:folio/{id:[\w\.]+}[/]', 'MapsController@view_map_folio', 'view.map.folio');
+    AppRouter::get('/map:js/{id:[\w\.]+}.js', 'MapsController@view_js_map_definition');
 
-        SimpleRouter::get('/map:folio/{map_alias}', 'MapsController@view_map_folio');
+    AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
 
-        // получить информацию по региону
-        SimpleRouter::get('/api/get/regiondata', 'RegionsController@view_region_info'); // /api/getRegionData/{map_alias}/{region_id}
+    AppRouter::get('/auth/login', 'AuthController@view_form_login');
+    AppRouter::post('/auth/login', 'AuthController@callback_login');
+    AppRouter::get('/auth/logout', 'AuthController@callback_logout');
 
-        // получить JS-файл описания разметки
-        SimpleRouter::get('/js/map/{map_alias}.js', 'MapsController@get_js_map_definition');
-    });
+    AppRouter::group(
+        [
+            // не залогинен
+        ], static function() {
+            // Регистрация
+            AppRouter::get('/auth/register', 'UsersController@view_form_register');
+            AppRouter::post('/auth/register', 'UsersController@callback_register');
 
-    SimpleRouter::start();
+            // Активация аккаунта, заготовка
+            AppRouter::get('/auth/activate', 'UsersController@callback_activate_account');
 
-} catch (Exception $e) {
-    if (function_exists('dump')) {
-        dump($e->getMessage());
-    } else {
-        die( $e->getMessage() );
-    }
+            // Восстановить пароль (не реализованы)
+            AppRouter::get('/auth/recover', 'UsersController@view_form_recover_password'); // форма восстановления пароля
+            AppRouter::post('/auth/recover', 'UsersController@callback_recover_password'); // обработчик формы, шлет запрос на почту
+            AppRouter::get('/auth/reset', 'UsersController@view_form_new_password'); // принимает ключ сброса пароля и предлагает ввести новый
+            AppRouter::post('/auth/reset', 'UsersController@callback_new_password'); // коллбэк: устанавливает новый пароль
+        }
+    );
+
+    AppRouter::group(
+        [
+            // залогинен
+        ], static function() {
+            // редактировать профиль (должно быть в группе "залогинен")
+            AppRouter::get('/users/profile', 'UsersController@view_form_profile'); // показать текущий профиль
+            AppRouter::post('/users/profile:update', 'UsersController@callback_profile_update'); // обновить текущий профиль
+
+            // редактировать регион: форма и коллбэк
+            AppRouter::get('/region/edit', 'RegionsController@view_region_edit_form', 'edit.region.info');
+            AppRouter::post('/region/edit', 'RegionsController@callback_update_region', 'update.region.info');
+        }
+    );
+
+    /**********
+     * END *
+     *********/
+    AppRouter::dispatch();
+
+    App::$template->assign("title", App::$template->makeTitle(" &mdash;"));
+
+    App::$template->assign("flash_messages", json_encode( App::$flash->getMessages() ));
+
+    App::$template->assign("_auth", \config('auth'));
+    App::$template->assign("_config", \config());
+    App::$template->assign("_request", $_REQUEST);
+
+} catch (\RuntimeException|\Exception $e) {
+    // \Arris\Util\Debug::dump($e);
+    d($_REQUEST);
+    d($_SERVER['REQUEST_URI']);
+    dd($e);
 }
+
+/*  catch (AppRouterHandlerError $e) {
+
+    AppLogger::scope('main')->error("AppRouter::InvalidRoute", [ $e->getMessage(), $e->getInfo() ] );
+    http_response_code(500);
+
+} catch (AppRouterNotFoundException $e) {
+
+    AppLogger::scope('main')->notice("AppRouter::NotFound", [ $e->getMessage(), $e->getInfo() ] );
+    http_response_code(404);
+    App::$template->setTemplate("_errors/404.tpl");
+
+} catch (AppRouterMethodNotAllowedException $e){
+
+    AppLogger::scope('main')->error("AppRouter::NotAllowed", [ $e->getMessage(), $e->getInfo() ] );
+    http_response_code(405);
+
+} catch (\AjurMedia\MediaBox\Exceptions\AccessDeniedException $e) {
+
+    AppLogger::scope('access.denied')->notice($e->getMessage(), [ $_SERVER['REQUEST_URI'], config('auth.ipv4') ] );
+    App::$template->assign('message', $e->getMessage());
+    App::$template->setTemplate("_errors/403.tpl");
+
+} catch (\PDOException|\RuntimeException|\JsonException|SmartyException|\Exception $e) {
+    AppLogger::scope('main')->error("Other exception", [ $e->getMessage(), $e->getFile(), $e->getLine() ]);
+    http_response_code(500);
+
+    App::$template->assign('message', $e->getMessage());
+    App::$template->setTemplate("_errors/500.tpl");
+}*/
+
+$render = App::$template->render();
+if ($render) {
+    echo $render;
+}
+
+logSiteUsage( AppLogger::scope('site_usage') );
+
+if (App::$template->isRedirect()) {
+    App::$template->makeRedirect();
+}
+

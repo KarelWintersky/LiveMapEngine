@@ -1,6 +1,5 @@
 <?php
 
-namespace Livemap\Interfaces;
 
 interface MapInterface
 {

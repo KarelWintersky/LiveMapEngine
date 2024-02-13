@@ -1,9 +1,7 @@
 <?php
 
-namespace Livemap\Units;
 
 use Livemap\App;
-use PDO;
 
 class ACL
 {

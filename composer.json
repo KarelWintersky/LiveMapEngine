@@ -10,30 +10,37 @@
     ],
     "autoload": {
         "files": [
-            "engine/routing.helpers.php",
-            "engine/core.functions.php"
+            "engine/_functions.php"
         ],
         "psr-4": {
             "Livemap\\" : "engine/"
         }
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4 | 8.*",
+        "ext-curl": "*",
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-mbstring": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
-        "ext-curl": "*",
+        "ext-iconv": "*",
         "vlucas/phpdotenv": "^3.3",
-        "karelwintersky/arris": "^1.65",
-        "karelwintersky/arris.helpers": "^0.4.0",
         "psr/log": "^1.1",
         "spatie/regex": "^1.4",
-        "pecee/simple-router": "4.2.0.5",
-        "phpauth/phpauth": "dev-master",
-        "smarty/smarty": "^3.1",
-        "symfony/var-dumper": "^5.3"
+        "symfony/var-dumper": "^5.3",
+        "karelwintersky/arris": "^2.9",
+        "karelwintersky/arris.helpers": "^0.5",
+        "karelwintersky/arris.router": "^1.3",
+        "karelwintersky/arris.logger": "^1.0",
+        "karelwintersky/arris.delight-php-auth": "^0.9.1",
+        "ajur-media/template": "^1.2",
+        "ajur-media/template.flash": "^0.1.0",
+        "mobiledetect/mobiledetectlib": "^3.74",
+        "kuria/error": "^4.2",
+        "pecee/simple-router": "5.4.1.7",
+        "ganlvtech/kcaptcha": "^1.0",
+        "slim/psr7": "^1.6"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"

@@ -1,4 +1,4 @@
-const URL_GETREGIONCONTENT = '/api/get/regiondata?map=';
+const URL_GETREGIONCONTENT = '/region/get?map=';
 
 Number.prototype.between = function(a, b) {
     let min = Math.min.apply(Math, [a, b]),
@@ -114,12 +114,13 @@ setup_MapCreateOverlay = function(map, theMap, bounds) {
  */
 showContentColorbox = function(id_region , title) {
     let is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
-    let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region + is_iframe;
+    // let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region + is_iframe;
+    let url = `${URL_GETREGIONCONTENT}${map_alias}&id=${id_region}${is_iframe}`
 
     $.get( url, function() {
     }).done(function(data) {
-        var colorbox_width  = 800;
-        var colorbox_height = 600;
+        let colorbox_width  = 800;
+        let colorbox_height = 600;
         $.colorbox({
             html: data,
             width: colorbox_width,
@@ -164,7 +165,7 @@ manageInfoBox = function(event, id_region) {
 
     let $infobox = $("#section-infobox");
     let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
-    var current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
+    let current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
 
     // if (IS_DEBUG) console.log("Event: " + event + " for region " + id_region);
     // if (IS_DEBUG) console.log('Current infobox visibility state: ' + current_infobox_visible_state);
@@ -215,15 +216,15 @@ do_HighlightRegion = function(id_region) {
 
 /* ==================================================== begin: focus ================================================= */
 onclick_FocusRegion = function(id_region){
-    var id_layer = theMap['regions'][id_region]['layer'];
-    var is_visible = LGS[id_layer].visible;
-    var bounds;
+    let id_layer = theMap['regions'][id_region]['layer'];
+    let is_visible = LGS[id_layer].visible;
+    let bounds;
 
     // if (IS_DEBUG) console.log("onclick_FocusRegion -> layer " + id_layer + " is_visible " + is_visible);
     // if (IS_DEBUG) console.log( LGS[id_layer].actor );
 
     // сохраняем оригинальный стиль региона
-    var old_style = polymap[id_region].options['fillColor'];
+    let old_style = polymap[id_region].options['fillColor'];
 
     if (!is_visible) {
         map.setZoom( theMap['layers'][id_layer]['zoom'], {
@@ -252,9 +253,9 @@ onclick_FocusRegion = function(id_region){
 
 wlh_FocusRegion = function(id_region){
     /* позиционируем */
-    var id_layer = theMap['regions'][id_region]['layer'];
-    var is_visible = LGS[id_layer].visible;
-    var bounds;
+    let id_layer = theMap['regions'][id_region]['layer'];
+    let is_visible = LGS[id_layer].visible;
+    let bounds;
 
     if (IS_DEBUG) console.log("Текущий зум: ", map.getZoom());
     if (IS_DEBUG) console.log("Запрашиваемый регион: " , id_region);
@@ -262,14 +263,13 @@ wlh_FocusRegion = function(id_region){
     if (IS_DEBUG) console.log("Видимость группы слоёв с регионом: " , is_visible);
     if (IS_DEBUG) console.log("Описание группы слоёв: ", LGS[id_layer]);
 
-
-    var zmin = LGS[id_layer].zoom_min;
-    var zmax = LGS[id_layer].zoom_max;
+    let zmin = LGS[id_layer].zoom_min;
+    let zmax = LGS[id_layer].zoom_max;
 
     if (IS_DEBUG) console.log("Зум слоя (из инфо карты)", theMap['layers'][id_layer]['zoom']);
     if (IS_DEBUG) console.log("Зум слоя (из layergroup)", LGS[id_layer]['zoom']);
 
-    var currentZoom = map.getZoom();
+    let currentZoom = map.getZoom();
 
     // добавляем все слои
     Object.keys( LGS ).forEach(function(lg){

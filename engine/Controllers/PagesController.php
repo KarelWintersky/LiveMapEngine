@@ -2,46 +2,23 @@
 
 namespace Livemap\Controllers;
 
-use Arris\Path;
-use Livemap\Template as Template;
-use Livemap\Units\Auth;
+use Livemap\AbstractClass;
+use Livemap\Units\Storage;
 
-class PagesController
+class PagesController extends AbstractClass
 {
     public function __construct()
     {
+        parent::__construct();
     }
 
-    public function view_page_frontpage()
+    public function view_frontpage()
     {
-        $auth = Auth::getInstance();
-        $userinfo = $auth->getCurrentSessionUserInfo();
+        $storage = new Storage();
 
-        Template::setGlobalTemplate('index.tpl');
+        $this->template->assign("inner_template", "pages/frontpage.tpl");
+        $this->template->assign("maps_list", $storage->getPublicMapsList());
 
-        Template::assign('authinfo', []);
-        Template::assign('copyright', getenv('COPYRIGHT'));
-
-        $maps_list = [];
-        $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json')->toString();
-
-        if (is_readable($indexfile)) {
-            $json = json_decode( file_get_contents( $indexfile ) );
-
-            foreach ($json->maps as $i => $map) {
-                $alias = $map->alias;
-                $title = $map->title;
-                $key = str_replace('.', '~', $alias);
-
-                $maps_list[ $key ] = [
-                    'alias' =>  $alias,
-                    'title' =>  $title
-                ];
-            }
-        }
-
-        Template::assign('maps_list', $maps_list);
-
-        return Template::render();
     }
+
 }

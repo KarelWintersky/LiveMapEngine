@@ -20,7 +20,7 @@
 
     <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
 
-    <script type="text/javascript" src="/js/map/{$map_alias}.js" id="the-map-outer"></script>
+    <script src="/map:js/{$map_alias}.js" id="the-map-data"></script>
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
 </head>
 <body>

@@ -2,170 +2,220 @@
 
 namespace Livemap;
 
+use AJUR\Template\FlashMessages;
+use AJUR\Template\Template;
+use AJUR\Template\TemplatePlugins;
+use Arris\AppLogger;
 use Arris\Core\Dot;
-use PDO;
-use RuntimeException;
+use Arris\Database\DBWrapper;
+use Arris\DelightAuth\Auth\Auth;
+use Arris\Helpers\Server;
+use Arris\Path;
+use Smarty;
 
-class App
+use Kuria\Error\ErrorHandler;
+use Kuria\Error\Screen\WebErrorScreen;
+use Kuria\Error\Screen\WebErrorScreenEvents;
+
+class App extends \Arris\App
 {
     /**
-     * @var \Arris\App ссылка на инстанс
+     * @var DBWrapper
      */
-    private static $instance;
+    public static DBWrapper $pdo;
 
     /**
-     * @var PDO
+     * @var Smarty
      */
-    public $pdo;
+    public static Smarty $smarty;
 
     /**
-     * Репозиторий App
-     *
      * @var Dot
      */
-    private $repository = null;
+    public static Dot $config;
 
     /**
-     * "Магический" репозиторий App для методов __set, __get, __isset
-     *
-     * @var array|null|Dot
+     * @var Auth
      */
-    private $magic_repo = null;
+    public static $auth;
 
     /**
-     * DOT-Репозиторий конфига
-     *
-     * @var array|null|Dot $config
+     * @var Template;
      */
-    private $config = null;
-
-
-    public static function factory($options = null)
-    {
-        return self::getInstance($options);
-    }
-
-    public static function key($key, $default)
-    {
-        return (self::getInstance())->get($key, $default);
-    }
-
-    public static function config($key = null, $value = null)
-    {
-        if (is_null($value)) {
-            return (self::getInstance())->getConfig($key);
-        }
-
-        (self::getInstance())->set('config', $key);
-        return true;
-    }
+    public static $template;
 
     /**
-     * Возвращает инстанс синглтона App (вызывается обёрткой)
-     *
-     * @param null $options
-     * @return App
+     * @var FlashMessages
      */
-    protected static function getInstance($options = null)
+    public static $flash;
+
+    public static function init()
     {
-        if (!self::$instance) {
-            self::$instance = new self($options);
-        } else {
-            (self::$instance)->add($options);
+        $app = App::factory();
+
+        $_path_install = Path::create( getenv('PATH.INSTALL') );
+        $_path_monolog = Path::create( getenv('PATH.LOGS') );
+
+        config('path', [
+            'install'   =>      $_path_install->toString(true),
+            'logs'      =>      $_path_monolog->toString(true),
+            'public'    =>      $_path_install->join('public')->toString('/'),
+            'cache'             =>  $_path_install->join('cache')->toString('/'),
+            'storage'           =>  getenv('PATH.STORAGE')
+        ]);
+
+        config('app', [
+            'copyright'     =>  'LiveMap Engine version 1.5+ "Algrist"',
+        ]);
+
+/*        config('domains', [
+            'scheme'    =>  getenv('SCHEME'),
+            'site'      =>  getenv('DOMAIN'),
+            'fqdn'      =>  getenv('DOMAIN.FQDN')
+        ]);*/
+
+        /*config('limits', [
+            'MAX_UPLOAD_SIZE'   =>  min(get_ini_value('post_max_size'), get_ini_value('upload_max_filesize'), Common::return_bytes(_env('MAX_UPLOAD_SIZE', '64M')))
+        ]);*/
+    }
+
+    public static function initErrorHandler()
+    {
+        $errorHandler = new ErrorHandler();
+        $errorHandler->setDebug(true);
+        error_reporting(E_ALL & ~E_NOTICE);
+        $errorHandler->register();
+
+        // добавлено правильное сообщение об ошибке для прода
+        // смотри https://github.com/kuria/error/issues/2
+        if (getenv('IS.PRODUCTION') == 1) {
+            $errorScreen = $errorHandler->getErrorScreen();
+            if (!$errorHandler->isDebugEnabled() && $errorScreen instanceof WebErrorScreen) {
+                $errorScreen->on(WebErrorScreenEvents::RENDER, static function ($event) {
+                    $event['heading'] = 'MediaBox';
+                    $event['text'] = 'У нас что-то сломалось. Мы уже чиним.';
+                });
+            }
         }
 
-        return self::$instance;
-    }
-
-    private function __construct($options = null)
-    {
-        if (is_null($this->repository)) {
-            $this->repository = new Dot($options);
-        } else if (!empty($options)) {
-            $this->repository->add($options);
-        }
-
-        if (is_null($this->config)) {
-            $this->config = new Dot();
-        }
-    }
-
-    public function add($keys, $value = null)
-    {
-        $this->repository->add($keys, $value);
-    }
-
-    public function set($key, $data = null)
-    {
-        $this->repository->set($key, $data);
-    }
-
-    public function get($key = null, $default = null)
-    {
-        return $this->repository->get($key, $default);
-    }
-
-    public function getConfig($key = null)
-    {
-        return  is_null($key)
-            ? $this->config
-            : $this->config[$key];
-    }
-
-    public function setConfig($config)
-    {
-        $this->config = new Dot($config);
-    }
-
-    /* ===================== MAGIC METHODS =========================== */
-
-    public function __invoke($key = null, $data = null)
-    {
-        return
-            is_null($data)
-                ? $this->repository->get($key)
-                : $this->repository->set($key, $data);
-    }
-
-    public function __set($key, $value)
-    {
-        if (is_null($this->magic_repo)) {
-            $this->magic_repo = new Dot([]);
-        }
-        $this->magic_repo->set($key, $value);
-    }
-
-    public function __isset($key)
-    {
-        return $this->magic_repo->has($key);
-    }
-
-    public function __get($key)
-    {
-        return $this->__isset($key) ? $this->magic_repo->get($key) : null;
     }
 
     /**
-     * Prevent the instance from being cloned.
-     * Предотвращаем клонирование инстанса
-     *
-     * @return void
+     * @throws \Exception
      */
-    final private function __clone()
+    public static function initLogger()
     {
-        throw new RuntimeException("Cannot serialize an App");
+        AppLogger::init('Livemap', bin2hex(\random_bytes(8)), [
+            'default_logfile_path'      => config('path.logs'),
+            'default_logfile_prefix'    => date_format(date_create(), 'Y-m-d') . '__'
+        ] );
     }
 
-    /**
-     * Prevent from being unserialized.
-     * Предотвращаем десериализацию инстанса
-     *
-     * @return void
-     * @throws RuntimeException
-     */
-    final private function __wakeup()
+    public static function initTemplate()
     {
-        throw new RuntimeException("Cannot unserialize an App");
+        $app = self::factory();
+
+        config('smarty', [
+            'path_template'     =>  config('path.install') . 'templates/',
+            'path_cache'        =>  config('path.cache'),
+            'force_compile'     =>  _env('DEBUG.SMARTY_FORCE_COMPILE', false, 'bool')
+        ]);
+        App::$smarty = new Smarty();
+        App::$smarty->setTemplateDir( config('smarty.path_template'));
+        App::$smarty->setCompileDir( config('smarty.path_cache'));
+        App::$smarty->setForceCompile(config('smarty.force_compile'));
+        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'dd', 'dd', false);
+        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'size_format', [ TemplatePlugins::class, 'size_format' ], false);
+        // App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", [ \AjurMedia\MediaBox\Common::class, "convertDateTime" ]);
+
+        $app->addService(Smarty::class, App::$smarty);
+
+        // ******
+        // Smarty
+        // ******
+
+        // ********
+        // Template
+        // ********
+        App::$template = new Template(App::$smarty, $_REQUEST, [], AppLogger::scope('smarty')); // global template
+        App::$template->setTemplate("_public.pages.tpl");
+
+        $app->addService(Template::class, App::$template);
+
+        // **********
+        // Slim flash
+        // **********
+        // App::$flash = new Messages();
+        App::$flash = new FlashMessages();
+
+    }
+
+    public static function initMobileDetect()
+    {
+        $MOBILE_DETECT_INSTANCE = new \Detection\MobileDetect();
+        config('features', [
+            'is_cli'        =>  PHP_SAPI === "cli",
+            'is_mobile'     =>  PHP_SAPI !== "cli" && $MOBILE_DETECT_INSTANCE->isMobile(),
+            'is_iphone'     =>  $MOBILE_DETECT_INSTANCE->is('iPhone'),
+            'is_android'    =>  $MOBILE_DETECT_INSTANCE->is('Android'),
+        ]);
+    }
+
+    public static function initDBConnection()
+    {
+        $app = self::factory();
+
+        /**
+         * Database
+         */
+        $db_credentials = [
+            'driver'            =>  'mysql',
+            'hostname'          =>  getenv('DB.HOST'),
+            'database'          =>  getenv('DB.NAME'),
+            'username'          =>  getenv('DB.USERNAME'),
+            'password'          =>  getenv('DB.PASSWORD'),
+            'port'              =>  getenv('DB.PORT'),
+            'charset'           =>  'utf8',
+            'charset_collate'   =>  'utf8_general_ci',
+            'slow_query_threshold'  => 1
+        ];
+        config('db_credentials', $db_credentials);
+
+        App::$pdo = new DBWrapper(config('db_credentials'), [ 'slow_query_threshold' => 100 ], AppLogger::scope('mysql') );
+        $app->addService('pdo', App::$pdo);
+    }
+
+    public static function initAuth()
+    {
+        $app = self::factory();
+
+        /**
+         * Auth Delight
+         */
+        App::$auth = new Auth(new \PDO(
+            sprintf(
+                "mysql:dbname=%s;host=%s;charset=utf8mb4",
+                config('db_credentials.database'),
+                config('db_credentials.hostname')
+            ),
+            config('db_credentials.username'),
+            config('db_credentials.password')
+        ));
+        $app->addService(Auth::class, App::$auth);
+        config('auth', [
+            'id'            =>  App::$auth->id(),
+            'is_logged_in'  =>  App::$auth->isLoggedIn(),       // флаг "залогинен"
+            'username'      =>  App::$auth->getUsername(),      // пользователь
+            'email'         =>  App::$auth->getEmail(),
+            'ipv4'          =>  Server::getIP(),                // IPv4
+
+            // основная роль пользователя
+            // 'is_banned'     =>  App::$auth->hasRole(\Livemap\AuthRoles::BANNED),
+            // 'is_viewer'     =>  App::$auth->hasRole(\Livemap\AuthRoles::VIEWER),    // просмотр
+            // 'is_editor'     =>  App::$auth->hasRole(\Livemap\AuthRoles::EDITOR),      // загрузка и редактирование
+            // 'is_curator'    =>  App::$auth->hasRole(\Livemap\AuthRoles::CURATOR),     // куратор: статистика
+            'is_admin'      =>  App::$auth->hasRole(\Livemap\AuthRoles::ADMIN),       // админ
+        ]);
     }
 
 

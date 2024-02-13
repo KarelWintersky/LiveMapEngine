@@ -8,12 +8,11 @@
  * Date: 14.10.2018, time: 20:36
  */
 
-namespace Livemap\Middlewares;
-
-use Pecee\Http\Middleware\IMiddleware;
-use Pecee\Http\Request;
+namespace Middlewares;
 
 use Livemap\Auth;
+use Pecee\Http\Middleware\IMiddleware;
+use Pecee\Http\Request;
 
 /**
  * Проверяет, доступна ли переденная карта данному пользователю. Если нет - редиректит на главную
