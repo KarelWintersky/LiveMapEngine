@@ -35,7 +35,7 @@
 
         <ul class="list-unstyled">
             <li>
-                {*<a aria-expanded="#">Карты</a>*}
+                <a aria-expanded="#">Карты</a>
                 <ul class="list-unstyled">
                     {foreach $maps_list as $map}
                         <li>
@@ -49,7 +49,20 @@
         <hr>
         <ul class="list-unstyled">
             {if $is_logged_in}
-                <li>Кнопки профиля</li>
+                <li>
+                    <a href="/user/profile">Мой профиль</a>
+                </li>
+                {if $_config.auth.is_admin}
+                    <li>
+                        <hr>
+                    </li>
+                    <li>
+                        <a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">[[[ Админка ]]]</a>
+                    </li>
+                    <li>
+                        <hr>
+                    </li>
+                {/if}
                 <li>
                     <a href="{Arris\AppRouter::getRouter('view.form.logout')}">Выход</a>
                 </li>

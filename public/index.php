@@ -61,9 +61,12 @@ try {
     AppRouter::post('/auth/login', 'AuthController@callback_login', 'callback.form.login');
     AppRouter::get('/auth/logout', 'AuthController@callback_logout', 'view.form.logout');
 
+    // Для доступа к роутам этой группы пользователь должен быть НЕ залогинен
+    // Это проверяет метод AuthMiddleware@check_not_logged_in
+    // Если пользователь залогинен - делается редирект в корень
     AppRouter::group(
         [
-            // не залогинен
+            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_not_logged_in'
         ], static function() {
             // Регистрация
             AppRouter::get('/auth/register', 'AuthController@view_form_register', 'view.form.register');
@@ -80,9 +83,13 @@ try {
         }
     );
 
+    // Для доступа к роутам этой группы пользователь должен быть ЗАЛОГИНЕН
+    // Это проверяет посредник
+    // AuthMiddleware@check_is_logged_in
+    // Если проверка неудачна - кидается исключение AccessDeniedException
     AppRouter::group(
         [
-            // залогинен
+            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_logged_in'
         ], static function() {
             // редактировать профиль (должно быть в группе "залогинен")
             AppRouter::get('/users/profile', 'UsersController@view_form_profile'); // показать текущий профиль
@@ -95,16 +102,21 @@ try {
     );
 
     // админские роуты
+    // Роуты этой группы доступны только СУПЕРАДМИНИСТРАТОРУ
+    // Проверяет посредник AuthMiddleware@check_is_admin_logged
+    // иначе кидается исключение AccessDeniedException
     AppRouter::group(
         [
-
+            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_admin_logged',
+            'prefix'    =>  '/admin'
         ], static function() {
-            AppRouter::get('/admin/users/list', 'AdminController@view_list_users', 'admin.view.list.users');
-            AppRouter::get('/admin/users/create', '');
-            AppRouter::post('/admin/users/insert', '');
-            AppRouter::get('/admin/users/edit', '');
-            AppRouter::get('/admin/users/update', '');
-            AppRouter::get('/admin/users/delete', '');
+            AppRouter::get('[/]', 'AdminController@view_main_page', 'admin.view.main.page'); // можно пустую строчку, но я добавил необязательный элемент и убираю его регуляркой в роутере
+            AppRouter::get('/users/list', 'AdminController@view_list_users', 'admin.view.list.users');
+            AppRouter::get('/users/create', '');
+            AppRouter::post('/users/insert', '');
+            AppRouter::get('/users/edit', '');
+            AppRouter::get('/users/update', '');
+            AppRouter::get('/users/delete', '');
 
             // права доступа к картам?
             // редактирование списка карт?

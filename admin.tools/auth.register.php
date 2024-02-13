@@ -15,7 +15,7 @@ $PATH_INSTALL = dirname(__DIR__, 1);
 
 require_once __ROOT__ . '/vendor/autoload.php';
 
-foreach ([ 'site.conf' ] as $file) { Dotenv::create( PATH_CONFIG, $file )->load(); }
+foreach ([ 'common.conf' ] as $file) { Dotenv::create( PATH_CONFIG, $file )->load(); }
 
 $connection = [
     'driver'    =>  'mysql',
@@ -45,7 +45,7 @@ $credentials = [
 if (empty($credentials['email']) || empty($credentials['password'])) {
     echo <<<MSG1
 Both EMAIL and PASSWORD options required. 
-Use register.php --email email --password password [--is_admin] 
+Use register.php --email email --password password [--role admin|editor] 
 MSG1;
     echo PHP_EOL;
     die;
