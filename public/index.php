@@ -48,7 +48,7 @@ try {
 
     // публичный показ карты
 
-    AppRouter::get('/', 'PagesController@view_frontpage', 'page.frontpage');
+    AppRouter::get('/', 'PagesController@view_frontpage', 'view.frontpage');
     AppRouter::get('/map/{id:[\w\.]+}[/]', 'MapsController@view_map_fullscreen', 'view.map.fullscreen');
     AppRouter::get('/map:iframe/{id:[\w\.]+}[/]', 'MapsController@view_iframe', 'view.map.iframe');
     AppRouter::get('/map:folio/{id:[\w\.]+}[/]', 'MapsController@view_map_folio', 'view.map.folio');
@@ -56,26 +56,27 @@ try {
 
     AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
 
-    AppRouter::get('/auth/login', 'AuthController@view_form_login');
-    AppRouter::post('/auth/login', 'AuthController@callback_login');
-    AppRouter::get('/auth/logout', 'AuthController@callback_logout');
+    // логин-логаут
+    AppRouter::get('/auth/login', 'AuthController@view_form_login', 'view.form.login');
+    AppRouter::post('/auth/login', 'AuthController@callback_login', 'callback.form.login');
+    AppRouter::get('/auth/logout', 'AuthController@callback_logout', 'view.form.logout');
 
     AppRouter::group(
         [
             // не залогинен
         ], static function() {
             // Регистрация
-            AppRouter::get('/auth/register', 'UsersController@view_form_register');
-            AppRouter::post('/auth/register', 'UsersController@callback_register');
+            AppRouter::get('/auth/register', 'AuthController@view_form_register', 'view.form.register');
+            AppRouter::post('/auth/register', 'AuthController@callback_register');
 
             // Активация аккаунта, заготовка
-            AppRouter::get('/auth/activate', 'UsersController@callback_activate_account');
+            AppRouter::get('/auth/activate', 'AuthController@callback_activate_account');
 
-            // Восстановить пароль (не реализованы)
-            AppRouter::get('/auth/recover', 'UsersController@view_form_recover_password'); // форма восстановления пароля
-            AppRouter::post('/auth/recover', 'UsersController@callback_recover_password'); // обработчик формы, шлет запрос на почту
-            AppRouter::get('/auth/reset', 'UsersController@view_form_new_password'); // принимает ключ сброса пароля и предлагает ввести новый
-            AppRouter::post('/auth/reset', 'UsersController@callback_new_password'); // коллбэк: устанавливает новый пароль
+            // Восстановить пароль, заготовки
+            AppRouter::get('/auth/recover', 'AuthController@view_form_recover_password'); // форма восстановления пароля
+            AppRouter::post('/auth/recover', 'AuthController@callback_recover_password'); // обработчик формы, шлет запрос на почту
+            AppRouter::get('/auth/reset', 'AuthController@view_form_new_password'); // принимает ключ сброса пароля и предлагает ввести новый
+            AppRouter::post('/auth/reset', 'AuthController@callback_new_password'); // коллбэк: устанавливает новый пароль
         }
     );
 
@@ -93,6 +94,27 @@ try {
         }
     );
 
+    // админские роуты
+    AppRouter::group(
+        [
+
+        ], static function() {
+            AppRouter::get('/admin/users/list', 'AdminController@view_list_users', 'admin.view.list.users');
+            AppRouter::get('/admin/users/create', '');
+            AppRouter::post('/admin/users/insert', '');
+            AppRouter::get('/admin/users/edit', '');
+            AppRouter::get('/admin/users/update', '');
+            AppRouter::get('/admin/users/delete', '');
+
+            // права доступа к картам?
+            // редактирование списка карт?
+            // присвоение карте владельца (связь owner - map)
+            // права доступа к карте
+
+    });
+
+    App::$template->assign("routing", AppRouter::getRoutersNames());
+
     /**********
      * END *
      *********/
@@ -105,6 +127,12 @@ try {
     App::$template->assign("_auth", \config('auth'));
     App::$template->assign("_config", \config());
     App::$template->assign("_request", $_REQUEST);
+
+} catch (\Livemap\Exceptions\AccessDeniedException $e) {
+
+    AppLogger::scope('access.denied')->notice($e->getMessage(), [ $_SERVER['REQUEST_URI'], config('auth.ipv4') ] );
+    App::$template->assign('message', $e->getMessage());
+    App::$template->setTemplate("_errors/403.tpl");
 
 } catch (\RuntimeException|\Exception $e) {
     // \Arris\Util\Debug::dump($e);

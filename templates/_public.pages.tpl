@@ -16,15 +16,16 @@
     <script src="/frontend/jquery/jquery-1.12.0.min.js"></script>
     <script src="/frontend/bootstrap/bootstrap.min.js"></script>
     <script src="/frontend/colorbox/jquery.colorbox-min.js"></script>
+    <script src="/frontend/scripts.js"></script>
     <script type="text/javascript" id="bind-auth">
-        $('#actor-auth').on('click', function(){
+        /*$('#actor-auth').on('click', function(){
             $.colorbox({
                 href: '/auth',
                 width: '30%',
                 height: '30%',
                 title: 'Login form'
             });
-        });
+        });*/
     </script>
 </head>
 <body>
@@ -42,7 +43,24 @@
                         </li>
                     {/foreach}
                 </ul>
+
             </li>
+        </ul>
+        <hr>
+        <ul class="list-unstyled">
+            {if $is_logged_in}
+                <li>Кнопки профиля</li>
+                <li>
+                    <a href="{Arris\AppRouter::getRouter('view.form.logout')}">Выход</a>
+                </li>
+            {else}
+                <li>
+                    <a href="{Arris\AppRouter::getRouter('view.form.login')}">Вход</a>
+                </li>
+                <li>
+                    <a href="{Arris\AppRouter::getRouter('view.form.register')}">Регистрация</a>
+                </li>
+            {/if}
         </ul>
     </nav>
 

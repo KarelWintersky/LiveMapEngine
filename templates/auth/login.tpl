@@ -53,7 +53,7 @@
 
         {else}
 
-        <form method="post" action="/auth/login/" class="left-align">
+        <form method="post" action="{Arris\AppRouter::getRouter('callback.form.login')}" class="left-align">
             <input type="hidden" name="action" value="auth" />
             <table>
                 <tr>
