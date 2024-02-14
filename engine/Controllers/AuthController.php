@@ -91,7 +91,73 @@ class AuthController extends \Livemap\AbstractClass
         App::$flash->addMessage("success", "Успешно вышли из системы");
 
         App::$template->setRedirect( AppRouter::getRouter('view.frontpage') );
+    }
 
+
+    public function view_form_register()
+    {
+        $this->template->assign("sid", session_id());
+        $this->template->setTemplate('auth/register.tpl');
+    }
+
+    /**
+     * @return void
+     * @throws AuthError
+     * @throws InvalidEmailException
+     * @throws InvalidPasswordException
+     * @throws TooManyRequestsException
+     * @throws \Arris\DelightAuth\Auth\UserAlreadyExistsException
+     */
+    public function callback_register()
+    {
+        try {
+            if ($_REQUEST['captcha'] != $_SESSION['captcha_keystring']) {
+                throw new \RuntimeException("Вы неправильно ввели надпись с картинки");
+            }
+
+            if (empty($_REQUEST['email'])) {
+                throw new \RuntimeException("Вы не указали email");
+            }
+
+            if (!filter_var($_REQUEST['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new \RuntimeException("Вы указали не EMail");
+            }
+
+            if (empty($_REQUEST['password']) || empty($_REQUEST['password_retry'])) {
+                throw new \RuntimeException("Вы не указали пароль или его повтор");
+            }
+
+            if ($_REQUEST['password'] != $_REQUEST['password_retry']) {
+                throw new \RuntimeException("Пароли не совпадают");
+            }
+
+            $credentials = [
+                'email'     =>  $_REQUEST['email'],
+                'username'  =>  $_REQUEST['username'],
+                'password'  =>  $_REQUEST['password']
+            ];
+
+            App::$auth->register(
+                $credentials['email'],
+                $credentials['password'],
+                $credentials['username'],
+                static function($selector, $token) {
+                    App::$auth->confirmEmail($selector, $token);
+                }
+            );
+
+            $this->template->setRedirect( AppRouter::getRouter('/'));
+            App::$flash->addMessage("success", "Регистрация успешна");
+
+        } catch (\RuntimeException $e) {
+            App::$flash->addMessage("error", $e->getMessage());
+            $this->template->setRedirect( AppRouter::getRouter('view.form.register') );
+        }
+    }
+
+    public function view_form_recover_password()
+    {
+        dd('todo');
     }
 
 }

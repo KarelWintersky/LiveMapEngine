@@ -39,8 +39,8 @@
         "mobiledetect/mobiledetectlib": "^3.74",
         "kuria/error": "^4.2",
         "pecee/simple-router": "5.4.1.7",
-        "ganlvtech/kcaptcha": "^1.0",
-        "slim/psr7": "^1.6"
+        "slim/psr7": "^1.6",
+        "ajur-media/kcaptcha": "^1.1"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"

@@ -1,3 +1,4 @@
+{* контейнер публичных страниц, исключая карты *}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -14,18 +15,16 @@
     <link rel="stylesheet" href="/frontend/bootstrap/with_simple_sidebar.css">
 
     <script src="/frontend/jquery/jquery-1.12.0.min.js"></script>
+
     <script src="/frontend/bootstrap/bootstrap.min.js"></script>
     <script src="/frontend/colorbox/jquery.colorbox-min.js"></script>
+
     <script src="/frontend/scripts.js"></script>
-    <script type="text/javascript" id="bind-auth">
-        /*$('#actor-auth').on('click', function(){
-            $.colorbox({
-                href: '/auth',
-                width: '30%',
-                height: '30%',
-                title: 'Login form'
-            });
-        });*/
+    <script>
+        const flash_messages = {$flash_messages};
+        $(document).ready(function() {
+            notifyFlashMessages(flash_messages);
+        });
     </script>
 </head>
 <body>

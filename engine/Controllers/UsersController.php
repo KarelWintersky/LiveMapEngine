@@ -15,6 +15,11 @@ class UsersController extends AbstractClass
         parent::__construct($options, $logger);
     }
 
+    public function view_form_profile()
+    {
+        dd('show my profile');
+    }
+
 
 
 }

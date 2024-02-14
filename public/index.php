@@ -70,13 +70,13 @@ try {
         ], static function() {
             // Регистрация
             AppRouter::get('/auth/register', 'AuthController@view_form_register', 'view.form.register');
-            AppRouter::post('/auth/register', 'AuthController@callback_register');
+            AppRouter::post('/auth/register', 'AuthController@callback_register', 'callback.form.register');
 
             // Активация аккаунта, заготовка
             AppRouter::get('/auth/activate', 'AuthController@callback_activate_account');
 
             // Восстановить пароль, заготовки
-            AppRouter::get('/auth/recover', 'AuthController@view_form_recover_password'); // форма восстановления пароля
+            AppRouter::get('/auth/recover', 'AuthController@view_form_recover_password', 'view.auth.recover.form'); // форма восстановления пароля
             AppRouter::post('/auth/recover', 'AuthController@callback_recover_password'); // обработчик формы, шлет запрос на почту
             AppRouter::get('/auth/reset', 'AuthController@view_form_new_password'); // принимает ключ сброса пароля и предлагает ввести новый
             AppRouter::post('/auth/reset', 'AuthController@callback_new_password'); // коллбэк: устанавливает новый пароль
@@ -92,8 +92,8 @@ try {
             'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_logged_in'
         ], static function() {
             // редактировать профиль (должно быть в группе "залогинен")
-            AppRouter::get('/users/profile', 'UsersController@view_form_profile'); // показать текущий профиль
-            AppRouter::post('/users/profile:update', 'UsersController@callback_profile_update'); // обновить текущий профиль
+            AppRouter::get('/user/profile', 'UsersController@view_form_profile'); // показать текущий профиль
+            AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update'); // обновить текущий профиль
 
             // редактировать регион: форма и коллбэк
             AppRouter::get('/region/edit', 'RegionsController@view_region_edit_form', 'edit.region.info');
