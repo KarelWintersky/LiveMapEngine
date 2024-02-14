@@ -32,7 +32,7 @@ class AuthController extends \Livemap\AbstractClass
      */
     public function view_form_login()
     {
-        $this->template->setTemplate('auth/login.tpl');
+        $this->template->assign("inner_template", 'auth/login.tpl');
     }
 
     /**
@@ -98,7 +98,7 @@ class AuthController extends \Livemap\AbstractClass
     public function view_form_register()
     {
         $this->template->assign("sid", session_id());
-        $this->template->setTemplate('auth/register.tpl');
+        $this->template->assign("inner_template", 'auth/register.tpl');
     }
 
     /**

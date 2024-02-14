@@ -10,8 +10,8 @@ class PagesController extends AbstractClass
     public function __construct()
     {
         parent::__construct();
-        // $this->template->setTemplate("_pages(legacy).tpl");
-        $this->template->setTemplate("_pages(flex).tpl");
+        $this->template->setTemplate("_pages(legacy).tpl");
+        // $this->template->setTemplate("_pages(flex).tpl");
     }
 
     public function view_frontpage()
