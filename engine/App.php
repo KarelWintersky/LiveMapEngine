@@ -138,16 +138,13 @@ class App extends \Arris\App
         // Template
         // ********
         App::$template = new Template(App::$smarty, $_REQUEST, [], AppLogger::scope('smarty')); // global template
-        App::$template->setTemplate("_public.pages.tpl");
 
         $app->addService(Template::class, App::$template);
 
         // **********
         // Slim flash
         // **********
-        // App::$flash = new Messages();
         App::$flash = new FlashMessages();
-
     }
 
     public static function initMobileDetect()

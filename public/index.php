@@ -118,6 +118,8 @@ try {
             AppRouter::get('/users/update', '');
             AppRouter::get('/users/delete', '');
 
+            AppRouter::get('/maps/list', '');
+
             // права доступа к картам?
             // редактирование списка карт?
             // присвоение карте владельца (связь owner - map)

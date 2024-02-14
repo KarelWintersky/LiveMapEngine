@@ -22,6 +22,7 @@ class AuthController extends \Livemap\AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
+        $this->template->setTemplate("_auth.tpl");
     }
 
     /**

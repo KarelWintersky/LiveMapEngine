@@ -19,7 +19,7 @@ class MapsController extends AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
-        $this->template->setTemplate("_public.view_maps.tpl");
+        $this->template->setTemplate("_view_maps.tpl");
     }
 
     /**
