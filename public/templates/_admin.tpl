@@ -1,3 +1,4 @@
+{* контейнер страниц админки *}
 {* контейнер публичных страниц, исключая карты, V2 *}
 <!DOCTYPE html>
 <html lang="ru">
@@ -5,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Живые карты</title>
+    <title>Админка</title>
 
     {include file="_common/favicon_defs.tpl"}
 
@@ -83,7 +84,7 @@
             width: 250px;
             margin-right: 20px;
             padding: 5px;
-            background-color: var(--color-legacy);
+            background-color: #c7ddef;
         }
 
         #sidebar h3 {
@@ -105,12 +106,14 @@
         .menu li {
             padding: 15px;
             font-size: 0.9em;
+            height: 40px;
+            outline: 1px solid red;
         }
 
         .menu li a {
             color: whitesmoke;
             display: block;
-            width: 100%;
+            width: 100%; height: 100%;
         }
 
         .menu li:hover {
@@ -151,40 +154,20 @@
     </div>*}
     <div id="container">
         <div id="sidebar">
-            <h3>Карты</h3>
             <ul class="menu">
-                {foreach $maps_list as $map}
-                    <li class="submenu-item">
-                        <a href="/map/{$map.alias}">{$map.title}</a>
-                    </li>
-                {/foreach}
+                <li><a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">Главная страница</a></li>
+                <li>Пользователи</li>
+                <li><a href="{Arris\AppRouter::getRouter('admin.view.users.list')}">Список</a></li>
+                <li><a href="{Arris\AppRouter::getRouter('admin.view.users.create')}">Создать</a></li>
+                <li>Карты</li>
+                <li><a href="{Arris\AppRouter::getRouter('admin.view.maps.list')}">Список</a></li>
+                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+
             </ul>
-
-            <hr>
-
-            <ul class="menu">
-                {if $is_logged_in}
-                    <li class="submenu-item">
-                        <a href="/user/profile">Мой профиль</a>
-                    </li>
-                    {if $_config.auth.is_admin}
-                        <li class="submenu-item">
-                            <a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">[[[ Админка ]]]</a>
-                        </li>
-                    {/if}
-                    <li class="submenu-item">
-                        <a href="{Arris\AppRouter::getRouter('view.form.logout')}">Выход</a>
-                    </li>
-                {else}
-                    <li class="submenu-item">
-                        <a href="{Arris\AppRouter::getRouter('view.form.login')}">Вход</a>
-                    </li>
-                    <li class="submenu-item">
-                        <a href="{Arris\AppRouter::getRouter('view.form.register')}">Регистрация</a>
-                    </li>
-                {/if}
-            </ul>
-
         </div>
         <div id="content">
             {include file=$inner_template}

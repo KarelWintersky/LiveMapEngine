@@ -54,6 +54,8 @@ try {
     AppRouter::get('/map:folio/{id:[\w\.]+}[/]', 'MapsController@view_map_folio', 'view.map.folio');
     AppRouter::get('/map:js/{id:[\w\.]+}.js', 'MapsController@view_js_map_definition');
 
+    // AppRouter::get('/123', [ \Livemap\Controllers\PagesController::class, 'view_frontpage']);
+
     AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
 
     // логин-логаут
@@ -111,14 +113,14 @@ try {
             'prefix'    =>  '/admin'
         ], static function() {
             AppRouter::get('[/]', 'AdminController@view_main_page', 'admin.view.main.page'); // можно пустую строчку, но я добавил необязательный элемент и убираю его регуляркой в роутере
-            AppRouter::get('/users/list', 'AdminController@view_list_users', 'admin.view.list.users');
-            AppRouter::get('/users/create', '');
+            AppRouter::get('/users/list', 'AdminController@view_list_users', 'admin.view.users.list');
+            AppRouter::get('/users/create', 'admin.view.users.create');
             AppRouter::post('/users/insert', '');
             AppRouter::get('/users/edit', '');
             AppRouter::get('/users/update', '');
             AppRouter::get('/users/delete', '');
 
-            AppRouter::get('/maps/list', '');
+            AppRouter::get('/maps/list', '', 'admin.view.maps.list');
 
             // права доступа к картам?
             // редактирование списка карт?
