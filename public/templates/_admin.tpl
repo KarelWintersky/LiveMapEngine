@@ -1,184 +1,69 @@
-{* контейнер страниц админки *}
-{* контейнер публичных страниц, исключая карты, V2 *}
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Админка</title>
-
-    {include file="_common/favicon_defs.tpl"}
-
-    <script src="/frontend/jquery/jquery-1.12.0.min.js"></script>
-
-    <script src="/frontend/scripts.js"></script>
-    <script>
-        const flash_messages = {$flash_messages};
-        $(document).ready(function () {
-            notifyFlashMessages(flash_messages);
-        });
-    </script>
-    <style>
-        :root {
-            --color-legacy: #7386D5;
-            --color-submenu: #6d7fcc;
-            --color-hover: #20B2AA;
-        }
-
-        @font-face {
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 400;
-            src: local(''),
-            url('/frontend/fonts/poppins-v15-latin-regular.woff2') format('woff2'),
-            url('/frontend/fonts/poppins-v15-latin-regular.woff') format('woff');
-        }
-
-        @font-face {
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 500;
-            src: local(''),
-            url('/frontend/fonts/poppins-v15-latin-500.woff2') format('woff2'),
-            url('/frontend/fonts/poppins-v15-latin-500.woff') format('woff');
-        }
-
-        * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
-        }
-
-        body, html {
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-        #wrapper {
-            margin: auto;
-            height: 100%;
-        }
-
-        #header {
-            height: 50px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        #container {
-            display: flex;
-        }
-
-        #content {
-            width: 100%;
-            height: 700px;
-            padding: 20px;
-        }
-
-        #sidebar {
-            width: 250px;
-            margin-right: 20px;
-            padding: 5px;
-            background-color: #c7ddef;
-        }
-
-        #sidebar h3 {
-            color: whitesmoke;
-            font-size: 1em;
-        }
-
-        #footer {
-            height: 100px;
-            padding: 20px;
-            font-size: small;
-        }
-
-        .menu {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .menu li {
-            padding: 15px;
-            font-size: 0.9em;
-            height: 40px;
-            outline: 1px solid red;
-        }
-
-        .menu li a {
-            color: whitesmoke;
-            display: block;
-            width: 100%; height: 100%;
-        }
-
-        .menu li:hover {
-            cursor: pointer;
-            background-color: whitesmoke;
-        }
-
-        .menu li:hover * {
-            color: var(--color-legacy);
-        }
-
-        iframe {
-            width: 100%;
-            height: 500px;
-        }
-
-        #content a, #content a:visited {
-            color: #0d88c1;
-        }
-
-        #content a:hover {
-            text-decoration: underline;
-        }
-
-        .line {
-            width: 100%;
-            height: 1px;
-            border-bottom: 1px dashed #ddd;
-            margin: 40px 0;
-        }
-    </style>
+    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <title>Responsive Side Menu &ndash; Layout Examples &ndash; Pure</title>
+    <link rel="stylesheet" href="/frontend/pure/pure-min.css">
+    <link rel="stylesheet" href="/frontend/pure/_styles.admin.css">
 </head>
 <body>
 
-<div id="wrapper">
-    {*<div id="header">
-        Livemap Atlas
-    </div>*}
-    <div id="container">
-        <div id="sidebar">
-            <ul class="menu">
-                <li><a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">Главная страница</a></li>
-                <li>Пользователи</li>
-                <li><a href="{Arris\AppRouter::getRouter('admin.view.users.list')}">Список</a></li>
-                <li><a href="{Arris\AppRouter::getRouter('admin.view.users.create')}">Создать</a></li>
-                <li>Карты</li>
-                <li><a href="{Arris\AppRouter::getRouter('admin.view.maps.list')}">Список</a></li>
-                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
-                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
-                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
-                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
-                <li><a href="{Arris\AppRouter::getRouter()}"></a></li>
+<div id="layout">
+    <a href="#menu" id="menuLink" class="menu-link">
+        <span></span>
+    </a>
+
+    <div id="menu">
+        <div class="pure-menu">
+            <a class="pure-menu-heading" href="{Arris\AppRouter::getRouter('admin.main.page')}">LIVEMAP</a>
+
+            {*
+            add class `pure-menu-selected` for selected menu
+            *}
+
+            <ul class="pure-menu-list">
+                <li class="pure-menu-heading menu-item-divided">
+                    Пользователи
+                </li>
+
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('admin.users.view.list')}" class="pure-menu-link">Список</a>
+                </li>
+
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('admin.users.view.create')}" class="pure-menu-link">Создать</a>
+                </li>
+                {*<li class="pure-menu-item menu-item-divided">
+                    <a href="#" class="pure-menu-link">Services</a>
+                </li>
+
+                <li class="pure-menu-item"><a href="#contact" class="pure-menu-link">Contact</a></li>*}
+            </ul>
+            <ul class="pure-menu-list">
+                <li class="pure-menu-heading">
+                    Карты
+                </li>
+
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('admin.maps.view.list')}" class="pure-menu-link">Список</a>
+                </li>
+
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('admin.maps.view.create')}" class="pure-menu-link">Создать</a>
+                </li>
 
             </ul>
         </div>
-        <div id="content">
-            {include file=$inner_template}
-        </div>
     </div>
-    {*<div id="footer">
-        (c)
-    </div>*}
+
+    <div id="main">
+        {include file=$inner_template}
+    </div>
 </div>
+
+<script src="/frontend/pure/pure.js"></script>
 
 </body>
 </html>
-
-

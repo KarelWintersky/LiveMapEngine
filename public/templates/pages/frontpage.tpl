@@ -1,5 +1,4 @@
-<iframe src="/map:iframe/pony?view=iframe" width="100%" height="500px" scrolling="no" frameborder="1">
-</iframe>
+<iframe src="/map:iframe/pony?view=iframe" width="100%" height="500px" scrolling="no" frameborder="1"></iframe>
 <div class="line"></div>
 
 <h2 id="maps">Карты</h2>

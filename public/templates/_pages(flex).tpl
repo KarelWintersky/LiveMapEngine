@@ -170,7 +170,7 @@
                     </li>
                     {if $_config.auth.is_admin}
                         <li class="submenu-item">
-                            <a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">[[[ Админка ]]]</a>
+                            <a href="{Arris\AppRouter::getRouter('admin.view.page')}">[[[ Админка ]]]</a>
                         </li>
                     {/if}
                     <li class="submenu-item">

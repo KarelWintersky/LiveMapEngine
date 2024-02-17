@@ -112,21 +112,26 @@ try {
             'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_admin_logged',
             'prefix'    =>  '/admin'
         ], static function() {
-            AppRouter::get('[/]', 'AdminController@view_main_page', 'admin.view.main.page'); // можно пустую строчку, но я добавил необязательный элемент и убираю его регуляркой в роутере
-            AppRouter::get('/users/list', 'AdminController@view_list_users', 'admin.view.users.list');
-            AppRouter::get('/users/create', 'admin.view.users.create');
-            AppRouter::post('/users/insert', '');
-            AppRouter::get('/users/edit', '');
-            AppRouter::get('/users/update', '');
-            AppRouter::get('/users/delete', '');
+            AppRouter::get('[/]',           [\Livemap\Controllers\AdminController::class, 'view_main_page'], 'admin.main.page'); // можно пустую строчку, но я добавил необязательный элемент и убираю его регуляркой в роутере
+            AppRouter::get('/users/list',   [\Livemap\Controllers\AdminController::class, 'view_list_users'], 'admin.users.view.list');
+            AppRouter::get('/users/create', [\Livemap\Controllers\AdminController::class, 'form_create_user' ], 'admin.users.view.create');
+            AppRouter::post('/users/insert', [\Livemap\Controllers\AdminController::class, 'callback_insert'], 'admin.users.callback.insert');
+            AppRouter::get('/users/edit',   [\Livemap\Controllers\AdminController::class, 'form_edit_user' ], 'admin.users.view.edit');
+            AppRouter::post('/users/update', [\Livemap\Controllers\AdminController::class, 'callback_update'], 'admin.users.callback.update');
+            AppRouter::get('/users/delete', [\Livemap\Controllers\AdminController::class, 'callback_delete'], 'admin.users.callback.delete');
 
-            AppRouter::get('/maps/list', '', 'admin.view.maps.list');
+            // редактирование списка карт?
+            AppRouter::get('/maps/list', [\Livemap\Controllers\AdminController::class, 'view_list_maps' ], 'admin.maps.view.list');
+            AppRouter::get('/maps/create', [\Livemap\Controllers\AdminController::class, 'view_map_create' ], 'admin.maps.view.create');
+            AppRouter::post('/maps/insert', [\Livemap\Controllers\AdminController::class, 'callback_map_insert' ], 'admin.maps.callback.insert');
+            AppRouter::post('/maps/upload', [\Livemap\Controllers\AdminController::class, 'callback_map_upload' ], 'admin.maps.callback.upload');
+
+            // Прочие
 
             // права доступа к картам?
-            // редактирование списка карт?
+
             // присвоение карте владельца (связь owner - map)
             // права доступа к карте
-
     });
 
     App::$template->assign("routing", AppRouter::getRoutersNames());

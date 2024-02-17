@@ -126,7 +126,7 @@ class App extends \Arris\App
         App::$smarty->setForceCompile(config('smarty.force_compile'));
         App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'dd', 'dd', false);
         App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'size_format', [ TemplatePlugins::class, 'size_format' ], false);
-        // App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", [ \AjurMedia\MediaBox\Common::class, "convertDateTime" ]);
+        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", "convertDateTime");
 
         $app->addService(Smarty::class, App::$smarty);
 

@@ -56,7 +56,7 @@
                         <hr>
                     </li>
                     <li>
-                        <a href="{Arris\AppRouter::getRouter('admin.view.main.page')}">[[[ Админка ]]]</a>
+                        <a href="{Arris\AppRouter::getRouter('admin.view.page')}">[[[ Админка ]]]</a>
                     </li>
                     <li>
                         <hr>
