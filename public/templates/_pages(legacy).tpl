@@ -49,14 +49,14 @@
         <ul class="list-unstyled">
             {if $is_logged_in}
                 <li>
-                    <a href="/user/profile">Мой профиль</a>
+                    <a href="{Arris\AppRouter::getRouter('view.user.profile')}?id={$_auth.id}">Мой профиль</a>
                 </li>
                 {if $_config.auth.is_admin}
                     <li>
                         <hr>
                     </li>
                     <li>
-                        <a href="{Arris\AppRouter::getRouter('admin.view.page')}">[[[ Админка ]]]</a>
+                        <a href="{Arris\AppRouter::getRouter('admin.main.page')}">[[[ Админка ]]]</a>
                     </li>
                     <li>
                         <hr>

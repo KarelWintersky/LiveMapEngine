@@ -17,7 +17,16 @@
 
     <div id="menu">
         <div class="pure-menu">
-            <a class="pure-menu-heading" href="{Arris\AppRouter::getRouter('admin.main.page')}">LIVEMAP</a>
+            <ul class="pure-menu-list">
+                <a class="pure-menu-heading" href="">LIVEMAP</a>
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('view.frontpage')}" class="pure-menu-link">Сайт</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('admin.main.page')}" class="pure-menu-link">Главная админки</a>
+                </li>
+            </ul>
+
 
             {*
             add class `pure-menu-selected` for selected menu
@@ -53,8 +62,22 @@
                 <li class="pure-menu-item">
                     <a href="{Arris\AppRouter::getRouter('admin.maps.view.create')}" class="pure-menu-link">Создать</a>
                 </li>
-
             </ul>
+
+            <ul class="pure-menu-list">
+                <li class="pure-menu-heading">
+                    Auth
+                </li>
+
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('view.user.profile')}?id={$_auth.id}" class="pure-menu-link">Профиль</a>
+                </li>
+                <li class="pure-menu-item">
+                    <a href="{Arris\AppRouter::getRouter('view.form.logout')}" class="pure-menu-link">Выход</a>
+                </li>
+            </ul>
+
+
         </div>
     </div>
 

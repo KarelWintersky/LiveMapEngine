@@ -94,8 +94,8 @@ try {
             'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_logged_in'
         ], static function() {
             // редактировать профиль (должно быть в группе "залогинен")
-            AppRouter::get('/user/profile', 'UsersController@view_form_profile'); // показать текущий профиль
-            AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update'); // обновить текущий профиль
+            AppRouter::get('/user/profile', 'UsersController@view_form_profile', 'view.user.profile'); // показать текущий профиль
+            AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update', 'callback.user.profile.update'); // обновить текущий профиль
 
             // редактировать регион: форма и коллбэк
             AppRouter::get('/region/edit', 'RegionsController@view_region_edit_form', 'edit.region.info');

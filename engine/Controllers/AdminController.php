@@ -55,11 +55,12 @@ class AdminController extends \Livemap\AbstractClass
     public function callback_update()
     {
 
+
     }
 
     public function callback_delete()
     {
-
+        die(__METHOD__);
     }
 
     public function view_list_maps()

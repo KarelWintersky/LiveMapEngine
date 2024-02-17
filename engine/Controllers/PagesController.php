@@ -11,7 +11,6 @@ class PagesController extends AbstractClass
     {
         parent::__construct();
         $this->template->setTemplate("_pages(legacy).tpl");
-        // $this->template->setTemplate("_pages(flex).tpl");
         // $this->template->setTemplate("pure.tpl");
     }
 
