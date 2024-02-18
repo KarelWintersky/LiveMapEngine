@@ -2,7 +2,6 @@
 
 namespace Livemap\Units;
 
-use Arris\Entity\Result;
 use Arris\Path;
 use Psr\Log\LoggerInterface;
 
@@ -26,7 +25,17 @@ class MapConfig extends \Livemap\AbstractClass
     /**
      * @var \stdClass
      */
-    private $config;
+    public $json;
+
+    /**
+     * @var bool
+     */
+    public bool $error = false;
+
+    /**
+     * @var string
+     */
+    public string $error_message = '';
 
     public function __construct($map_id, $mode = 'file', $options = [], LoggerInterface $logger = null)
     {
@@ -43,8 +52,6 @@ class MapConfig extends \Livemap\AbstractClass
                 ->joinName('index.json')
                 ->toString();
         $this->config_type = $mode;
-
-        $this->config = new Result();
     }
 
     public function loadConfig():self
@@ -63,9 +70,9 @@ class MapConfig extends \Livemap\AbstractClass
         return $this;
     }
 
-    public function getConfig():Result
+    public function getConfig():\stdClass
     {
-        return $this->config;
+        return $this->json;
     }
 
     private function loadConfig_File() {
@@ -74,22 +81,27 @@ class MapConfig extends \Livemap\AbstractClass
                 throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} not found", 2 );
             }
 
+            if (!is_readable($this->json_config_filename)) {
+                throw new \RuntimeException("[JS Builder]  {$this->json_config_filename} not readable", 3);
+            }
+
             $json_config_content = file_get_contents( $this->json_config_filename );
 
-            if (!$json_config_content) {
+            if (false === $json_config_content) {
                 throw new \RuntimeException( "[JS Builer] Can't get content of {$this->json_config_filename} file." );
             }
 
             $json = json_decode( $json_config_content );
 
-            if (!$json) {
+            if (null === $json) {
                 throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} json file is invalid", 3 );
             }
 
-            $this->config->set('json', $json);
+            $this->json = $json;
 
         } catch (\RuntimeException $e) {
-            $this->config->error($e->getMessage());
+            $this->error = true;
+            $this->error_message = $e->getMessage();
             // $this->error_message = json_last_error_msg();
         }
     }

@@ -49,10 +49,10 @@ try {
     // публичный показ карты
 
     AppRouter::get('/', 'PagesController@view_frontpage', 'view.frontpage');
-    AppRouter::get('/map/{id:[\w\.]+}[/]', 'MapsController@view_map_fullscreen', 'view.map.fullscreen');
-    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]', 'MapsController@view_iframe', 'view.map.iframe');
-    AppRouter::get('/map:folio/{id:[\w\.]+}[/]', 'MapsController@view_map_folio', 'view.map.folio');
-    AppRouter::get('/map:js/{id:[\w\.]+}.js', 'MapsController@view_js_map_definition');
+    AppRouter::get('/map/{id:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'], 'view.map.fullscreen');
+    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'], 'view.map.iframe');
+    AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'], 'view.map.folio');
+    AppRouter::get('/map:js/{id:[\w\.]+}.js',       [\Livemap\Controllers\MapsController::class, 'view_js_map_definition', 'view.map.js']);
 
     // AppRouter::get('/123', [ \Livemap\Controllers\PagesController::class, 'view_frontpage']);
 

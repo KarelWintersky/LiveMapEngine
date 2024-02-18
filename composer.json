@@ -40,7 +40,8 @@
         "kuria/error": "^4.2",
         "pecee/simple-router": "5.4.1.7",
         "slim/psr7": "^1.6",
-        "ajur-media/kcaptcha": "^1.1"
+        "ajur-media/kcaptcha": "^1.1",
+        "colinodell/json5": "^2.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"
