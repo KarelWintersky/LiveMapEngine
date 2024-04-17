@@ -147,8 +147,8 @@ class RegionsController extends AbstractClass
 
             'is_present'        =>  $region_data['is_present'],      // 1 - регион существует, 0 - новый регион
 
-            'is_logged_user'    =>  $userinfo['email'] ?? 'n/a',
-            'is_logged_user_ip' =>  $userinfo['ip'] ?? 'n/a',
+            'is_logged_user'    =>  config('auth.username'),
+            'is_logged_user_ip' =>  config('auth.ipv4'),
 
             'edit_templates'            =>  $edit_templates,
             'edit_templates_options'    => $edit_templates_options,

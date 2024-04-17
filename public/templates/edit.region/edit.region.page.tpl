@@ -28,11 +28,19 @@
 
             plugins: ["advlist lists autolink link image anchor responsivefilemanager charmap insertdatetime paste searchreplace contextmenu code textcolor template hr pagebreak table print preview wordcount visualblocks visualchars legacyoutput"],
             formats: {
-                strikethrough: {inline: 'del'},
-                underline: {inline: 'span', 'classes': 'underline', exact: true}
+                strikethrough: {
+                    inline: 'del'
+                },
+                underline: {
+                    inline: 'span',
+                    'classes': 'underline',
+                    exact: true
+                }
             },
 
-            insertdatetime_formats: ["%d.%m.%Y", "%H:%m", "%d/%m/%Y"],
+            insertdatetime_formats: [
+                "%d.%m.%Y", "%H:%m", "%d/%m/%Y"
+            ],
             contextmenu: "link image responsivefilemanager | inserttable cell row column deletetable | charmap",
             toolbar1: "undo redo | bold italic underline subscript superscript strikethrough | fontsizeselect styleselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | ",
             toolbar2: "responsivefilemanager image | template table charmap | link unlink anchor | pastetext removeformat | preview",
@@ -137,9 +145,9 @@
     </script>
 </head>
 <body>
-<h3 style="margin-bottom: 1px">Регион {if $is_present}{$region_title}{else}{$id_region}{/if}</h3>
+<h3 style="margin-bottom: 1px">Регион:<span style="color: blue">  {if $is_present}{$region_title}{else}{$id_region}{/if}</span></h3>
 
-<form {*action="/api/put/regiondata?map={$alias_map}&id={$id_region}"*} action="{$form_actor}" method="post" id="form-edit-region">
+<form action="{$form_actor}" method="post" id="form-edit-region">
     <input type="hidden" name="edit:id:map"     value="{$id_map}">
     <input type="hidden" name="edit:id:region"  value="{$id_region}">
     <input type="hidden" name="edit:alias:map"  value="{$alias_map}">
