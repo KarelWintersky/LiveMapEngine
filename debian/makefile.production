@@ -22,7 +22,7 @@ help:               ##@help Help :)
 #	@sudo -u www-data php $(INSTALL_PATH)/admin.tools/tool.rebuild_rt_indexes.php
 #	@echo Ok.
 
-backup:		##@backup Make backup immediatly
+backup:		##@backup Make backup immediately
 	/bin/bash ./admin.cron/backup-db.sh
 	/bin/bash ./admin.cron/backup-files.sh
 

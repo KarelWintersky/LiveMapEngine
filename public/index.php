@@ -34,6 +34,8 @@ try {
 
     App::initAuth();
 
+    App::initRedis();
+
     /**
      * End bootstrap
      * Routing

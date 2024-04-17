@@ -215,5 +215,16 @@ class App extends \Arris\App
         ]);
     }
 
+    public static function initRedis()
+    {
+        \Arris\Cache\Cache::init([
+            'enabled'   =>  getenv('REDIS.ENABLED'),
+            'host'      =>  getenv('REDIS.HOST'),
+            'port'      =>  getenv('REDIS.PORT'),
+            'password'  =>  getenv('REDIS.PASSWORD'),
+            'database'  =>  getenv('REDIS.DATABASE')
+        ], [ ], App::$pdo, AppLogger::scope('redis'));
+    }
+
 
 }
