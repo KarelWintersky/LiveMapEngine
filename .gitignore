@@ -1,12 +1,11 @@
 .idea
 
-./vendor
-./config
-./composer.lock
+vendor
+config
+cache
+logs
+public/storage
 
-./storage.tiles
-./storage
-./public/storage
-
-./debian/livemap/*
-./debian/livemap.debhelper.log
+composer.lock
+debian/livemap/*
+debian/livemap.debhelper.log

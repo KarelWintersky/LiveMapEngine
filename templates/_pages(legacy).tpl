@@ -5,9 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Живые карты</title>
+    <title>STORYMAPS - Карты и истории</title>
 
     {include file="_common/favicon_defs.tpl"}
+
+    <meta property="og:title" content="STORYMAPS - Карты и истории">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="storymaps.ru">
+    <meta property="og:image" content="/frontend/og_image.png"">
+    <meta property="og:site_name" content="STORYMAPS - Карты и истории">
+    <meta property="og:description" content="STORYMAPS - Карты и истории">
 
     <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
 

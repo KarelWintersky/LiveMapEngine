@@ -127,6 +127,7 @@ class App extends \Arris\App
         App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'dd', 'dd', false);
         App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'size_format', [ TemplatePlugins::class, 'size_format' ], false);
         App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", "convertDateTime");
+        App::$smarty->registerClass("Arris\AppRouter", "Arris\AppRouter");
 
         $app->addService(Smarty::class, App::$smarty);
 

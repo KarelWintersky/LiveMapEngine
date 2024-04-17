@@ -44,6 +44,7 @@ install: 	##@system Install package. Don't run it manually!!!
 	@echo Installing...
 	install -d $(PATH_PROJECT)
 	cp -r admin.cron $(PATH_PROJECT)
+	cp -r admin.tools $(PATH_PROJECT)
 	cp -r engine $(PATH_PROJECT)
 	cp -r public $(PATH_PROJECT)
 	cp -r templates $(PATH_PROJECT)
@@ -54,9 +55,8 @@ install: 	##@system Install package. Don't run it manually!!!
 	git log --oneline --format="%at" -n 1 HEAD | xargs -I{} date -d @{} +%Y-%m-%d >> $(PATH_PROJECT)/_version
 	cd $(PATH_PROJECT)/ && composer install && rm composer.json
 	mkdir -p $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)
-	cp -r config.searchd/* $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)/
-	chown -R manticore:manticore $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)/
-	install -d $(PATH_PROJECT)/config
+#	cp -r config.searchd/* $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)/
+#	chown -R manticore:manticore $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)/
 	install -d $(PATH_PROJECT)/cache
 	install -d $(PATH_PROJECT)/logs
 
