@@ -110,7 +110,7 @@
     </section>
 {/if}
 
-<script src="{$js_main_script}"></script>
+<script src="{$main_js_file}"></script>
 
 </body>
 </html>
