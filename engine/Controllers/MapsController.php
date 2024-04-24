@@ -22,7 +22,6 @@ class MapsController extends AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
-        // $this->template->setTemplate("_view_maps.tpl");
         $this->template->setTemplate("_map.tpl");
     }
 
@@ -321,6 +320,7 @@ class MapsController extends AbstractClass
         ]);
         // главный обслуживающий скрипт
         $this->template->assign('js_main_script', '/frontend/view.map.fullscreen.js');
+        $this->template->assign('main_css_file', '/frontend/view.map.fullscreen.css');
 
         if ($map->mapViewMode === 'wide:infobox>regionbox' || $map->mapViewMode === 'infobox>regionbox') {
             $this->template->assign('section', [
@@ -361,6 +361,7 @@ class MapsController extends AbstractClass
         ]);
         // главный обслуживающий скрипт
         $this->template->assign('js_main_script', '/frontend/view.map.iframe_colorbox.js');
+        $this->template->assign('main_css_file', '/frontend/view.map.fullscreen.css');
     }
 
     /**
@@ -372,8 +373,6 @@ class MapsController extends AbstractClass
     public function view_map_folio($map_alias)
     {
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
-
-        // $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
 
         $this->template->assign('map_alias', $map_alias);
         $this->template->assign('html_title', $this->mapConfig->title);
@@ -390,5 +389,6 @@ class MapsController extends AbstractClass
         ]);
         // главный обслуживающий скрипт
         $this->template->assign('js_main_script', '/frontend/view.map.folio.js');
+        $this->template->assign('main_css_file', '/frontend/view.map.folio.css');
     }
 }

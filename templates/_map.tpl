@@ -8,7 +8,8 @@
     {include file="_common/opengraph.tpl"}
 
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
-    <link rel="stylesheet" href="/frontend/view.map.fullscreen.css">
+    <link rel="stylesheet" href="{$main_css_file}">
+
     {if !empty($custom_css)}
     <link rel="stylesheet" href="{$custom_css}">
     {/if}
