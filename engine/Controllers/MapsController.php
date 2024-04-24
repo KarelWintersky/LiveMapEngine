@@ -5,13 +5,16 @@ namespace Livemap\Controllers;
 use AJUR\Template\Template;
 use AJUR\Template\TemplateInterface;
 use Arris\Path;
+use JsonException;
 use Livemap\AbstractClass;
 use Livemap\App;
+use Livemap\OpenGraph;
 use Livemap\Units\Map;
 use Livemap\Units\MapConfig;
 use Livemap\Units\SVGParser;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use SmartyException;
 use stdClass;
 
 class MapsController extends AbstractClass
@@ -27,8 +30,8 @@ class MapsController extends AbstractClass
      *
      * @param $map_alias
      * @return void
-     * @throws \JsonException
-     * @throws \SmartyException
+     * @throws JsonException
+     * @throws SmartyException
      * @route  /map:js/alias.js
      */
     public function view_js_map_definition($map_alias)
@@ -226,15 +229,15 @@ class MapsController extends AbstractClass
                 ];
             }
         } catch (\RuntimeException $e) {
-            $this->ERROR = TRUE;
-            $this->ERROR_MESSAGE = $e->getMessage();
+            $this->error = TRUE;
+            $this->error_message = $e->getMessage();
         }
 
         $t = new Template(App::$smarty);
         $t->setTemplate("_js/theMapDefinition.tpl");
 
         if ($this->error) {
-            $t->assign('/JSBuilderError', $this->ERROR_MESSAGE);
+            $t->assign('/JSBuilderError', $this->error_message);
         }
 
         $t->assign("map", [
@@ -285,6 +288,8 @@ class MapsController extends AbstractClass
         $map = new Map();
         $map->loadConfig($map_alias);
         $map->loadMap($map_alias);
+
+        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
 
         // assign data
         $this->template->assign('map_alias', $map_alias);
@@ -341,6 +346,7 @@ class MapsController extends AbstractClass
     public function view_map_folio($map_alias)
     {
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
+
         $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
 
         $this->template->assign('map_alias', $map_alias);

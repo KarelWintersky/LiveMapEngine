@@ -5,15 +5,22 @@ namespace Livemap\Controllers;
 use Livemap\AbstractClass;
 use Livemap\Units\Storage;
 
+/**
+ * Контроллер отвечает за главную страницу и прочие информационные
+ */
 class PagesController extends AbstractClass
 {
     public function __construct()
     {
         parent::__construct();
-        $this->template->setTemplate("_pages(legacy).tpl");
-        // $this->template->setTemplate("pure.tpl");
+        $this->template->setTemplate("_pages_public.tpl");
     }
 
+    /**
+     * Главная страница сайта
+     *
+     * @return void
+     */
     public function view_frontpage()
     {
         $storage = new Storage();
