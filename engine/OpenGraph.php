@@ -22,11 +22,11 @@ class OpenGraph
     /**
      * Генерирует OpenGraph-информацию для страницы
      *
-     * @param string $map_alias
+     * @param string|null $map_alias
      * @param \stdClass|null $map
      * @return array
      */
-    public static function getInfo(string $map_alias = '', \stdClass $map = null)
+    public static function getInfo(string $map_alias = null, \stdClass $map = null)
     {
         $OG_DEFAULT = self::getDefault();
 
@@ -35,7 +35,7 @@ class OpenGraph
         }
 
         $OG = [
-            'url'           =>  "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['REQUEST_URI']}/",
+            'url'           =>  "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}",
             'type'          =>  'website',
             'domain'        =>  $_SERVER['HTTP_HOST']
         ];

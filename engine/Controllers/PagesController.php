@@ -3,6 +3,7 @@
 namespace Livemap\Controllers;
 
 use Livemap\AbstractClass;
+use Livemap\OpenGraph;
 use Livemap\Units\Storage;
 
 /**
@@ -30,6 +31,8 @@ class PagesController extends AbstractClass
 
         $this->template->assign("is_logged_in", config('auth.is_logged_in'));
         $this->template->assign("logged_email", config('auth.email'));
+
+        $this->template->assign("og", OpenGraph::getInfo(null));
 
     }
 

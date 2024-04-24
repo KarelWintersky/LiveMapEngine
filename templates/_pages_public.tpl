@@ -9,22 +9,7 @@
     <title>STORYMAPS - Карты и истории</title>
 
     {include file="_common/favicon_defs.tpl"}
-
-    <meta property="og:url" content="https://storymaps.ru/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="STORYMAPS - Карты и истории">
-    <meta property="og:description" content="STORYMAPS - Карты и истории">
-    <meta property="og:image" content="https://storymaps.ru/frontend/og_image.png">
-    <meta property="og:logo" content="https://storymaps.ru/frontend/og_image.png">
-    <meta property="og:site_name" content="STORYMAPS - Карты и истории">
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="storymaps.ru">
-    <meta property="twitter:url" content="https://storymaps.ru/">
-    <meta name="twitter:title" content="STORYMAPS - Карты и истории">
-    <meta name="twitter:description" content="STORYMAPS - Карты и истории">
-    <meta name="twitter:image" content="https://storymaps.ru/frontend/og_image.png">
+    {include file="_common/opengraph.tpl"}
 
     <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
 
