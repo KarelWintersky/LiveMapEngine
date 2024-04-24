@@ -22,7 +22,8 @@ class MapsController extends AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
-        $this->template->setTemplate("_view_maps.tpl");
+        // $this->template->setTemplate("_view_maps.tpl");
+        $this->template->setTemplate("_map.tpl");
     }
 
     /**
@@ -283,7 +284,8 @@ class MapsController extends AbstractClass
     public function view_map_fullscreen($map_alias)
     {
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
-        $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
+
+        // $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
 
         $map = new Map();
         $map->loadConfig($map_alias);
@@ -299,6 +301,8 @@ class MapsController extends AbstractClass
         }
 
         $this->template->assign('panning_step', $map->mapConfig->display->panning_step ?? 70);
+
+
         $this->template->assign('html_title', $map->mapConfig->title);
         $this->template->assign('html_callback', '/');
 
@@ -307,6 +311,16 @@ class MapsController extends AbstractClass
         $this->template->assign('map_regions_order_by_title', $map->mapRegionWithInfoOrderByTitle);
         $this->template->assign('map_regions_order_by_date', $map->mapRegionWithInfoOrderByDate);
         $this->template->assign('map_regions_count', count($map->mapRegionsWithInfo));
+
+        $this->template->assign("sections_present", [
+            'infobox'   =>  true,
+            'regions'   =>  true,
+            'backward'  =>  true,
+            'title'     =>  false,
+            'colorbox'  =>  false,
+        ]);
+        // главный обслуживающий скрипт
+        $this->template->assign('js_main_script', '/frontend/view.map.fullscreen.js');
 
         if ($map->mapViewMode === 'wide:infobox>regionbox' || $map->mapViewMode === 'infobox>regionbox') {
             $this->template->assign('section', [
@@ -335,6 +349,18 @@ class MapsController extends AbstractClass
         $this->template->assign('map_alias', $map_alias);
         $this->template->assign('html_title', $this->mapConfig->title);
         $this->template->assign('html_callback', '/');
+
+        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
+
+        $this->template->assign("sections_present", [
+            'infobox'   =>  false,
+            'regions'   =>  false,
+            'backward'  =>  true,
+            'title'     =>  false,
+            'colorbox'  =>  true,
+        ]);
+        // главный обслуживающий скрипт
+        $this->template->assign('js_main_script', '/frontend/view.map.iframe_colorbox.js');
     }
 
     /**
@@ -347,11 +373,22 @@ class MapsController extends AbstractClass
     {
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
 
-        $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
+        // $this->template->assign("inner_template", "view.map/view.map.fullscreen.tpl");
 
         $this->template->assign('map_alias', $map_alias);
         $this->template->assign('html_title', $this->mapConfig->title);
         $this->template->assign('html_callback', '/');
 
+        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
+
+        $this->template->assign("sections_present", [
+            'infobox'   =>  false,
+            'regions'   =>  false,
+            'backward'  =>  true,
+            'title'     =>  true,
+            'colorbox'  =>  false,
+        ]);
+        // главный обслуживающий скрипт
+        $this->template->assign('js_main_script', '/frontend/view.map.folio.js');
     }
 }

@@ -52,11 +52,11 @@ try {
 
     AppRouter::get('/', 'PagesController@view_frontpage', 'view.frontpage');
     AppRouter::get('/map/{id:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'], 'view.map.fullscreen');
-    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'], 'view.map.iframe');
-    AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'], 'view.map.folio');
     AppRouter::get('/map:js/{id:[\w\.]+}.js',       [\Livemap\Controllers\MapsController::class, 'view_js_map_definition', 'view.map.js']);
 
-    // AppRouter::get('/123', [ \Livemap\Controllers\PagesController::class, 'view_frontpage']);
+    // роуты для дополнительного функционала
+    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'], 'view.map.iframe');
+    AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'], 'view.map.folio');
 
     AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
 

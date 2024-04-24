@@ -22,6 +22,13 @@
 
     <script src="/map:js/{$map_alias}.js" id="the-map-data"></script>
     <script type="text/javascript" src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
+
+    <script type="text/javascript" id="init">
+        let map_alias = '{$map_alias}';
+        let regions_with_content_ids = [
+            {$regions_with_content_ids}
+        ];
+    </script>
 </head>
 <body>
 
@@ -40,12 +47,6 @@
     </span>
 </section>
 
-<script type="text/javascript" id="init">
-    let map_alias = '{$map_alias}';
-    let regions_with_content_ids = [
-        {$regions_with_content_ids}
-    ];
-</script>
 
 <script type="text/javascript" src="/frontend/view.map.iframe_colorbox.js"></script>
 
