@@ -1,4 +1,4 @@
-const URL_GETREGIONCONTENT = '/region/get?map=';
+const URL_GET_REGION_CONTENT = '/region/get?map=';
 
 Number.prototype.between = function(a, b) {
     let min = Math.min.apply(Math, [a, b]),
@@ -23,37 +23,63 @@ $.fn.escape = function (callback) {
     });
 };
 /* ==================================================== create map =================================================== */
-setup_MapCreate = function(target, theMap) {
-    var map = null;
+setup_MapCreate = function(target, theMap, options = {}) {
+    let map = null;
+
+    let use_zoom_slider;
+    let use_zoom_slider_position = options['zoom_slider_position'] || 'bottomright';
+
+    let _options = {
+        crs: L.CRS.Simple,
+        minZoom: theMap['display']['zoom_min'],
+        maxZoom: theMap['display']['zoom_max'],
+        preferCanvas: true,
+        renderer: L.canvas(),
+    };
+
+    switch (options['zoom_mode']) {
+        case 'native': {
+            _options.zoomControl = true;
+            // _options.zoomSnap = 0.1;
+            // _options.wheelDebounceTime = 100;
+            use_zoom_slider = false;
+            break;
+        }
+        case 'smooth': {
+            _options.scrollWheelZoom = false;   // disable original zoom function
+            _options.smoothWheelZoom = true;    // enable smooth zoom
+            _options.smoothSensitivity = 1;     // zoom speed. default is 1
+            use_zoom_slider = false;
+            _options.zoomControl = true;
+            break;
+        }
+        default: {
+            _options.zoomControl = false;
+            use_zoom_slider = true;
+        }
+    }
 
     switch (theMap.map.type) {
         case 'bitmap': {
-            map = L.map(target, {
-                crs: L.CRS.Simple,
-                minZoom: theMap['display']['zoom_min'],
-                maxZoom: theMap['display']['zoom_max'],
-                preferCanvas: true,
-                renderer: L.canvas(),
-                zoomControl: false,
-            });
-            map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+            map = L.map(target, _options);
+
+            if (use_zoom_slider) {
+                map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
+            }
 
             break;
         }
         case 'vector': {
-            map = L.map(target, {
-                crs: L.CRS.Simple,
-                minZoom: theMap['display']['zoom_min'],
-                maxZoom: theMap['display']['zoom_max'],
-                preferCanvas: true,
-                renderer: L.canvas(),
-                zoomControl: false,
-            });
-            map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+            map = L.map(target, _options);
+
+            if (use_zoom_slider) {
+                map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
+            }
 
             break;
         }
         case 'tileset': {
+            //@todo
             break;
         }
     }
@@ -62,30 +88,42 @@ setup_MapCreate = function(target, theMap) {
 }
 
 setup_MapSetMaxBounds = function(map, theMap) {
-    var base_map_bounds  = [ [0, 0], [theMap['map']['height'], theMap['map']['width'] ] ];
+    const base_map_bounds = [
+        [0, 0],
+        [theMap['map']['height'], theMap['map']['width']]
+    ];
+
     if (theMap['maxbounds']) {
-        var mb = theMap['maxbounds'];
-        map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
+        let mb = theMap['maxbounds'];
+        map.setMaxBounds([
+            [
+                mb['topleft_h'] * theMap['map']['height'],
+                mb['topleft_w'] * theMap['map']['width']
+            ],
+            [
+                mb['bottomright_h'] * theMap['map']['height'],
+                mb['bottomright_w'] * theMap['map']['width']
+            ]
+        ]);
     }
     return base_map_bounds;
 }
 
 setup_MapCreateOverlay = function(map, theMap, bounds) {
-    var image = null;
+    let image = null;
 
     switch (theMap.map.type) {
         case 'bitmap': {
             image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
-
             break;
         }
         case 'vector': {
             image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
-
-
             break;
         }
         case 'tileset': {
+            //@todo: почему ESO-то?
+            // storage/ID/tiles/z/x_y.jpg - наверное так должно быть?
             L.tileLayer('eso/{z}/{x}/{y}.jpg', {
                 minZoom: theMap['display']['zoom_min'],
                 maxZoom: theMap['display']['zoom_max'],
@@ -114,13 +152,14 @@ setup_MapCreateOverlay = function(map, theMap, bounds) {
  */
 showContentColorbox = function(id_region , title) {
     let is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
-    // let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region + is_iframe;
-    let url = `${URL_GETREGIONCONTENT}${map_alias}&id=${id_region}${is_iframe}`
+    let url = `${URL_GET_REGION_CONTENT}${map_alias}&id=${id_region}${is_iframe}`
 
     $.get( url, function() {
+
     }).done(function(data) {
         let colorbox_width  = 800;
         let colorbox_height = 600;
+
         $.colorbox({
             html: data,
             width: colorbox_width,
@@ -142,7 +181,7 @@ do_LoadContent = function(id_region) {
     if (IS_DEBUG) console.log("Called do_LoadContent for " + id_region);
 
     if (current_infobox_region_id !== id_region) {
-        let url = URL_GETREGIONCONTENT + map_alias + '&id=' + id_region;
+        let url = URL_GET_REGION_CONTENT + map_alias + '&id=' + id_region;
 
         $("#section-infobox-content").html('');
 
@@ -391,30 +430,32 @@ createControl_Backward = function(position){
 /* ==================================================== toggles ====================================================== */
 
 toggleRegionsBox = function(el) {
-    var state = $(el).data('content-is-visible');
-    var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
+    let state = $(el).data('content-is-visible');
+    let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
     $(el).html(text);
 
-    var data = $(el).data('content');
+    let data = $(el).data('content');
     $('#' + data).toggle();
     $('#sort-select').toggle();
     $(el).data('content-is-visible', !state);
 };
+
 toggleInfoBox = function(el) {
-    var state = $(el).data('content-is-visible');
-    var text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
+    let state = $(el).data('content-is-visible');
+    let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
     $(el).html(text);
 
-    var data = $(el).data('content');
+    let data = $(el).data('content');
     $('#' + data).toggle();
     $(el).data('content-is-visible', !state);
 }
+
 toggle_BackwardBox = function(el){
-    var state = $(el).data('content-is-visible');
-    var text = (state == false) ? '&lt;' : '&gt;';
+    let state = $(el).data('content-is-visible');
+    let text = (state == false) ? '&lt;' : '&gt;';
     $(this).html(text);
 
-    var data = $(el).data('content');
+    let data = $(el).data('content');
     $('#' + data).toggle();
     $(this).data('content-is-visible', !state);
 }
@@ -429,30 +470,38 @@ toggle_BackwardBox = function(el){
  * @returns {Object}
  */
 buildPolymap = function(theMap) {
-    var polymap = Object.create(null);
+    let polymap = Object.create(null);
 
     Object.keys( theMap.regions ).forEach(function( key ){
-        var region = theMap.regions[ key ];
-        var type = region['type'];
-        var coords = region['coords'];
+        let region = theMap.regions[key];
+        let type = region['type'];
+        let coords = region['coords'];
 
         // DEFAULTS for ALL polygons
-        var options = {
-            color: region['borderColor']      ||  theMap.region_defaults_empty.borderColor,
-            weight: region['borderWidth']      ||  theMap.region_defaults_empty.borderWidth,
-            opacity: region['borderOpacity']    ||  theMap.region_defaults_empty.borderOpacity,
-            fillColor: region['fillColor']  ||  theMap.region_defaults_empty.fillColor,
+        let options = {
+            color: region['borderColor'] || theMap.region_defaults_empty.borderColor,
+            weight: region['borderWidth'] || theMap.region_defaults_empty.borderWidth,
+            opacity: region['borderOpacity'] || theMap.region_defaults_empty.borderOpacity,
+            fillColor: region['fillColor'] || theMap.region_defaults_empty.fillColor,
             fillOpacity: region['fillOpacity'] || theMap.region_defaults_empty.fillOpacity,
             radius: region['radius'] || 10
         };
 
-        var entity;
-        if (type == 'polygon') {
-            entity = L.polygon(coords, options);
-        } else if (type == 'rect') {
-            entity = L.rectangle(coords, options);
-        } else if (type == 'circle') {
-            entity = L.circle(coords, options)
+        let entity;
+        switch (type) {
+            case 'polygon': {
+                entity = L.polygon(coords, options);
+                break;
+            }
+            case 'rect': {
+                entity = L.rectangle(coords, options);
+                break;
+            }
+            case 'circle': {
+                entity = L.circle(coords, options);
+                break;
+            }
+            //@todo: КАЖЕТСЯ СЮДА НАДО ДОБАВЛЯТЬ НОВЫЕ ТИПЫ ОБЪЕКТОВ НА КАРТЕ
         }
 
         polymap[ key ] = entity;
@@ -477,9 +526,9 @@ buildPolymap = function(theMap) {
  * @returns {boolean}
  */
 wlhBased_GetAction = function(polymap) {
-    var wlh = window.location.hash;
-    var wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
-    var options = false;
+    let wlh = window.location.hash;
+    let wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
+    let options = false;
 
     if (
         ((wlh.length > 1) && (wlh_params !== null))

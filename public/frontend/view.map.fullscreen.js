@@ -1,19 +1,21 @@
-var focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
-var focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
-var focus_timeout = theMap['display']['focus_timeout'] || 1500;
-var current_infobox_region_id = '';
-var map;
-var base_map_bounds;
-var __InfoBox = null;
-var IS_DEBUG = false;
-var LGS = Object.create(null);
-var polymap = Object.create(null);
+const focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
+const focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
+const focus_timeout = theMap['display']['focus_timeout'] || 1500;
+const IS_DEBUG = false;
 
+let current_infobox_region_id = '';
+let map;
+let base_map_bounds;
+let __InfoBox = null;
+let LGS = Object.create(null);
+let polymap = Object.create(null);
 
-;$(function(){
+$(function(){
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
-    map = setup_MapCreate('map', theMap);
+    map = setup_MapCreate('map', theMap, {
+        zoom_mode: theMap['display']['zoom_mode']
+    });
 
     base_map_bounds = setup_MapSetMaxBounds(map, theMap);
 
@@ -127,8 +129,8 @@ var polymap = Object.create(null);
 
 }).on('click', '#actor-edit', function(){
 
-    var region_id = $(this).data('region-id');
-    document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
+    let region_id = $(this).data('region-id');
+    document.location.href = `/edit/region?map=${map_alias}&id=${region_id}`;
 
 }).on('click', '#actor-regions-toggle', function (el) {
 

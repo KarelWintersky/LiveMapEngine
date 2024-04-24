@@ -21,10 +21,15 @@
     <script src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
     <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css">
 
+    <script src="/frontend/leaflet/SmoothWheelZoom.js"></script>
+
     {if $sections_present.colorbox}
         <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
         <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
     {/if}
+    <script>
+        window.theMap = { };
+    </script>
 
     <script src="/map:js/{$map_alias}.js" id="the-map-data"></script>
     <script src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>

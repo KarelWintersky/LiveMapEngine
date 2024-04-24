@@ -254,6 +254,7 @@ class MapsController extends AbstractClass
             'zoom'                      =>  $json->display->zoom,
             'zoom_max'                  =>  $json->display->zoom_max,
             'zoom_min'                  =>  $json->display->zoom_min,
+            'zoom_mode'                 =>  $json->display->zoom_mode ?? 'slider',
             'background_color'          =>  $json->display->background_color,
             'custom_css'                =>  $json->display->custom_css ?? '',
             'focus_animate_duration'    =>  $json->display->focus_animate_duration ?? 0.7,
@@ -268,7 +269,7 @@ class MapsController extends AbstractClass
         $t->assign('regions', $paths_data);
 
         $content = $t->render();
-        $content = preg_replace('/^\h*\v+/m', '', $content);
+        $content = preg_replace('/^\h*\v+/m', '', $content); // удаляем лишние переводы строк
 
         $this->template->assignRAW($content);
         $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);

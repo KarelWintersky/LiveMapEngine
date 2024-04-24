@@ -1,7 +1,8 @@
-var theMap = {
+window.theMap = {
     {if $JSBuilderError}"JSBuilderError": "{$JSBuilderError}",{/if}
 
     "map": {
+
         "title"             :   "{$map.title}",
         "type"              :   "{$map.type}",
         "imagefile"         :   "/storage/{$map.alias}/{$map.imagefile}",
@@ -13,6 +14,7 @@ var theMap = {
 
     {if $source_image}
     "image": {
+
         "file"              :   "/storage/{$map.alias}/{$source_image.file}",
         "width"             :   {$source_image.width},
         "height"            :   {$source_image.height},
@@ -25,6 +27,7 @@ var theMap = {
         "zoom"              :   {$display.zoom},
         "zoom_min"          :   {$display.zoom_min},
         "zoom_max"          :   {$display.zoom_max},
+        "zoom_mode"         :   "{$display.zoom_mode|default:'slider'}",
         "background_color"  :   "{$display.background_color}",
 
         {if $display.custom_css}"custom_css" : "{$display.custom_css}",{/if}
@@ -32,11 +35,13 @@ var theMap = {
         {if $maxbounds}
 
         "maxbounds": {
+
             {foreach $maxbounds as $key => $value}
 
             "{$key}": "{$value}",
 
             {/foreach}
+
         },
         {/if}
 
@@ -87,9 +92,11 @@ var theMap = {
         },
 
     {/foreach}
+
     },
 
     "regions": {
+
     {foreach $regions as $region}
 
         "{$region.id}": {
@@ -123,6 +130,7 @@ var theMap = {
         },
 
     {/foreach}
+
     }
 };
 
