@@ -2,6 +2,9 @@
 
 namespace Livemap\Units;
 
+use SimpleXMLElement;
+use stdClass;
+
 /**
  * User: Arris
  * Date: 15.01.2018, time: 18:47
@@ -75,8 +78,9 @@ class SVGParser {
      * Создает экземпляр класса
      * @param $svg_file_content
      */
-    public function __construct( $svg_file_content ) {
-        libxml_use_internal_errors(true);
+    public function __construct( $svg_file_content )
+    {
+        \libxml_use_internal_errors(true);
 
         try {
             $this->svg = new \SimpleXMLElement( $svg_file_content );
@@ -87,7 +91,7 @@ class SVGParser {
 
         } catch (\Exception $e) {
             $this->svg_parsing_error = array(
-                'state'     =>  TRUE,
+                'state'     =>  true,
                 'code'      =>  $e->getCode(),
                 'message'   =>  $e->getMessage()
             );
@@ -99,9 +103,9 @@ class SVGParser {
      * Изображения у нас обычно задают фон (изображение с индексом 0)
      *
      * @param $layer_name
-     * @return bool|int
+     * @return bool
      */
-    public function parseImages( $layer_name )
+    public function parseImages( $layer_name ):bool
     {
         if ($layer_name !== '') {
             $xpath_images_layer_attrs = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]';
@@ -130,16 +134,17 @@ class SVGParser {
         }
 
         $this->layer_images = $this->svg->xpath($xpath_images);
-        return TRUE;
+
+        return true;
     }
 
     /**
      * Возвращает количество изображений
      * @return int
      */
-    public function getImagesCount()
+    public function getImagesCount(): int
     {
-        return count($this->layer_images);
+        return \count($this->layer_images);
     }
 
     /**
@@ -150,7 +155,7 @@ class SVGParser {
      */
     private function parseTransform($transform_definition)
     {
-        if (1 == preg_match('/translate\(\s*([^\s,)]+)[\s,]([^\s,)]+)/', $transform_definition, $translate_matches)) {
+        if (1 == \preg_match('/translate\(\s*([^\s,)]+)[\s,]([^\s,)]+)/', $transform_definition, $translate_matches)) {
             return [
                 'ox'    =>  (float)$translate_matches[1],
                 'oy'    =>  (float)$translate_matches[2]
@@ -170,18 +175,18 @@ class SVGParser {
      */
     public function getImageInfo($index = 0)
     {
-        if (array_key_exists($index, $this->layer_images)) {
+        if (\array_key_exists($index, $this->layer_images)) {
             /**
              * @var SimpleXMLElement $an_image
              */
             $an_image = $this->layer_images[ $index ];
 
             return array(
-                'width'     =>  round((float)$an_image->attributes()->{'width'}, self::ROUND_PRECISION),
-                'height'    =>  round((float)$an_image->attributes()->{'height'}, self::ROUND_PRECISION),
-                'ox'        =>  round((float)$an_image->attributes()->{'x'} + (float)$this->layer_images_translation['ox'], self::ROUND_PRECISION),
-                'oy'        =>  round((float)$an_image->attributes()->{'y'} + (float)$this->layer_images_translation['oy'], self::ROUND_PRECISION),
-                'xhref'     =>       (string)$an_image->attributes('xlink', true)->{'href'}
+                'width'     =>  \round((float)$an_image->attributes()->{'width'}, self::ROUND_PRECISION),
+                'height'    =>  \round((float)$an_image->attributes()->{'height'}, self::ROUND_PRECISION),
+                'ox'        =>  \round((float)$an_image->attributes()->{'x'} + (float)$this->layer_images_translation['ox'], self::ROUND_PRECISION),
+                'oy'        =>  \round((float)$an_image->attributes()->{'y'} + (float)$this->layer_images_translation['oy'], self::ROUND_PRECISION),
+                'xhref'     =>              (string)$an_image->attributes('xlink', true)->{'href'}
             );
         }
     
@@ -232,7 +237,7 @@ class SVGParser {
         $data = (array)$this->layer_elements;
         $data = $part != '' ? $data[$part] : $data ;
 
-        var_dump( $data );
+        \var_dump( $data );
     }
 
     /**
@@ -245,7 +250,7 @@ class SVGParser {
      */
     public function set_CRSSimple_TranslateOptions($ox = NULL , $oy = NULL, $image_height = NULL)
     {
-        if (!( is_null($ox) || is_null($oy) || is_null($image_height))) {
+        if (!( \is_null($ox) || \is_null($oy) || \is_null($image_height))) {
             $this->crs_translation_options = [
                 'ox'    =>  $ox,
                 'oy'    =>  $oy,
@@ -280,7 +285,7 @@ class SVGParser {
                 // SVG Path -> Polygon
                 $coords = $this->convert_SVGElement_to_Polygon( $element );
                 if (!$coords) {
-                    return false;
+                    return [];
                 }
 
                 // сдвиг координат и преобразрвание в CRS-модель
@@ -296,12 +301,12 @@ class SVGParser {
                 // кол-во путей 1
                 // кол-во узлов 1
                 $data['type'] = 'circle';
-                $data['radius'] = round((float)$element->attributes()->{'r'}, self::ROUND_PRECISION); //@todo: existance check
+                $data['radius'] = \round((float)$element->attributes()->{'r'}, self::ROUND_PRECISION); //@todo: existance check
 
                 // SVG Path -> Polygon
                 $coords = $this->convert_SVGElement_to_Circle( $element );
                 if (!$coords) {
-                    return false;
+                    return [];
                 }
 
                 // сдвиг координат и преобразрвание в CRS-модель
@@ -319,7 +324,7 @@ class SVGParser {
                 $data['type'] = 'rect';
                 $coords = $this->convert_SVGElement_to_Rect( $element );
                 if (!$coords) {
-                    return false;
+                    return [];
                 }
 
                 $data['coords'][] = [
@@ -336,12 +341,12 @@ class SVGParser {
 
                 //@todo: rx, ry existance check
 
-                $data['radius'] = round( ( (float)$element->attributes()->{'rx'} + (float)$element->attributes()->{'ry'} ) /2 , self::ROUND_PRECISION);
+                $data['radius'] = \round( ( (float)$element->attributes()->{'rx'} + (float)$element->attributes()->{'ry'} ) /2 , self::ROUND_PRECISION);
 
                 // SVG Element to coords
                 $coords = $this->convert_SVGElement_to_Circle( $element );
                 if (!$coords) {
-                    return false;
+                    return [];
                 }
 
                 // сдвиг координат и преобразрвание в CRS-модель
@@ -357,21 +362,21 @@ class SVGParser {
         // получем информацию об атрибутах региона из SVG-разметки
 
         // получаем атрибут fillColor
-        if (preg_match('#fill:([\#\d\w]{7})#', $path_style, $path_style_fillColor) ) {
+        if (\preg_match('#fill:([\#\d\w]{7})#', $path_style, $path_style_fillColor) ) {
             $data['fillColor'] = $path_style_fillColor[1];
         } else {
             $data['fillColor'] = null;
         };
 
         // получаем атрибут fillOpacity
-        if (preg_match('#fill-opacity:([\d]?\.[\d]{0,8})#', $path_style, $path_style_fillOpacity) ) {
+        if (\preg_match('#fill-opacity:([\d]?\.[\d]{0,8})#', $path_style, $path_style_fillOpacity) ) {
             $data['fillOpacity'] = round($path_style_fillOpacity[1] , self::ROUND_PRECISION);
         } else {
             $data['fillOpacity'] = null;
         };
 
         // получаем атрибут fillRule
-        if (preg_match('#fill-rule:(evenodd|nonzero)#', $path_style, $path_style_fillRule) ) {
+        if (\preg_match('#fill-rule:(evenodd|nonzero)#', $path_style, $path_style_fillRule) ) {
             if ($path_style_fillRule[1] !== 'evenodd') {
                 $data['fillRule'] = $path_style_fillRule[1];
             }
@@ -413,13 +418,13 @@ class SVGParser {
         // получаем title узла
         $path_title = (string)$element->{'title'}[0];
         if ($path_title) {
-            $data['title'] = htmlspecialchars($path_title, ENT_QUOTES | ENT_HTML5);
+            $data['title'] = \htmlspecialchars($path_title, ENT_QUOTES | ENT_HTML5);
         }
 
         // получаем description узла
         $path_desc = (string)$element->{'desc'}[0];
         if ($path_desc) {
-            $data['desc'] = htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
+            $data['desc'] = \htmlspecialchars($path_desc, ENT_QUOTES | ENT_HTML5);
         }
 
         $data['layer'] = $this->layer_name;
@@ -559,27 +564,29 @@ class SVGParser {
     }
 
     // применяет трансформацию к субполигону
-    public function apply_transform_for_subpolygon( $subpolyline, $options = NULL) {
-        return array_map( function($knot) use ($options) {
+    public function apply_transform_for_subpolygon( $subpolyline, $options = NULL)
+    {
+        return \array_map( function($knot) use ($options) {
             return $this->apply_transform_for_knot( $knot );
         }, $subpolyline);
     }
 
     // применяет трансформацию к мультиполигону
-    public function apply_transform_for_polygon( $polygon, $options ) {
+    public function apply_transform_for_polygon( $polygon, $options )
+    {
         if (empty($polygon)) {
             return array();
         }
 
         return
-            ( count($polygon) > 1 )
+            ( \count($polygon) > 1 )
             ?
-                array_map( function($subpoly) use ($options) {
+                \array_map( function($subpoly) use ($options) {
                     return $this->apply_transform_for_subpolygon($subpoly, $options);
                 }, $polygon )
             :
                 array(
-                    $this->apply_transform_for_subpolygon( array_shift($polygon), $options)
+                    $this->apply_transform_for_subpolygon( \array_shift($polygon), $options)
                 );
     }
 
@@ -592,22 +599,22 @@ class SVGParser {
         }
 
         return
-            ( count($polygon) > 1 )    // если суб-полигонов больше одного
+            ( \count($polygon) > 1 )    // если суб-полигонов больше одного
                 ?
                 // проходим по всем
-                array_map( function($subpath) {
+                \array_map( function($subpath) {
                     return $this->convert_to_SimpleCRS_subpolygon( $subpath );
                 }, $polygon )
                 :
                 // иначе возвращаем первый элемент массива субполигонов, но как единственный элемент массива!
                 array(
-                    $this->convert_to_SimpleCRS_subpolygon( array_shift($polygon) )
+                    $this->convert_to_SimpleCRS_subpolygon( \array_shift($polygon) )
                 );
     }
 
     public function convert_to_SimpleCRS_subpolygon( $subpolygon )
     {
-        return array_map( function($knot) {
+        return \array_map( function($knot) {
             return $this->convert_to_SimpleCRS_knot( $knot );
         }, $subpolygon);
     }
@@ -620,8 +627,8 @@ class SVGParser {
 
         // (X, Y) => (Height - (Y-oY) , (X-oX)
         return [
-            'x'     =>  round( $height - ($knot['y'] - $oy), self::ROUND_PRECISION),
-            'y'     =>  round(           ($knot['x'] - $ox), self::ROUND_PRECISION)
+            'x'     =>  \round( $height - ($knot['y'] - $oy), self::ROUND_PRECISION),
+            'y'     =>  \round(           ($knot['x'] - $ox), self::ROUND_PRECISION)
         ];
     }
 
@@ -631,7 +638,10 @@ class SVGParser {
     /**
      * выполняет трансляцию узла в CRS-модель
      *
-     * @todo: @warning: ГРЯЗНЫЙ ХАК: Тут мы сделали важное упрощение - сдвиг объектов на слое и трансляция данных в модель CRS делаются в одной функции, которая (если судить просто по имени) должна только транслировать вершину в CRS-модель. Это сделано для упрощения, но потенциально здесь может крыться ошибка!
+     * @todo: @warning: ГРЯЗНЫЙ ХАК:
+     * Тут мы сделали важное упрощение - сдвиг объектов на слое и трансляция данных в модель CRS делаются в одной функции,
+     * которая (если судить просто по имени) должна только транслировать вершину в CRS-модель.
+     * Это сделано для упрощения, но потенциально здесь может крыться ошибка!
      *
      * @param $knot
      * @return array
@@ -655,8 +665,8 @@ class SVGParser {
 
         // (X, Y) => (Height - (Y-oY) , (X-oX)
         return [
-            'x'     =>  round( $height - ($knot['y'] - $oy) , self::ROUND_PRECISION),
-            'y'     =>  round( $knot['x'] - $ox, self::ROUND_PRECISION)
+            'x'     =>  \round( $height - ($knot['y'] - $oy) , self::ROUND_PRECISION),
+            'y'     =>  \round( $knot['x'] - $ox, self::ROUND_PRECISION)
         ];
     }
 
@@ -667,7 +677,7 @@ class SVGParser {
      */
     public function translate_subpolygon_from_XY_to_CRS( $subpolyline )
     {
-        return array_map( function($knot) {
+        return \array_map( function($knot) {
             return $this->translate_knot_from_XY_to_CRS( $knot );
         }, $subpolyline);
     }
@@ -688,14 +698,14 @@ class SVGParser {
         }
 
         return
-            ( count($polygone) > 1 )    // если суб-полигонов больше одного
+            ( \count($polygone) > 1 )    // если суб-полигонов больше одного
                 ?                           // проходим по всем
-                array_map( function($subpath) {
+                \array_map( function($subpath) {
                     return $this->translate_subpolygon_from_XY_to_CRS( $subpath );
                 }, $polygone )
                 : // возвращаем первый элемент массива субполигонов, но как единственный элемент массива!
                 array(
-                    $this->translate_subpolygon_from_XY_to_CRS( array_shift($polygone)
+                    $this->translate_subpolygon_from_XY_to_CRS( \array_shift($polygone)
                 )
             );
     }
@@ -726,7 +736,7 @@ class SVGParser {
 
         // если путь не заканчивается на z/Z - это какая-то херня, а не путь. Отбрасываем
         //@todo: [УЛУЧШИТЬ] PARSE_SVG -- unfinished paths may be correct?
-        if ( 'z' !== strtolower(substr($path, -1)) ) {
+        if ( 'z' !== \strtolower(\substr($path, -1)) ) {
             return array();
         }
 
@@ -744,14 +754,14 @@ class SVGParser {
 
         // есть ли в пути управляющие последовательности кривых Безье любых видов?
         $charlist_unsupported_knots = 'CcSsQqTtAa'; // так быстрее, чем регулярка по '#(C|c|S|s|Q|q|T|t|A|a)#'
-        if (strpbrk($path, $charlist_unsupported_knots)) {
-            return array();
+        if (\strpbrk($path, $charlist_unsupported_knots)) {
+            return [];
         }
 
-        $path_fragments = explode(' ', $path);
+        $path_fragments = \explode(' ', $path);
 
-        $polygon = array();             // массив узлов полигона
-        $multipolygon = array();        // массив, содержащий все полигоны. Если в нём один элемент - то у фигуры один полигон.
+        $polygon = [];             // массив узлов полигона
+        $multipolygon = [];        // массив, содержащий все полигоны. Если в нём один элемент - то у фигуры один полигон.
 
         $polygon_is_relative = null;    // тип координат: TRUE - Относительные, false - абсолютные, null - не определено
         $prev_knot_x = 0;               // X-координата предыдущего узла
@@ -763,13 +773,15 @@ class SVGParser {
         $LOOKAHEAD_FLAG = self::PATHSEG_UNDEFINED;
 
         do {
-            $fragment = array_splice($path_fragments, 0, 1)[0];
+            $fragment = \array_splice($path_fragments, 0, 1)[0];
 
             if ($is_debug) echo PHP_EOL, "Извлеченный фрагмент : ", $fragment, PHP_EOL;
 
-            if ( $fragment === 'Z') $fragment = 'z';
+            if ( $fragment === 'Z') {
+                $fragment = 'z';
+            }
 
-            if ( strpbrk($fragment, 'MmZzHhVvLl') ) {    // faster than if (preg_match('/(M|m|Z|z|H|h|V|v|L|l)/', $fragment) > 0)
+            if ( \strpbrk($fragment, 'MmZzHhVvLl') ) {    // faster than if (preg_match('/(M|m|Z|z|H|h|V|v|L|l)/', $fragment) > 0)
                 switch ($fragment) {
                     case 'M' : {
                         $LOOKAHEAD_FLAG = self::PATHSEG_MOVETO_ABS;
@@ -831,7 +843,7 @@ class SVGParser {
                     //@todo: Подумать над ускорением преобразования (ЧИСЛО,ЧИСЛО)
 
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)\,(?<Y>\-?\d+(\.\d+)?)+#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     // так как путь относительный, moveto делается относительно предыдущего положения "пера"
                     // вообще, скорее всего, нам не нужны совсем переменные $path_start_x и $path_start_y
@@ -839,10 +851,11 @@ class SVGParser {
                     $path_start_y = $prev_knot_y;
 
                     if ($matches_count > 0) {
-                        $xy = array(
-                            'x' =>  $path_start_x + $knot['X'],
-                            'y' =>  $path_start_y + $knot['Y']
-                        );
+                        //@todo: bcmath - bcadd(x, y)
+                        $xy = [
+                            'x' =>  (float)$path_start_x + (float)$knot['X'],
+                            'y' =>  (float)$path_start_y + (float)$knot['Y']
+                        ];
                         $polygon[] = $xy;
 
                         $prev_knot_x = $xy['x'];
@@ -863,7 +876,7 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением преобразования (ЧИСЛО,ЧИСЛО)
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)\,(?<Y>\-?\d+(\.\d+)?)+#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     // вообще, скорее всего, нам не нужны совсем переменные $path_start_x и $path_start_y
                     $path_start_x = 0;
@@ -871,8 +884,8 @@ class SVGParser {
 
                     if ($matches_count > 0) {
                         $xy = array(
-                            'x' =>  $path_start_x + $knot['X'],
-                            'y' =>  $path_start_y + $knot['Y']
+                            'x' =>  (float)$path_start_x + (float)$knot['X'],
+                            'y' =>  (float)$path_start_y + (float)$knot['Y']
                         );
                         $polygon[] = $xy;
 
@@ -895,7 +908,7 @@ class SVGParser {
                     //@todo: формат с запятыми - это inkscape-friendly запись. Стандарт считает, что запятая не нужна и числа идут просто парами через пробел.
 
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)\,(?<Y>\-?\d+(\.\d+)?)+#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     // Если это неправильная комбинация float-чисел - пропускаем обработку и идем на след. итерацию
                     if ($matches_count == 0) continue;
@@ -906,8 +919,8 @@ class SVGParser {
                         // var_dump('Это первый узел. Он всегда задается в абсолютных координатах! ');
 
                         $xy = array(
-                            'x' =>  $prev_knot_x + $knot['X'],
-                            'y' =>  $prev_knot_y + $knot['Y']
+                            'x' =>  (float)$prev_knot_x + (float)$knot['X'],
+                            'y' =>  (float)$prev_knot_y + (float)$knot['Y']
                         );
 
                         $polygon[] = $xy;
@@ -921,8 +934,8 @@ class SVGParser {
                             // var_dump("его координаты относительные и даны относительно предыдущего узла полилинии ");
 
                             $xy = array(
-                                'x' =>  $prev_knot_x + $knot['X'],
-                                'y' =>  $prev_knot_y + $knot['Y']
+                                'x' =>  (float)$prev_knot_x + (float)$knot['X'],
+                                'y' =>  (float)$prev_knot_y + (float)$knot['Y']
                             );
 
                             $polygon[] = $xy;
@@ -946,7 +959,7 @@ class SVGParser {
 
                         } // if()
                     } // endif (polygon)
-                    if ($is_debug) var_dump($xy);
+                    if ($is_debug) \var_dump($xy);
                     unset($xy);
                 } // if ($LOOKAHEAD_FLAG == SVGPATH_UNDEFINED || $LOOKAHEAD_FLAG == SVGPATH_NORMAL_KNOT )
 
@@ -957,7 +970,7 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
@@ -978,12 +991,12 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
-                            'x' =>  $prev_knot_x + $knot['X'],
-                            'y' =>  $prev_knot_y
+                            'x' =>  (float)$prev_knot_x + (float)$knot['X'],
+                            'y' =>  (float)$prev_knot_y
                         );
 
                         $polygon[] = $xy;
@@ -999,7 +1012,7 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<Y>\-?\d+(\.\d+)?)#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
@@ -1020,12 +1033,12 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<Y>\-?\d+(\.\d+)?)#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
                             'x' =>  $prev_knot_x,
-                            'y' =>  $prev_knot_y + $knot['Y']
+                            'y' =>  (float)$prev_knot_y + (float)$knot['Y']
                         );
 
                         $polygon[] = $xy;
@@ -1042,7 +1055,7 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)\,(?<Y>\-?\d+(\.\d+)?)+#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
@@ -1063,12 +1076,12 @@ class SVGParser {
 
                     //@todo: Подумать над ускорением проверки (ЧИСЛО)
                     $pattern = '#(?<X>\-?\d+(\.\d+)?)\,(?<Y>\-?\d+(\.\d+)?)+#';
-                    $matches_count = preg_match($pattern, $fragment, $knot);
+                    $matches_count = \preg_match($pattern, $fragment, $knot);
 
                     if ($matches_count > 0) {
                         $xy = array(
-                            'x' =>  $prev_knot_x + $knot['X'],
-                            'y' =>  $prev_knot_y + $knot['Y']
+                            'x' =>  (float)$prev_knot_x + (float)$knot['X'],
+                            'y' =>  (float)$prev_knot_y + (float)$knot['Y']
                         );
 
                         $polygon[] = $xy;
@@ -1085,7 +1098,7 @@ class SVGParser {
 
         // обработка мультиполигона
 
-        if ($is_debug) var_dump($multipolygon);
+        if ($is_debug) \var_dump($multipolygon);
 
         return $multipolygon;
     }
@@ -1134,16 +1147,14 @@ class SVGParser {
 
         $js_coords_string = array();
 
-        if (count($multicoords) > 1) {
-            array_walk( $multicoords, function($sub_coords) use (&$js_coords_string) {
+        if (\count($multicoords) > 1) {
+            \array_walk( $multicoords, function($sub_coords) use (&$js_coords_string) {
                 $js_coords_string[] = $this->convert_subCRS_to_JSstring( $sub_coords );
             });
-            return '[ ' . implode(', ' , $js_coords_string) . ' ]';
+            return '[ ' . \implode(', ' , $js_coords_string) . ' ]';
         }
-    
-        $js_coords_string = $this->convert_subCRS_to_JSstring( array_shift($multicoords));
-        return $js_coords_string;
-    
+
+        return $this->convert_subCRS_to_JSstring( array_shift($multicoords));
     }
 
     /**
@@ -1153,10 +1164,9 @@ class SVGParser {
      */
     public function convert_knotCRS_to_JSstring ( $knot )
     {
-        return '[' . implode(',', array(
-            $knot['x'],
-            $knot['y']
-        )) . ']';
+        return '['
+            . \implode(',', [ $knot['x'], $knot['y'] ])
+            . ']';
     }
 
     /**
@@ -1168,11 +1178,11 @@ class SVGParser {
     {
         $js_coords_string = array();
 
-        array_walk( $coords, function($knot) use (&$js_coords_string) {
+        \array_walk( $coords, function($knot) use (&$js_coords_string) {
             $js_coords_string[] = $this->convert_knotCRS_to_JSstring( $knot );
         });
 
-        return '[ ' . implode(', ' , $js_coords_string) . ' ]';
+        return '[ ' . \implode(', ' , $js_coords_string) . ' ]';
     }
 
     /* =================== EXPORT ==================== */
@@ -1200,23 +1210,23 @@ PDT;
             'type': '{$path_data['type']}',
             'coords': {$coords_js}";
 
-            if (array_key_exists('fillColor', $path_data)) {
+            if (\array_key_exists('fillColor', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'fillColor' : '{$path_data['fillColor']}'";
             }
-            if (array_key_exists('fillOpacity', $path_data)) {
+            if (\array_key_exists('fillOpacity', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'fillOpacity' : '{$path_data['fillOpacity']}'";
             }
-            if (array_key_exists('fillRule', $path_data)) {
+            if (\array_key_exists('fillRule', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'fillRule' : '{$path_data['fillRule']}'";
             }
-            if (array_key_exists('title', $path_data)) {
+            if (\array_key_exists('title', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'title' : '{$path_data['title']}'";
             }
-            if (array_key_exists('desc', $path_data)) {
+            if (\array_key_exists('desc', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'desc' : '{$path_data['desc']}'";
             }
 
-            if (array_key_exists('radius', $path_data)) {
+            if (\array_key_exists('radius', $path_data)) {
                 $path_data_text .= ', ' . PHP_EOL . "            'radius' : '{$path_data['radius']}'";
             }
 
@@ -1226,7 +1236,7 @@ PDT;
         }
 
         // массив строк оборачиваем запятой если нужно
-        return implode(','.PHP_EOL, $all_paths_text);
+        return \implode(',' . PHP_EOL, $all_paths_text);
     }
 
 
