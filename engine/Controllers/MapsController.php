@@ -9,7 +9,7 @@ use JsonException;
 use Livemap\AbstractClass;
 use Livemap\App;
 use Livemap\OpenGraph;
-use Livemap\Units\Map;
+use Livemap\Units\MapLegacy;
 use Livemap\Units\MapConfig;
 use Livemap\Units\SVGParser;
 use Psr\Log\LoggerInterface;
@@ -75,7 +75,7 @@ class MapsController extends AbstractClass
             if (!is_file($svg_filename)) {
                 throw new RuntimeException( "[JS Builder] Layout file {$svg_filename} not found." );
             }
-            $svg_content = file_get_contents( $svg_filename );
+            $svg_content = \file_get_contents( $svg_filename );
 
             if ($svg_content === '') {
                 throw new RuntimeException( "[JS Builder] Layout file is empty" );
@@ -137,10 +137,10 @@ class MapsController extends AbstractClass
                 // запросим БД на предмет кастомных значений и заполненности регионов
 
                 // технически в функцию надо отдавать МАССИВ, а превращать его в строку внутри функции
-                $paths_at_layer_filled = Map::getRegionsWithInfo( $map_alias, $paths_at_layers_ids );
+                $paths_at_layer_filled = MapLegacy::getRegionsWithInfo( $map_alias, $paths_at_layers_ids );
 
                 // фильтруем по доступности пользователю (is_publicity)
-                $paths_at_layer_filled = Map::checkRegionsVisibleByCurrentUser($paths_at_layer_filled, $map_alias);
+                $paths_at_layer_filled = MapLegacy::checkRegionsVisibleByCurrentUser($paths_at_layer_filled, $map_alias);
 
                 foreach ($paths_at_layer_filled as $path_present) {
                     $id_region = $path_present['id_region'];
@@ -208,7 +208,7 @@ class MapsController extends AbstractClass
 
                 $layers[] = [
                     'id'        =>  $layer,
-                    'hint'      =>  htmlspecialchars($layer_config->hint, ENT_QUOTES | ENT_HTML5),
+                    'hint'      =>  \htmlspecialchars($layer_config->hint, ENT_QUOTES | ENT_HTML5),
                     'zoom'      =>  $layer_config->zoom ?? $json->display->zoom,
                     'zoom_min'  =>  $layer_config->zoom_min ?? -100,
                     'zoom_max'  =>  $layer_config->zoom_max ?? 100,
@@ -229,7 +229,7 @@ class MapsController extends AbstractClass
                 ];
             }
         } catch (\RuntimeException $e) {
-            $this->error = TRUE;
+            $this->error = true;
             $this->error_message = $e->getMessage();
         }
 
@@ -269,7 +269,7 @@ class MapsController extends AbstractClass
         $t->assign('regions', $paths_data);
 
         $content = $t->render();
-        $content = preg_replace('/^\h*\v+/m', '', $content); // удаляем лишние переводы строк
+        $content = \preg_replace('/^\h*\v+/m', '', $content); // удаляем лишние переводы строк
 
         $this->template->assignRAW($content);
         $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
@@ -285,7 +285,7 @@ class MapsController extends AbstractClass
     {
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
 
-        $map = new Map();
+        $map = new MapLegacy();
         $map->loadConfig($map_alias);
         $map->loadMap($map_alias);
 

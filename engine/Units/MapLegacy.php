@@ -8,7 +8,7 @@ use Livemap\App;
 use PDO;
 use Psr\Log\LoggerInterface;
 
-class Map extends \Livemap\AbstractClass
+class MapLegacy extends \Livemap\AbstractClass
 {
     const allowed_cursors = [
         'auto', 'default', 'none', 'context-menu', 'help', 'pointer', 'progress', 'wait', 'cell', 'crosshair',
@@ -85,7 +85,7 @@ class Map extends \Livemap\AbstractClass
         // $this->mapRegionsWithInfo = Map::checkRegionsVisibleByCurrentUser($this->mapRegionsWithInfo, $map_alias);
 
         // фильтруем по visibility ????
-        $this->mapRegionsWithInfo = Map::removeExcludedFromRegionsList($this->mapRegionsWithInfo);
+        $this->mapRegionsWithInfo = MapLegacy::removeExcludedFromRegionsList($this->mapRegionsWithInfo);
 
         $this->mapRegionsWithInfo_IDS = self::convertRegionsWithInfo_to_IDs_String($this->mapRegionsWithInfo);
 

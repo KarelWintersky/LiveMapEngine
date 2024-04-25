@@ -8,7 +8,7 @@ use Arris\AppRouter;
 use Arris\Path;
 use Livemap\AbstractClass;
 use Livemap\App;
-use Livemap\Units\Map;
+use Livemap\Units\MapLegacy;
 
 class RegionsController extends AbstractClass
 {
@@ -25,7 +25,7 @@ class RegionsController extends AbstractClass
         $id_region = $_GET['id']    ?? null;
         $template  = $_GET['resultType'] ?? 'html';
 
-        $region_data = (new Map())->getMapRegionData($map_alias, $id_region);
+        $region_data = (new MapLegacy())->getMapRegionData($map_alias, $id_region);
 
         $t = new Template(App::$smarty);
         $t->assign('is_present', $region_data['is_present']);
@@ -79,7 +79,7 @@ class RegionsController extends AbstractClass
         setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');
         setcookie( getenv('AUTH.COOKIES.FILEMANAGER_CURRENT_MAP'), $map_alias, 0, '/');
 
-        $map_engine = new Map();
+        $map_engine = new MapLegacy();
         $region_data = $map_engine->getMapRegionData($map_alias, $region_id);
 
         $filename
@@ -173,7 +173,7 @@ class RegionsController extends AbstractClass
         $map_alias = $_REQUEST['edit:alias:map'];
         $region_id = $_REQUEST['edit:id:region'];
 
-        $result = (new Map())->storeMapRegionData($map_alias, $region_id, $_REQUEST);
+        $result = (new MapLegacy())->storeMapRegionData($map_alias, $region_id, $_REQUEST);
 
         $this->template->assignRAW($result->serialize());
         $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
