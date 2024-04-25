@@ -1,16 +1,17 @@
 {
-  "title"         : "Атлас Восходящего",
-  "type"          : "bitmap",
+  // название карты
+  "title"         : "Map of Confederation",
+  // тип карты
+  "type"          : "vector | bitmap | tileset | wms",
   "display": {
     "zoom": 0,
-    "zoom_min": -2,
-    "zoom_max": 1,
-    // тип зума, варианты: smooth, native, slider (по умолчанию)
+    "zoom_min": -3,
+    "zoom_max": 2,
     "zoom_mode": "smooth",
-    "background_color"  : "#000000",
-    // курсор
+    "background_color"  : "transparent",
+    "maxbounds": [[-0.5, -1], [1.5, 2]],
+    "custom_css" : "style.css",
     "cursor": "pointer",
-    // режим просмотра карты, варианты: folio, infobox>regionbox,
     "viewmode": "folio"
   },
   "display_defaults": {
@@ -34,64 +35,69 @@
     }
   },
   "source": {
-    "type": "image",
-    "file": "balance_livemap.png",
+    "type": "image | tiles | url",
+    "file": "temp.svg",
+    "path": "eso/{z}/{x}/{y}.jpg",
+    "url": "",
     "zoom": 2,
-    "zoom_min": 2,
-    "zoom_max": 5
+    "zoom_min": 1,
+    "zoom_max": 6
   },
   "image" : {
-    "file"  : "balance_livemap.png",
-    "width" : 3508,
-    "height": 2480,
+    "file"  : "temp.svg",
+    "width" : 2104,
+    "height": 1488,
     "ox"    : 0,
     "oy"    : 0
   },
   "layout": {
-    "file"   : "balance_paths.svg",
+    "file"   : "temp.svg",
     "layers" : [ "Paths" ]
   },
   "layers": {
     "Paths": {
-      "hint" : "Силы",
+      "hint" : "Все пути",
       "zoom_min" : -100,
       "zoom_max" : 100,
-      "display_defaults": {
-        "empty": {
-          "stroke": 0,
-          "borderColor" : "#000000",
-          "borderWidth" : 0,
-          "borderOpacity": 0,
-          "fill": 1,
-          "fillColor": "#0000ff",
-          "fillOpacity": 0.1
-        },
-        "present": {
-          "stroke": 0,
-          "borderColor" : "#000000",
-          "borderWidth" : 0,
-          "borderOpacity": 0,
-          "fill": 1,
-          "fillColor": "#00ff00",
-          "fillOpacity": 0.2
-        }
+      "empty": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#0000ff",
+        "fillOpacity": 0.1
+      },
+      "present": {
+        "stroke": 0,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.1
       }
     }
-  },
-  "colorbox": {
-    "width" : "900px",
-    "height": "700px"
   },
   "edit_templates": {
     "templates": [
       {
-        "title"       : "Базовый шаблон",
-        "description" : "Базовый шаблон",
+        "title"     : "Подробный шаблон",
+        "description" : "Шаблон с филдсетами",
+        "url"         : "tinymce.fieldsets.html"
+      },
+      {
+        "title"       : "Краткий шаблон",
+        "description" : "Шаблон plain/text",
         "url"         : "tinymce.plaintext.html"
       }
     ],
-    "content_css" : "tinymce-template-styles.css",
+    "content_css" : "template-styles.css",
     "template_popup_width"  : 800,
     "template_popup_height" : 400
+  },
+  "colorbox": {
+    "width" : "900px",
+    "height": "700px"
   }
 }
