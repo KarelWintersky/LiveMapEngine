@@ -283,7 +283,10 @@ class MapsController extends AbstractClass
      */
     public function view_map_fullscreen($map_alias)
     {
-        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
+        $mc = new MapConfig($map_alias);
+        $mc->loadConfig();
+
+        $this->mapConfig = $mc->getConfig();
 
         $map = new MapLegacy();
         $map->loadConfig($map_alias);

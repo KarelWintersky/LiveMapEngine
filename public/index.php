@@ -2,6 +2,7 @@
 
 use Arris\AppLogger;
 use Arris\AppRouter;
+use Arris\Exceptions\AppRouterNotFoundException;
 use Dotenv\Dotenv;
 use Livemap\App;
 
@@ -157,23 +158,34 @@ try {
     App::$template->assign('message', $e->getMessage());
     App::$template->setTemplate("_errors/403.tpl");
 
+} catch (AppRouterNotFoundException $e) {
+
+    AppLogger::scope('main')->notice("AppRouter::NotFound", [ $e->getMessage(), $e->getInfo() ] );
+    http_response_code(404);
+    App::$template->setTemplate("_errors/404.tpl");
+    App::$template->assign("message", $e->getMessage());
+
 } catch (\RuntimeException|\Exception $e) {
-    // \Arris\Util\Debug::dump($e);
+
+    AppLogger::scope('main')->notice("Runtime Error", [ $e->getMessage() ] );
+    http_response_code(500);
+    App::$template->setTemplate("_errors/500.tpl");
+    App::$template->assign("message", $e->getMessage());
+
+    /*echo "<h1>(RUNTIME) EXCEPTION</h1>";
+    echo "<h3>_REQUEST</h3>";
     d($_REQUEST);
+    echo "<h3>REQUEST_URI</h3>";
     d($_SERVER['REQUEST_URI']);
-    dd($e);
+    echo "<h3>EXCEPTION DUMP</h3>";
+    // \Arris\Util\Debug::ddt($e->getTrace());
+    dd($e);*/
 }
 
 /*  catch (AppRouterHandlerError $e) {
 
     AppLogger::scope('main')->error("AppRouter::InvalidRoute", [ $e->getMessage(), $e->getInfo() ] );
     http_response_code(500);
-
-} catch (AppRouterNotFoundException $e) {
-
-    AppLogger::scope('main')->notice("AppRouter::NotFound", [ $e->getMessage(), $e->getInfo() ] );
-    http_response_code(404);
-    App::$template->setTemplate("_errors/404.tpl");
 
 } catch (AppRouterMethodNotAllowedException $e){
 

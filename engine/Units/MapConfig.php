@@ -2,6 +2,7 @@
 
 namespace Livemap\Units;
 
+use Arris\Exceptions\AppRouterNotFoundException;
 use Arris\Path;
 use ColinODell\Json5\SyntaxError;
 use Psr\Log\LoggerInterface;
@@ -57,25 +58,6 @@ class MapConfig extends \Livemap\AbstractClass
 
         $this->map_id = $map_id;
         $this->config_type = $mode;
-
-        $fn_path = Path::create( config('path.storage') )->join($this->map_id);
-
-        $fn = $fn_path->joinName('index.json5')->toString();
-
-        if (is_readable($fn)) {
-            $this->json_config_filename = $fn;
-            $this->json_config_type = 'json5';
-            return;
-        }
-
-        $fn = $fn_path->joinName('index.json')->toString();
-
-        if (is_readable($fn)) {
-            $this->json_config_filename = $fn;
-            $this->json_config_type = 'json';
-            return;
-        }
-
     }
 
     public function loadConfig():self
@@ -101,38 +83,44 @@ class MapConfig extends \Livemap\AbstractClass
 
     /**
      * @throws SyntaxError
+     * @throws AppRouterNotFoundException
      */
     private function loadConfig_File()
     {
-        try {
-            if (!is_file($this->json_config_filename)) {
-                throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} not found", 2 );
-            }
+        $fn_path = Path::create( config('path.storage') )->join($this->map_id);
 
-            if (!is_readable($this->json_config_filename)) {
-                throw new \RuntimeException("[JS Builder]  {$this->json_config_filename} not readable", 3);
-            }
+        $fn = $fn_path->joinName('index.json')->toString();
+        $fn5 = $fn_path->joinName('index.json5')->toString();
 
-            $json_config_content = file_get_contents( $this->json_config_filename );
-
-            if (false === $json_config_content) {
-                throw new \RuntimeException( "[JS Builer] Can't get content of {$this->json_config_filename} file." );
-            }
-
-            //$json = json_decode( $json_config_content );
-            $json = json5_decode($json_config_content);
-
-            if (null === $json) {
-                throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} json file is invalid", 3 );
-            }
-
-            $this->json = $json;
-
-        } catch (\RuntimeException $e) {
-            $this->error = true;
-            $this->error_message = $e->getMessage();
-            // $this->error_message = json_last_error_msg();
+        if (is_readable($fn5)) {
+            $this->json_config_filename = $fn5;
+        } elseif (is_readable($fn)) {
+            $this->json_config_filename = $fn;
+        } else {
+            throw new AppRouterNotFoundException("Карта не найдена");
         }
+
+        if (!is_file($this->json_config_filename)) {
+            throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} not found", 2 );
+        }
+
+        if (!is_readable($this->json_config_filename)) {
+            throw new \RuntimeException("[JS Builder]  {$this->json_config_filename} not readable", 3);
+        }
+
+        $json_config_content = file_get_contents( $this->json_config_filename );
+
+        if (false === $json_config_content) {
+            throw new \RuntimeException( "[JS Builer] Can't get content of {$this->json_config_filename} file." );
+        }
+
+        $json = json5_decode($json_config_content);
+
+        if (null === $json) {
+            throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} json file is invalid", 3 );
+        }
+
+        $this->json = $json;
     }
 
     private function loadConfig_MySQL()
