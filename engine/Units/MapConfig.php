@@ -3,6 +3,7 @@
 namespace Livemap\Units;
 
 use Arris\Path;
+use ColinODell\Json5\SyntaxError;
 use Psr\Log\LoggerInterface;
 
 class MapConfig extends \Livemap\AbstractClass
@@ -11,6 +12,15 @@ class MapConfig extends \Livemap\AbstractClass
      * @var string
      */
     private string $json_config_filename;
+
+    /**
+     * Тип файла конфига. Варианты:
+     * json
+     * json5
+     *
+     * @var string
+     */
+    private string $json_config_type;
 
     /**
      * @var string
@@ -46,12 +56,26 @@ class MapConfig extends \Livemap\AbstractClass
         }
 
         $this->map_id = $map_id;
-        $this->json_config_filename =
-            Path::create( config('path.storage') )
-                ->join($this->map_id)
-                ->joinName('index.json')
-                ->toString();
         $this->config_type = $mode;
+
+        $fn_path = Path::create( config('path.storage') )->join($this->map_id);
+
+        $fn = $fn_path->joinName('index.json5')->toString();
+
+        if (is_readable($fn)) {
+            $this->json_config_filename = $fn;
+            $this->json_config_type = 'json5';
+            return;
+        }
+
+        $fn = $fn_path->joinName('index.json')->toString();
+
+        if (is_readable($fn)) {
+            $this->json_config_filename = $fn;
+            $this->json_config_type = 'json';
+            return;
+        }
+
     }
 
     public function loadConfig():self
@@ -75,7 +99,11 @@ class MapConfig extends \Livemap\AbstractClass
         return $this->json;
     }
 
-    private function loadConfig_File() {
+    /**
+     * @throws SyntaxError
+     */
+    private function loadConfig_File()
+    {
         try {
             if (!is_file($this->json_config_filename)) {
                 throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} not found", 2 );
@@ -91,7 +119,8 @@ class MapConfig extends \Livemap\AbstractClass
                 throw new \RuntimeException( "[JS Builer] Can't get content of {$this->json_config_filename} file." );
             }
 
-            $json = json_decode( $json_config_content );
+            //$json = json_decode( $json_config_content );
+            $json = json5_decode($json_config_content);
 
             if (null === $json) {
                 throw new \RuntimeException( "[JS Builder] {$this->json_config_filename} json file is invalid", 3 );
