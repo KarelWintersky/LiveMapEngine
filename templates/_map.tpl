@@ -7,6 +7,10 @@
     {include file="_common/favicon_defs.tpl"}
     {include file="_common/opengraph.tpl"}
 
+    <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="{$main_css_file}">
 
@@ -20,6 +24,10 @@
 
     <script src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
     <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css">
+
+    <!-- danwild/leaflet-fa-markers -->
+    <script src="/frontend/leaflet/L.Icon.FontAwesome.js"></script>
+    <link href="/frontend/leaflet/L.Icon.FontAwesome.css" rel="stylesheet">
 
     <script src="/frontend/leaflet/SmoothWheelZoom.js"></script>
 

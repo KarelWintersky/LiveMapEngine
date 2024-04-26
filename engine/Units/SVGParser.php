@@ -272,11 +272,41 @@ class SVGParser {
 
         $path_d     = (string)$element->attributes()->{'d'};
         $path_id    = (string)$element->attributes()->{'id'};
+        // $path_label = (string)$element->attributes()->{'inkscape:label'};
         $path_style = (string)$element->attributes()->{'style'};
 
+        // только с помощью дополнительного парсера можно распознать расширенные свойства (потому что DTD для inkscape:* и sodipodi:* больше не работают)
+        $element_as_array = \SbWereWolf\XmlNavigator\Convertation\FastXmlToArray::prettyPrint($element->asXML());
+        $element_attributes = $element_as_array['path']['@attributes'] ?? [];
+
+        $path_sodipodi_type = $element_attributes['sodipodi:type'] ?? 'path';
+        if ($path_sodipodi_type == "spiral") {
+            $type = "marker";
+        }
+
         $data['id'] = $path_id;
+        $data['label'] = $element_attributes["inkscape:label"] ?? $path_id;
 
         switch ($type) {
+            /*
+             * За POI-маркер отвечает Inkscape-элемент SPIRALE (точкой установки маркера является ЦЕНТР спирали)
+             *
+             * Теперь нам нужен INKSCAPE SVG файл
+             */
+            case 'marker': {
+                $data['type'] = 'marker';
+                $coords = [
+                    'x'     =>  $element_attributes['sodipodi:cx'],
+                    'y'     =>  $element_attributes['sodipodi:cy'],
+                ];
+                $coords = $this->translate_knot_from_XY_to_CRS( $coords );
+                $data['coords'] = $coords;
+
+                $data['js'] = $this->convert_knotCRS_to_JSstring( $data['coords'] );
+
+                break;
+            }
+
             case 'path' : {
                 // кол-во путей ~
                 // кол-во узлов ~
@@ -288,7 +318,7 @@ class SVGParser {
                     return [];
                 }
 
-                // сдвиг координат и преобразрвание в CRS-модель
+                // сдвиг координат и преобразование в CRS-модель
                 $coords = $this->translate_polygon_from_XY_to_CRS( $coords );
 
                 // convert_to_JS_style
@@ -301,7 +331,9 @@ class SVGParser {
                 // кол-во путей 1
                 // кол-во узлов 1
                 $data['type'] = 'circle';
-                $data['radius'] = \round((float)$element->attributes()->{'r'}, self::ROUND_PRECISION); //@todo: existance check
+
+                $r = $element->attributes()->{'r'} ?? 0;
+                $data['radius'] = \round((float)$r, self::ROUND_PRECISION); //@todo: existance check
 
                 // SVG Path -> Polygon
                 $coords = $this->convert_SVGElement_to_Circle( $element );
@@ -339,9 +371,10 @@ class SVGParser {
             case 'ellipse': {
                 $data['type'] = 'circle';
 
-                //@todo: rx, ry existance check
+                $rx = $element->attributes()->{'rx'} ?? 0;
+                $ry = $element->attributes()->{'ry'} ?? 0;
 
-                $data['radius'] = \round( ( (float)$element->attributes()->{'rx'} + (float)$element->attributes()->{'ry'} ) /2 , self::ROUND_PRECISION);
+                $data['radius'] = \round( ( (float)$rx + (float)$ry ) /2 , self::ROUND_PRECISION);
 
                 // SVG Element to coords
                 $coords = $this->convert_SVGElement_to_Circle( $element );
@@ -1196,7 +1229,7 @@ class SVGParser {
      */
     public function exportSPaths( $all_paths )
     {
-        $all_paths_text = array();
+        $all_paths_text = [];
 
         foreach($all_paths as $path_id => $path_data )
         {

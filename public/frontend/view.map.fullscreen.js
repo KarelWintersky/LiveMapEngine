@@ -29,8 +29,9 @@ $(function(){
     // биндим к каждому объекту функцию, показывающую информацию
     Object.keys( polymap ).forEach(function(id_region){
         // обернуть в функцию и отрефакторить
+        let region = polymap[id_region];
 
-        polymap[id_region].on('click', function(){
+        region.on('click', function() {
 
             if (current_infobox_region_id == id_region) {
                 manageInfoBox('toggle', id_region);
@@ -39,10 +40,18 @@ $(function(){
             }
             current_infobox_region_id = id_region;
 
-        }).on('mouseover', function(){
-            polymap[id_region].setStyle({stroke: true, color: '#00ff00', weight: 3, opacity: 0.1}); //@todo: это нужно брать из конфига!
+        }).on('mouseover', function() {
+            // для маркера типа POI стиль не ставится
+            if (region.options.type != 'poi') {
+                region.setStyle({stroke: true, color: '#00ff00', weight: 3, opacity: 0.1}); //@todo: это нужно брать из конфига!
+            }
+
         }).on('mouseout', function(){
-            polymap[id_region].setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
+            // для маркера типа POI стиль не ставится
+            if (region.options.type != 'poi') {
+                region.setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
+            }
+
         });
     });
 
@@ -99,6 +108,8 @@ $(function(){
         if (wlh_options) {
             // было бы более интересным решением имитировать триггером клик по ссылке на регионе, но.. оно не работает
             // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
+
+            console.log(wlh_options);
 
             wlh_FocusRegion(wlh_options.id_region);
             manageInfoBox('show', wlh_options.id_region);

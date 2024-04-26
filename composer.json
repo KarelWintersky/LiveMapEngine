@@ -43,7 +43,8 @@
         "ajur-media/kcaptcha": "^1.1",
         "colinodell/json5": "^2.3",
         "karelwintersky/arris.cache": "^0.7.1",
-        "karelwintersky/arris.entity": "^0.9.3"
+        "karelwintersky/arris.entity": "^0.9.3",
+        "sbwerewolf/xml-navigator": "^7.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"

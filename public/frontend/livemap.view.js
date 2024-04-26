@@ -319,13 +319,23 @@ wlh_FocusRegion = function(id_region){
     map.fitBounds(base_map_bounds);
 
     // зум
-    map.setZoom( LGS[id_layer]['zoom'], {
+    /*map.setZoom( LGS[id_layer]['zoom'], {
         animate: false
-    });
+    });*/
+    map.setZoom( theMap.display.zoom, {
+        animate: false
+    } );
 
     // пан
-    bounds = polymap[id_region].getBounds();
-    map.panTo( bounds.getCenter(), { animate: false, duration: 1, noMoveStart: true});
+    let region = polymap[id_region];
+
+    if (region.options.value == 'poi') {
+        bounds = region._latlng;
+        map.panTo( bounds, { animate: false, duration: 1, noMoveStart: true});
+    } else {
+        bounds = region.getBounds();
+        map.panTo( bounds.getCenter(), { animate: false, duration: 1, noMoveStart: true});
+    }
 
     // удаляем все невидные слои
     Object.keys( LGS ).forEach(function(lg){
@@ -466,39 +476,79 @@ toggle_BackwardBox = function(el){
  * Возвращает объект, содержащий все регионы.
  *
  * @param theMap
- * @param layer
  * @returns {Object}
  */
 buildPolymap = function(theMap) {
     let polymap = Object.create(null);
 
-    Object.keys( theMap.regions ).forEach(function( key ){
+    Object.keys( theMap.regions ).forEach(function( key ) {
         let region = theMap.regions[key];
         let type = region['type'];
         let coords = region['coords'];
 
         // DEFAULTS for ALL polygons
         let options = {
+            id: region.id,
+            title: region.title || region.id,
+            coords: region['coords'],
+
             color: region['borderColor'] || theMap.region_defaults_empty.borderColor,
             weight: region['borderWidth'] || theMap.region_defaults_empty.borderWidth,
             opacity: region['borderOpacity'] || theMap.region_defaults_empty.borderOpacity,
             fillColor: region['fillColor'] || theMap.region_defaults_empty.fillColor,
             fillOpacity: region['fillOpacity'] || theMap.region_defaults_empty.fillOpacity,
-            radius: region['radius'] || 10
+            radius: region['radius'] || 10,
         };
 
         let entity;
         switch (type) {
             case 'polygon': {
+                options.type = 'polygon';
                 entity = L.polygon(coords, options);
                 break;
             }
             case 'rect': {
+                options.type = 'rect';
                 entity = L.rectangle(coords, options);
                 break;
             }
             case 'circle': {
+                options.type = 'circle';
                 entity = L.circle(coords, options);
+                break;
+            }
+            case 'marker': {
+                let fa = {
+                    icon: 'fa-brands fa-fort-awesome',
+                    markerColor: 'green', // '#00a9ce'
+                    iconColor: '#FFF',
+                    iconXOffset: -1,
+                    iconYOffset: 0
+                };
+
+                /*let marker_options = options;
+                marker_options.icon = L.icon.fontAwesome({
+                    iconClasses: `fa ${fa.icon}`,
+                    markerColor: fa.markerColor,
+                    iconColor: fa.iconColor,
+                    iconXOffset: fa.iconXOffset,
+                    iconYOffset: fa.iconYOffset,
+                });
+                marker_options.type = 'poi';*/
+
+                entity = L.marker(coords, {
+                    title: region.title,
+                    type: 'poi',
+                    coords: coords,
+                    icon: L.icon.fontAwesome({
+                        iconClasses: `fa ${fa.icon}`,
+                        markerColor: fa.markerColor,
+                        iconColor: fa.iconColor,
+                        iconXOffset: fa.iconXOffset,
+                        iconYOffset: fa.iconYOffset,
+                    }),
+                });
+
                 break;
             }
             //@todo: КАЖЕТСЯ СЮДА НАДО ДОБАВЛЯТЬ НОВЫЕ ТИПЫ ОБЪЕКТОВ НА КАРТЕ
