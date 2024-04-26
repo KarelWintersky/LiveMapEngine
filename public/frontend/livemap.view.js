@@ -40,8 +40,6 @@ setup_MapCreate = function(target, theMap, options = {}) {
     switch (options['zoom_mode']) {
         case 'native': {
             _options.zoomControl = true;
-            // _options.zoomSnap = 0.1;
-            // _options.wheelDebounceTime = 100;
             use_zoom_slider = false;
             break;
         }
@@ -109,6 +107,15 @@ setup_MapSetMaxBounds = function(map, theMap) {
     return base_map_bounds;
 }
 
+/**
+ * Должно возвращать новый слой, который мы должны добавлять на карту вне функции
+ *
+ *
+ * @param map
+ * @param theMap
+ * @param bounds
+ * @returns {null}
+ */
 setup_MapCreateOverlay = function(map, theMap, bounds) {
     let image = null;
 
