@@ -33,8 +33,10 @@ setup_MapCreate = function(target, theMap, options = {}) {
         crs: L.CRS.Simple,
         minZoom: theMap['display']['zoom_min'],
         maxZoom: theMap['display']['zoom_max'],
-        preferCanvas: true,
-        renderer: L.canvas(),
+        // preferCanvas: true,
+        // renderer: L.canvas(),
+        preferCanvas: false,
+        renderer: L.svg({ padding: 3 }), // должно быть, походу, maxzoom+1
     };
 
     switch (options['zoom_mode']) {
@@ -86,25 +88,32 @@ setup_MapCreate = function(target, theMap, options = {}) {
 }
 
 setup_MapSetMaxBounds = function(map, theMap) {
-    const base_map_bounds = [
+    let bounds = [
         [0, 0],
         [theMap['map']['height'], theMap['map']['width']]
     ];
 
-    if (theMap['maxbounds']) {
-        let mb = theMap['maxbounds'];
-        map.setMaxBounds([
+    /*if (theMap['display']['maxbounds']) {
+        let mb = theMap['display']['maxbounds'];
+
+        bounds = [
             [
-                mb['topleft_h'] * theMap['map']['height'],
-                mb['topleft_w'] * theMap['map']['width']
+                // mb['topleft_h'] * theMap['map']['height'],
+                // mb['topleft_w'] * theMap['map']['width']
+                0, 0
             ],
             [
                 mb['bottomright_h'] * theMap['map']['height'],
                 mb['bottomright_w'] * theMap['map']['width']
             ]
-        ]);
-    }
-    return base_map_bounds;
+        ];
+
+    }*/
+    // map.setMaxBounds(bounds);
+
+    // map.setView();
+
+    return bounds;
 }
 
 /**
@@ -371,7 +380,7 @@ createControl_RegionTitle = function(position){
             position: position || 'topleft'
         },
         onAdd: function(map) {
-            var div = L.DomUtil.get('section-region-title');
+            let div = L.DomUtil.get('section-region-title');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomEvent.disableScrollPropagation(div);
             L.DomEvent.disableClickPropagation(div);
@@ -420,7 +429,7 @@ createControl_InfoBox = function(){
             position: $("#section-infobox").data('leaflet-control-position')
         },
         onAdd: function(map) {
-            var div = L.DomUtil.get('section-infobox');
+            let div = L.DomUtil.get('section-infobox');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomUtil.enableTextSelection();
             L.DomEvent.disableScrollPropagation(div);
@@ -444,7 +453,7 @@ createControl_Backward = function(position){
             position: position || 'bottomleft'
         },
         onAdd: function(map) {
-            var div = L.DomUtil.get('section-backward');
+            let div = L.DomUtil.get('section-backward');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomEvent.disableScrollPropagation(div);
             L.DomEvent.disableClickPropagation(div);
@@ -509,14 +518,54 @@ buildPolymap = function(theMap) {
         let options = {
             id: region.id,
             title: region.title || region.id,
-            coords: region['coords'],
-
-            color: region['borderColor'] || theMap.region_defaults_empty.borderColor,
-            weight: region['borderWidth'] || theMap.region_defaults_empty.borderWidth,
-            opacity: region['borderOpacity'] || theMap.region_defaults_empty.borderOpacity,
-            fillColor: region['fillColor'] || theMap.region_defaults_empty.fillColor,
-            fillOpacity: region['fillOpacity'] || theMap.region_defaults_empty.fillOpacity,
+            coords: coords,
             radius: region['radius'] || 10,
+
+            // present или empty - нужно брать из данных о регионе (пока что берётся present для всех регионов)
+
+            /* параметры по-умолчанию для создания региона. В дальнейшем (on('mouseout'), on('mouseover') будем брать из структуры region */
+            /* Это изменяемые параметры для региона. Они будут использованы для его создания */
+            stroke: theMap.display.region.present.stroke,
+            color: theMap.display.region.present.borderColor,
+            width: theMap.display.region.present.borderWidth,
+            opacity: theMap.display.region.present.borderOpacity,
+            fill: theMap.display.region.present.fill,
+            fillColor: theMap.display.region.present.fillColor,
+            fillOpacity: theMap.display.region.present.fillOpacity,
+
+            /*
+            А это неизменяемые параметры, они будут использованы для изменения стилей при событиях
+            on('mouseover') и on('mouseout')
+            * */
+            region: {
+                default: {
+                    stroke: theMap.display.region.present.stroke,
+                    borderColor: theMap.display.region.present.borderColor,
+                    borderWidth: theMap.display.region.present.borderWidth,
+                    borderOpacity: theMap.display.region.present.borderOpacity,
+                    fill: theMap.display.region.present.fill,
+                    fillColor: theMap.display.region.present.fillColor,
+                    fillOpacity: theMap.display.region.present.fillOpacity,
+                },
+                hover: {
+                    stroke: theMap.display.region.present_hover.stroke,
+                    borderColor: theMap.display.region.present_hover.borderColor,
+                    borderWidth: theMap.display.region.present_hover.borderWidth,
+                    borderOpacity: theMap.display.region.present_hover.borderOpacity,
+                    fill: theMap.display.region.present_hover.fill,
+                    fillColor: theMap.display.region.present_hover.fillColor,
+                    fillOpacity: theMap.display.region.present_hover.fillOpacity,
+                }
+            },
+            poi: {
+                default: {
+                    iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                    markerColor: 'green',
+                    iconColor: '#FFF',
+                    iconXOffset: -1,
+                    iconYOffset: 0
+                }
+            }
         };
 
         let entity;
@@ -537,28 +586,34 @@ buildPolymap = function(theMap) {
                 break;
             }
             case 'marker': {
-                let fa = {
-                    icon: 'fa-brands fa-fort-awesome',
-                    markerColor: 'green', // '#00a9ce'
-                    iconColor: '#FFF',
-                    iconXOffset: -1,
-                    iconYOffset: 0
-                };
+                options.type = 'poi';
+                options.keyboard = false;
 
-                /*let marker_options = options;
-                marker_options.icon = L.icon.fontAwesome({
+                let fa = {
+                    icon: `fa ${options.poi.default.iconClasses}`,
+                    markerColor: options.poi.default.markerColor,
+                    iconColor: options.poi.default.iconColor,
+                    iconXOffset: options.poi.default.iconXOffset,
+                    iconYOffset: options.poi.default.iconYOffset
+                }
+                /*options.icon = L.icon.fontAwesome({
                     iconClasses: `fa ${fa.icon}`,
                     markerColor: fa.markerColor,
                     iconColor: fa.iconColor,
                     iconXOffset: fa.iconXOffset,
                     iconYOffset: fa.iconYOffset,
                 });
-                marker_options.type = 'poi';*/
 
+                entity = L.marker(coords, options);
+                console.log(entity);*/
+
+                // кроме проблем, упомянутых в
                 entity = L.marker(coords, {
+                    id: region.id,
                     title: region.title,
                     type: 'poi',
                     coords: coords,
+                    keyboard: false,
                     icon: L.icon.fontAwesome({
                         iconClasses: `fa ${fa.icon}`,
                         markerColor: fa.markerColor,
@@ -566,6 +621,7 @@ buildPolymap = function(theMap) {
                         iconXOffset: fa.iconXOffset,
                         iconYOffset: fa.iconYOffset,
                     }),
+                    poi: options.poi
                 });
 
                 break;
@@ -680,7 +736,8 @@ if (false) {
     }
 
     function sprintf_format(parse_tree, argv) {
-        var cursor = 1, tree_length = parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length, is_positive, sign
+        let cursor = 1, tree_length = parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length,
+            is_positive, sign;
         for (i = 0; i < tree_length; i++) {
             if (typeof parse_tree[i] === 'string') {
                 output += parse_tree[i]
@@ -795,7 +852,7 @@ if (false) {
             return sprintf_cache[fmt]
         }
 
-        var _fmt = fmt, match, parse_tree = [], arg_names = 0
+        let _fmt = fmt, match, parse_tree = [], arg_names = 0;
         while (_fmt) {
             if ((match = re.text.exec(_fmt)) !== null) {
                 parse_tree.push(match[0])

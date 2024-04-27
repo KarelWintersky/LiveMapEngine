@@ -29,9 +29,9 @@ $(function(){
     // биндим к каждому объекту функцию, показывающую информацию
     Object.keys( polymap ).forEach(function(id_region){
         // обернуть в функцию и отрефакторить
-        let region = polymap[id_region];
+        let map_element = polymap[id_region];
 
-        region.on('click', function() {
+        map_element.on('click', function() {
 
             if (current_infobox_region_id == id_region) {
                 manageInfoBox('toggle', id_region);
@@ -41,15 +41,56 @@ $(function(){
             current_infobox_region_id = id_region;
 
         }).on('mouseover', function() {
-            // для маркера типа POI стиль не ставится
-            if (region.options.type != 'poi') {
-                region.setStyle({stroke: true, color: '#00ff00', weight: 3, opacity: 0.1}); //@todo: это нужно брать из конфига!
+            // выставляем стили для региона при наведении на него мышки, для маркера типа POI стиль не ставится
+            if (map_element.options.type != 'poi') {
+                map_element.setStyle({
+                    stroke: map_element.options.region.hover.stroke,
+                    color: map_element.options.region.hover.borderColor,
+                    weight: map_element.options.region.hover.borderWidth,
+                    opacity: map_element.options.region.hover.borderOpacity,
+
+                    fill: map_element.options.region.hover.fill,
+                    fillColor: map_element.options.region.hover.fillColor,
+                    fillOpacity: map_element.options.region.hover.fillOpacity,
+                });
+            } else {
+                // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
+                /*map_element.setIcon(L.icon.fontAwesome({
+                    iconClasses: `fa ${map_element.options.poi.hover.iconClasses}`,
+                    markerColor: map_element.options.poi.hover.markerColor,
+                    iconColor: map_element.options.poi.hover.iconColor,
+                    iconXOffset: map_element.options.poi.hover.iconXOffset,
+                    iconYOffset: map_element.options.poi.hover.iconYOffset,
+                }));*/
+                // обработчик события закомментирован, поскольку событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
+                // возможно это баг плагина FontAwesomeIcon
             }
 
         }).on('mouseout', function(){
-            // для маркера типа POI стиль не ставится
-            if (region.options.type != 'poi') {
-                region.setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
+            // выставляем стили для региона при наведении при уходе с него мышки, для маркера типа POI стиль не ставится (по крайней мере не так)
+            if (map_element.options.type != 'poi') {
+                // region.setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
+
+                map_element.setStyle({
+                    stroke: map_element.options.region.default.stroke,
+                    color: map_element.options.region.default.borderColor,
+                    weight: map_element.options.region.default.borderWidth,
+                    opacity: map_element.options.region.default.borderOpacity,
+
+                    fill: map_element.options.region.default.fill,
+                    fillColor: map_element.options.region.default.fillColor,
+                    fillOpacity: map_element.options.region.default.fillOpacity,
+                });
+            } else {
+                // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
+                /*
+                map_element.setIcon(L.icon.fontAwesome({
+                    iconClasses: `fa ${map_element.options.poi.default.iconClasses}`,
+                    markerColor: map_element.options.poi.default.markerColor,
+                    iconColor: map_element.options.poi.default.iconColor,
+                    iconXOffset: map_element.options.poi.default.iconXOffset,
+                    iconYOffset: map_element.options.poi.default.iconYOffset,
+                }));*/
             }
 
         });
@@ -124,8 +165,8 @@ $(function(){
         if (IS_DEBUG) console.log("zoom at zoomend -> " + currentZoom);
 
         Object.keys( LGS ).forEach(function(lg){
-            var zmin = LGS[lg].zoom_min;
-            var zmax = LGS[lg].zoom_max;
+            let zmin = LGS[lg].zoom_min;
+            let zmax = LGS[lg].zoom_max;
 
             if (currentZoom.inbound(zmin, zmax)) {
                 map.addLayer( LGS[lg].actor );

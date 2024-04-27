@@ -270,10 +270,6 @@ class MapsController extends AbstractClass
         ]);
         $t->assign('maxbounds', $max_bounds);
 
-        // legacy
-        $t->assign('region_defaults_empty', (array)$json->display_defaults->empty);
-        $t->assign('region_defaults_present', (array)$json->display_defaults->present);
-
         /*
          * Новый механизм данных для расцветки регионов по-умолчанию
          */
@@ -309,13 +305,13 @@ class MapsController extends AbstractClass
         ];
 
         $display_defaults_region['present_hover'] = [
-            "stroke"        =>  $json->display_defaults->region->{'present:hover'}->{'stroke'}          ?? $display_defaults_region['present']['stroke'],
-            "borderColor"   =>  $json->display_defaults->region->{'present:hover'}->{'borderColor'}     ?? $display_defaults_region['present']['borderColor'],
-            "borderWidth"   =>  $json->display_defaults->region->{'present:hover'}->{'borderWidth'}     ?? $display_defaults_region['present']['borderWidth'],
-            "borderOpacity" =>  $json->display_defaults->region->{'present:hover'}->{'borderOpacity'}   ?? $display_defaults_region['present']['borderOpacity'],
-            "fill"          =>  $json->display_defaults->region->{'present:hover'}->{'fill'}            ?? $display_defaults_region['present']['fill'],
-            "fillColor"     =>  $json->display_defaults->region->{'present:hover'}->{'fillColor'}       ?? $display_defaults_region['present']['fillColor'],
-            "fillOpacity"   =>  $json->display_defaults->region->{'present:hover'}->{'fillOpacity'}     ?? $display_defaults_region['present']['fillOpacity'],
+            "stroke"        =>  $json->display_defaults->region->{'present:hover'}->{'stroke'}          ?? $display_defaults_region['empty_hover']['stroke'],
+            "borderColor"   =>  $json->display_defaults->region->{'present:hover'}->{'borderColor'}     ?? $display_defaults_region['empty_hover']['borderColor'],
+            "borderWidth"   =>  $json->display_defaults->region->{'present:hover'}->{'borderWidth'}     ?? $display_defaults_region['empty_hover']['borderWidth'],
+            "borderOpacity" =>  $json->display_defaults->region->{'present:hover'}->{'borderOpacity'}   ?? $display_defaults_region['empty_hover']['borderOpacity'],
+            "fill"          =>  $json->display_defaults->region->{'present:hover'}->{'fill'}            ?? $display_defaults_region['empty_hover']['fill'],
+            "fillColor"     =>  $json->display_defaults->region->{'present:hover'}->{'fillColor'}       ?? $display_defaults_region['empty_hover']['fillColor'],
+            "fillOpacity"   =>  $json->display_defaults->region->{'present:hover'}->{'fillOpacity'}     ?? $display_defaults_region['empty_hover']['fillOpacity'],
         ];
 
         $display_defaults_poi = [];
@@ -347,7 +343,7 @@ class MapsController extends AbstractClass
             'iconXOffset'   =>  $json->display_defaults->poi->{'present:hover'}->{'iconXOffset'}  ?? $display_defaults_poi['present']['iconXOffset'],
             'iconYOffset'   =>  $json->display_defaults->poi->{'present:hover'}->{'iconYOffset'}  ?? $display_defaults_poi['present']['iconYOffset'],
         ];
-
+        // параметры для секции theMap.display.region и theMap.display.poi
         $t->assign("display_defaults", [
             "region"    =>  $display_defaults_region,
             "poi"       =>  $display_defaults_poi

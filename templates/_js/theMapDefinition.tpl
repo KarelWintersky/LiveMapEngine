@@ -71,41 +71,6 @@ window.theMap = {
 
     },
 
-{*    "display_defaults": {
-        "region": {
-            "empty": {$display_defaults.region.empty|json_encode},
-            "empty_hover": {$display_defaults.region.empty_hover|json_encode},
-            "present": {$display_defaults.region.present|default:[]|json_encode},
-            "present_hover": {$display_defaults.region.present_hover|default:[]|json_encode},
-        },
-        "poi": {
-            "empty": {$display_defaults.poi.empty|json_encode},
-            "empty_hover": {$display_defaults.poi.empty_hover|default:[]|json_encode},
-            "present": {$display_defaults.poi.present|default:[]|json_encode},
-            "present_hover": {$display_defaults.poi.present_hover|default:[]|json_encode},
-        }
-    },*}
-
-    "region_defaults_empty" : {
-        "stroke" : {$region_defaults_empty.stroke},
-        "borderColor" : "{$region_defaults_empty.borderColor}",
-        "borderWidth" : {$region_defaults_empty.borderWidth},
-        "borderOpacity" : {$region_defaults_empty.borderOpacity},
-        "fill" : {$region_defaults_empty.fill},
-        "fillColor" : "{$region_defaults_empty.fillColor}",
-        "fillOpacity" : {$region_defaults_empty.fillOpacity},
-    },
-
-    "region_defaults_present": {
-        "stroke" : {$region_defaults_present.stroke},
-        "borderColor" : "{$region_defaults_present.borderColor}",
-        "borderWidth" : {$region_defaults_present.borderWidth},
-        "borderOpacity" : {$region_defaults_present.borderOpacity},
-        "fill" : {$region_defaults_present.fill},
-        "fillColor" : "{$region_defaults_present.fillColor}",
-        "fillOpacity" : {$region_defaults_present.fillOpacity},
-    },
-
     "layers": {
 
     {foreach $layers as $layer}
@@ -131,6 +96,12 @@ window.theMap = {
             "type"      : "{$region.type}",
             "coords"    : {$region.js},
             "layer"     : "{$region.layer}",
+
+            {* вот эти стили должны присваиваться региону на основании: дефолтных настроек карты, переопределений слоя и наличия контента в регионе *}
+            {* сейчас используется общая настройка для карты *}
+            "style_default": { },
+            "style_hover": { },
+            "style_icon": { },
 
             {if $region.fillColor}"fillColor" : "{$region.fillColor}", {/if}
 
