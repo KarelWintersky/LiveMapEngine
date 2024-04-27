@@ -1,19 +1,50 @@
 {
-  // название карты
+  /* название карты */
   "title"         : "Map of Confederation",
+  /* Описание карты: используется сейчас только для OpenGraph-тегов, при отсутствии эквивалентен title */
+  "description"   : "",
   // тип карты
   "type"          : "vector | bitmap | tileset | wms",
   "display": {
+    /* Зум карты по умолчанию */
     "zoom": 0,
+    /* Минимальный уровень приближения */
     "zoom_min": -3,
+    /* Максимальный уровень приближения */
     "zoom_max": 2,
+    /* Режим зума, варианты:
+    - native
+    - slider (по умолчанию, плагином ZoomSlider
+    - smooth (условно-нативный, но гладкий, плагинов Smoothzoom)
+    */
     "zoom_mode": "smooth",
+    /* цвет фона (на который кладётся слой картинки и всё остальное)
+    для карт с векторным изображением указываем transparent
+    */
     "background_color"  : "transparent",
+    /* ??? */
     "maxbounds": [[-0.5, -1], [1.5, 2]],
+    /* файл с кастомными стилями для карты (это должен быть массив значений)
+    файл должен лежать в поддиректории `styles` относительно индексного файла
+    */
     "custom_css" : "style.css",
+    /* основной курсор для карты. Не реализован, видимо легаси от kwLeafletMap, старого проекта карт */
     "cursor": "pointer",
+    /* режим отображения карты. Должен ультимативно определять тип просмотра при доступе через универсальный роут `/map/XXX/`
+    Перечисляю все возможные, но не факт, что все используются:
+      'colorbox', 'tabled:colorbox',
+      'folio',
+      'iframe', 'iframe:colorbox',
+      'wide:infobox>regionbox', 'wide:regionbox>infobox',
+      'infobox>regionbox', 'regionbox>infobox'
+    */
     "viewmode": "folio"
   },
+  /*
+  Настройки отображения по-умолчанию для всех регионов на карте
+  @todo: усложнить, потому что есть настройки для регионов, а есть для маркеров
+  и есть empty, empty:hover, present (заполненный), present:hover
+  */
   "display_defaults": {
     "empty": {
       "stroke": 0,
@@ -55,27 +86,61 @@
     "layers" : [ "Paths" ]
   },
   "layers": {
-    "Paths": {
-      "hint" : "Все пути",
-      "zoom_min" : -100,
-      "zoom_max" : 100,
-      "empty": {
-        "stroke": 0,
-        "borderColor" : "#000000",
-        "borderWidth" : 0,
-        "borderOpacity": 0,
-        "fill": 1,
-        "fillColor": "#0000ff",
-        "fillOpacity": 0.1
-      },
-      "present": {
-        "stroke": 0,
-        "borderColor" : "#000000",
-        "borderWidth" : 0,
-        "borderOpacity": 0,
-        "fill": 1,
-        "fillColor": "#00ff00",
-        "fillOpacity": 0.1
+    "States": {
+      "hint": "Регионы",
+      "zoom": -1,
+      "zoom_min": 100,
+      "zoom_max": -1,
+      "display_defaults": {
+        "empty": {
+          "stroke": 0,
+          "borderColor": "#000000",
+          "borderWidth": 0,
+          "borderOpacity": 0,
+          "fill": 1,
+          "fillColor": "#0000ff",
+          "fillOpacity": 0.1
+        },
+        "present": {
+          "stroke": 0,
+          "borderColor": "#000000",
+          "borderWidth": 0,
+          "borderOpacity": 0,
+          "fill": 1,
+          "fillColor": "#00ff00",
+          "fillOpacity": 0.1
+        }
+      }
+    },
+    "Towns": {
+      "hint": "Города",
+      /* хз зачем нужен, вроде бы не имеет смысла? */
+      "zoom": 2,
+      /* максимальный уровень приближения, при котором объект еще будет на карте (да, поля нужно переименовать!), может быть дробным */
+      "zoom_min": 10,
+      /* минимальный уровень приближения, при котором объект появится на карте (да, поля нужно переименовать!), может быть дробным */
+      "zoom_max": 2.3,
+      "display_defaults": {
+        /* для POI-маркеров нужны другие параметры - iconClass, markerColor, iconColor, iconXOffset, iconYOffset */
+        /* кроме того, для пустого и заполненного региона маркеры могут быть разными (маркеры, не имеющие данных о регионе вообще могут отсутствовать на карте) */
+        "empty": {
+          "stroke": 0,
+          "borderColor": "#000000",
+          "borderWidth": 0,
+          "borderOpacity": 0,
+          "fill": 1,
+          "fillColor": "#0000ff",
+          "fillOpacity": 0.1
+        },
+        "present": {
+          "stroke": 0,
+          "borderColor": "#000000",
+          "borderWidth": 0,
+          "borderOpacity": 0,
+          "fill": 1,
+          "fillColor": "#00ff00",
+          "fillOpacity": 0.1
+        }
       }
     }
   },

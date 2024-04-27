@@ -325,10 +325,6 @@ wlh_FocusRegion = function(id_region){
 
     map.fitBounds(base_map_bounds);
 
-    // зум
-    /*map.setZoom( LGS[id_layer]['zoom'], {
-        animate: false
-    });*/
     map.setZoom( theMap.display.zoom, {
         animate: false
     } );
@@ -365,6 +361,10 @@ wlh_FocusRegion = function(id_region){
  * Создает в объекте L Control-элемент: имя региона (для карт типа folio)
  */
 createControl_RegionTitle = function(position){
+    if ($("#section-region-title").length == 0) {
+        return false;
+    }
+
     // return L.control.extend делать нельзя (ошибка TypeError: t.addTo is not a function )
     L.Control.Title = L.Control.extend({
         options: {
@@ -385,13 +385,17 @@ createControl_RegionTitle = function(position){
  * Создает в объекте L Control-элемент: список регионов
  */
 createControl_RegionsBox = function() {
+    if ($("#section-regions").length == 0) {
+        return false;
+    }
+
     L.Control.RegionsBox = L.Control.extend({
         is_content_visible: false,
         options: {
             position: $("#section-regions").data('leaflet-control-position')
         },
         onAdd: function(map) {
-            var div = L.DomUtil.get('section-regions');
+            let div = L.DomUtil.get('section-regions');
             L.DomUtil.removeClass(div, 'invisible');
             L.DomUtil.enableTextSelection();
             L.DomEvent.disableScrollPropagation(div);
@@ -406,6 +410,10 @@ createControl_RegionsBox = function() {
  * Создает в объекте L Control элемент: информация о регионе
  */
 createControl_InfoBox = function(){
+    if ($("#section-infobox").length == 0) {
+        return false;
+    }
+
     L.Control.InfoBox = L.Control.extend({
         is_content_visible: false,
         options: {
@@ -427,6 +435,10 @@ createControl_InfoBox = function(){
  * Создает в объекте L Control элемент: кнопка "назад"
  */
 createControl_Backward = function(position){
+    if ($("#section-backward").length == 0) {
+        return false;
+    }
+
     L.Control.Backward = L.Control.extend({
         options: {
             position: position || 'bottomleft'

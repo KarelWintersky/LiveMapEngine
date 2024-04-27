@@ -256,7 +256,7 @@ class MapsController extends AbstractClass
             'zoom_min'                  =>  $json->display->zoom_min,
             'zoom_mode'                 =>  $json->display->zoom_mode ?? 'slider',
             'background_color'          =>  $json->display->background_color,
-            'custom_css'                =>  $json->display->custom_css ?? '',
+            'custom_css'                =>  $json->display->custom_css ?? '',                       // файл кастомных стилей для карты
             'focus_animate_duration'    =>  $json->display->focus_animate_duration ?? 0.7,
             'focus_highlight_color'     =>  $json->display->focus_highlight_color ?? '#ff0000',
             'focus_timeout'             =>  $json->display->focus_timeout ?? 1000,
