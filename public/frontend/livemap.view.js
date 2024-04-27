@@ -558,15 +558,30 @@ buildPolymap = function(theMap) {
                 }
             },
             poi: {
-                default: {
+                any: {
+                    iconClass: theMap.display.poi.any.iconClass,
+                    markerColor: theMap.display.poi.any.markerColor,
+                    iconColor: theMap.display.poi.any.iconColor,
+                    iconXOffset: theMap.display.poi.any.iconXOffset,
+                    iconYOffset: theMap.display.poi.any.iconYOffset,
+                },
+                /*default: {
                     iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
                     markerColor: 'green',
                     iconColor: '#FFF',
                     iconXOffset: -1,
                     iconYOffset: 0
-                }
+                },
+                hover: {
+                    iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                    markerColor: 'red',
+                    iconColor: '#FFF',
+                    iconXOffset: -1,
+                    iconYOffset: 0
+                }*/
             }
         };
+        console.log(options);
 
         let entity;
         switch (type) {
@@ -590,11 +605,11 @@ buildPolymap = function(theMap) {
                 options.keyboard = false;
 
                 let fa = {
-                    icon: `fa ${options.poi.default.iconClasses}`,
-                    markerColor: options.poi.default.markerColor,
-                    iconColor: options.poi.default.iconColor,
-                    iconXOffset: options.poi.default.iconXOffset,
-                    iconYOffset: options.poi.default.iconYOffset
+                    icon: `fa ${options.poi.any.iconClass}`,
+                    markerColor: options.poi.any.markerColor,
+                    iconColor: options.poi.any.iconColor,
+                    iconXOffset: options.poi.any.iconXOffset,
+                    iconYOffset: options.poi.any.iconYOffset
                 }
                 /*options.icon = L.icon.fontAwesome({
                     iconClasses: `fa ${fa.icon}`,
@@ -623,6 +638,19 @@ buildPolymap = function(theMap) {
                     }),
                     poi: options.poi
                 });
+                /*
+                // и привязывать здесь не помогает
+                entity.on('mouseout', function () {
+                    console.log('out marker');
+
+                    entity.setIcon(L.icon.fontAwesome({
+                        iconClasses: `fa ${options.poi.default.iconClass}`,
+                        markerColor: options.poi.default.markerColor,
+                        iconColor: options.poi.default.iconColor,
+                        iconXOffset: options.poi.default.iconXOffset,
+                        iconYOffset: options.poi.default.iconYOffset,
+                    }))
+                });*/
 
                 break;
             }

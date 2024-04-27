@@ -55,7 +55,8 @@ $(function(){
                 });
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
-                /*map_element.setIcon(L.icon.fontAwesome({
+                /*map_element
+                    .setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.hover.iconClasses}`,
                     markerColor: map_element.options.poi.hover.markerColor,
                     iconColor: map_element.options.poi.hover.iconColor,
@@ -85,7 +86,7 @@ $(function(){
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
                 /*
                 map_element.setIcon(L.icon.fontAwesome({
-                    iconClasses: `fa ${map_element.options.poi.default.iconClasses}`,
+                    iconClasses: `fa ${map_element.options.poi.default.iconClass}`,
                     markerColor: map_element.options.poi.default.markerColor,
                     iconColor: map_element.options.poi.default.iconColor,
                     iconXOffset: map_element.options.poi.default.iconXOffset,

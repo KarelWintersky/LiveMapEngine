@@ -22,7 +22,15 @@
     для карт с векторным изображением указываем transparent
     */
     "background_color"  : "transparent",
-    /* ??? */
+    /*
+     When this option is set, the map restricts the view to the given geographical bounds, bouncing the user back if the user tries to pan outside the view.
+
+     С этой настройкой есть проблемы:
+     1) карта "дергается", пытаясь остаться в пределах bounds
+     2) при увеличении maxBounds слой карты остается тем же, а слой разметки ресайзится
+
+     Поэтому этот механизм нам не нужен
+     */
     "maxbounds": [[-0.5, -1], [1.5, 2]],
     /* файл с кастомными стилями для карты (это должен быть массив значений)
     файл должен лежать в поддиректории `styles` относительно индексного файла
@@ -42,27 +50,89 @@
   },
   /*
   Настройки отображения по-умолчанию для всех регионов на карте
-  @todo: усложнить, потому что есть настройки для регионов, а есть для маркеров
-  и есть empty, empty:hover, present (заполненный), present:hover
+  @todo: в данный момент display_defaults для СЛОЯ никак не обрабатываются
   */
   "display_defaults": {
-    "empty": {
-      "stroke": 0,
-      "borderColor" : "#000000",
-      "borderWidth" : 0,
-      "borderOpacity": 0,
-      "fill": 1,
-      "fillColor": "#0000ff",
-      "fillOpacity": 0.3
+    "region": {
+      "empty": {
+        "stroke": 1,
+        "borderColor" : "#000000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#2277ff",
+        "fillOpacity": 0.2
+      },
+      "empty:hover": {
+        "stroke": 1,
+        "borderColor" : "brown",
+        "borderWidth" : 1,
+        "borderOpacity": 1,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.2
+      },
+      "present": {
+        "stroke": 1,
+        "borderColor" : "#ff0000",
+        "borderWidth" : 0,
+        "borderOpacity": 0,
+        "fill": 1,
+        "fillColor": "#2277ff",
+        "fillOpacity": 0.3
+      },
+      "present:hover": {
+        "stroke": 1,
+        "borderColor" : "brown",
+        "borderWidth" : 1,
+        "borderOpacity": 1,
+        "fill": 1,
+        "fillColor": "#00ff00",
+        "fillOpacity": 0.2
+      }
     },
-    "present": {
-      "stroke": 0,
-      "borderColor" : "#000000",
-      "borderWidth" : 0,
-      "borderOpacity": 0,
-      "fill": 1,
-      "fillColor": "#00ff00",
-      "fillOpacity": 0.4
+    /*
+    для POI-маркеров нужны другие параметры - iconClass, markerColor, iconColor, iconXOffset, iconYOffset
+    кроме того, для пустого и заполненного региона маркеры могут быть разными (маркеры, не имеющие данных о регионе вообще могут отсутствовать на карте)
+    А вот событие MOUSEOUT маркер (версии FontAwesom уж точно) НЕ ЛОВИТ
+    Поэтому для описания POI реально остается только секция ANY
+    */
+    "poi": {
+      "any": {
+        iconClass: 'fa-brands fa-fort-awesome',
+        markerColor: 'green',
+        iconColor: 'white',
+        iconXOffset: -1,
+        iconYOffset: 0
+      },
+      /*"empty": {
+        iconClass: 'fa-brands fa-fort-awesome',
+        markerColor: 'green',
+        iconColor: 'white',
+        iconXOffset: -1,
+        iconYOffset: 0
+      },
+      "empty:hover": {
+        iconClass: 'fa-brands fa-fort-awesome',
+        markerColor: 'red',
+        iconColor: 'white',
+        iconXOffset: -1,
+        iconYOffset: 0
+      },
+      "present": {
+        iconClass: 'fa-brands fa-fort-awesome',
+        markerColor: 'green',
+        iconColor: 'white',
+        iconXOffset: -1,
+        iconYOffset: 0
+      },
+      "present:hover": {
+        iconClass: 'fa-brands fa-fort-awesome',
+        markerColor: 'red',
+        iconColor: 'white',
+        iconXOffset: -1,
+        iconYOffset: 0
+      }*/
     }
   },
   "source": {

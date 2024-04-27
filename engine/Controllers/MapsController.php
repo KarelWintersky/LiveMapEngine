@@ -315,6 +315,13 @@ class MapsController extends AbstractClass
         ];
 
         $display_defaults_poi = [];
+        $display_defaults_poi['any'] = [
+            'iconClass'     =>  $json->display_defaults->poi->{'any'}->{'iconClass'}          ?? 'fa-fort-awesome',
+            'markerColor'     =>  $json->display_defaults->poi->{'any'}->{'markerColor'}      ?? 'black',
+            'iconColor'     =>  $json->display_defaults->poi->{'any'}->{'iconColor'}          ?? 'white',
+            'iconXOffset'     =>  $json->display_defaults->poi->{'any'}->{'iconXOffset'}      ?? -1,
+            'iconYOffset'     =>  $json->display_defaults->poi->{'any'}->{'iconYOffset'}      ?? 0,
+        ];
         $display_defaults_poi['empty'] = [
             'iconClass'     =>  $json->display_defaults->poi->{'empty'}->{'iconClass'}          ?? 'fa-fort-awesome',
             'markerColor'     =>  $json->display_defaults->poi->{'empty'}->{'markerColor'}      ?? 'black',

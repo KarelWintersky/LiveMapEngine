@@ -63,10 +63,13 @@ window.theMap = {
             "present_hover": {$display_defaults.region.present_hover|default:[]|json_encode},
         },
         "poi": {
-            "empty": {$display_defaults.poi.empty|json_encode},
+            "any": {$display_defaults.poi.any|json_encode},
+
+            {*"empty": {$display_defaults.poi.empty|json_encode},
             "empty_hover": {$display_defaults.poi.empty_hover|default:[]|json_encode},
             "present": {$display_defaults.poi.present|default:[]|json_encode},
-            "present_hover": {$display_defaults.poi.present_hover|default:[]|json_encode},
+            "present_hover": {$display_defaults.poi.present_hover|default:[]|json_encode},*}
+
         }
 
     },
