@@ -30,10 +30,9 @@ window.theMap = {
         "zoom_mode"         :   "{$display.zoom_mode|default:'slider'}",
         "background_color"  :   "{$display.background_color}",
 
-        {if $display.custom_css}"custom_css" : "{$display.custom_css}",{/if}
+        {if $display.custom_css}"custom_css" : "{$display.custom_css}", {/if}
 
         {if $maxbounds}
-
         "maxbounds": {
 
             {foreach $maxbounds as $key => $value}
@@ -45,19 +44,47 @@ window.theMap = {
         },
         {/if}
 
-    {if $focus_animate_duration}
+        {if $focus_animate_duration}
         "focus_animate_duration": {$focus_animate_duration},
-    {/if}
+        {/if}
 
-    {if $focus_highlight_color}
+        {if $focus_highlight_color}
         "focus_highlight_color": "{$focus_highlight_color}",
-    {/if}
+        {/if}
 
-    {if $focus_timeout}
+        {if $focus_timeout}
         "focus_timeout": {$focus_timeout},
-    {/if}
+        {/if}
+
+        "region": {
+            "empty": {$display_defaults.region.empty|json_encode},
+            "empty_hover": {$display_defaults.region.empty_hover|json_encode},
+            "present": {$display_defaults.region.present|default:[]|json_encode},
+            "present_hover": {$display_defaults.region.present_hover|default:[]|json_encode},
+        },
+        "poi": {
+            "empty": {$display_defaults.poi.empty|json_encode},
+            "empty_hover": {$display_defaults.poi.empty_hover|default:[]|json_encode},
+            "present": {$display_defaults.poi.present|default:[]|json_encode},
+            "present_hover": {$display_defaults.poi.present_hover|default:[]|json_encode},
+        }
 
     },
+
+{*    "display_defaults": {
+        "region": {
+            "empty": {$display_defaults.region.empty|json_encode},
+            "empty_hover": {$display_defaults.region.empty_hover|json_encode},
+            "present": {$display_defaults.region.present|default:[]|json_encode},
+            "present_hover": {$display_defaults.region.present_hover|default:[]|json_encode},
+        },
+        "poi": {
+            "empty": {$display_defaults.poi.empty|json_encode},
+            "empty_hover": {$display_defaults.poi.empty_hover|default:[]|json_encode},
+            "present": {$display_defaults.poi.present|default:[]|json_encode},
+            "present_hover": {$display_defaults.poi.present_hover|default:[]|json_encode},
+        }
+    },*}
 
     "region_defaults_empty" : {
         "stroke" : {$region_defaults_empty.stroke},

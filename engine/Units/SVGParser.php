@@ -190,7 +190,7 @@ class SVGParser {
             );
         }
     
-        return false;
+        return [];
     }
 
     /**

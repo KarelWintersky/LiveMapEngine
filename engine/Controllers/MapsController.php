@@ -99,6 +99,13 @@ class MapsController extends AbstractClass
 
             if ($json->type === "bitmap" && $_svgParserClass->getImagesCount()) {
                 $image_info = $_svgParserClass->getImageInfo();
+
+                // использовать параметры из файла карты НЕЛЬЗЯ, потому что размеры слоя разметки привязаны к размеру карты в файле
+                // если мы изменим размеры (maxBounds) до размеров оригинальной картинки - все сломается :(
+                // $image_info['width'] = $json->image->width;
+                // $image_info['height'] = $json->image->height;
+
+
                 $_svgParserClass->set_CRSSimple_TranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
             } else {
                 $_svgParserClass->set_CRSSimple_TranslateOptions( 0, 0, $image_info['height'] );
@@ -262,8 +269,89 @@ class MapsController extends AbstractClass
             'focus_timeout'             =>  $json->display->focus_timeout ?? 1000,
         ]);
         $t->assign('maxbounds', $max_bounds);
+
+        // legacy
         $t->assign('region_defaults_empty', (array)$json->display_defaults->empty);
         $t->assign('region_defaults_present', (array)$json->display_defaults->present);
+
+        /*
+         * Новый механизм данных для расцветки регионов по-умолчанию
+         */
+        $display_defaults_region =[];
+
+        $display_defaults_region['empty'] = [
+                "stroke"        =>  $json->display_defaults->region->{'empty'}->{'stroke'} ?? 0,
+                "borderColor"   =>  $json->display_defaults->region->{'empty'}->{'borderColor'} ?? "#ff0000",
+                "borderWidth"   =>  $json->display_defaults->region->{'empty'}->{'borderWidth'} ?? 0,
+                "borderOpacity" =>  $json->display_defaults->region->{'empty'}->{'borderOpacity'} ?? 0,
+                "fill"          =>  $json->display_defaults->region->{'empty'}->{'fill'} ?? 0,
+                "fillColor"   =>  $json->display_defaults->region->{'empty'}->{'fillColor'} ?? "#ffffff",
+                "fillOpacity"   =>  $json->display_defaults->region->{'empty'}->{'fillOpacity'} ?? 0,
+        ];
+        $display_defaults_region['empty_hover'] = [
+            "stroke"        =>  $json->display_defaults->region->{'empty:hover'}->{'stroke'}          ?? $display_defaults_region['empty']['stroke'],
+            "borderColor"   =>  $json->display_defaults->region->{'empty:hover'}->{'borderColor'}     ?? $display_defaults_region['empty']['borderColor'],
+            "borderWidth"   =>  $json->display_defaults->region->{'empty:hover'}->{'borderWidth'}     ?? $display_defaults_region['empty']['borderWidth'],
+            "borderOpacity" =>  $json->display_defaults->region->{'empty:hover'}->{'borderOpacity'}   ?? $display_defaults_region['empty']['borderOpacity'],
+            "fill"          =>  $json->display_defaults->region->{'empty:hover'}->{'fill'}            ?? $display_defaults_region['empty']['fill'],
+            "fillColor"     =>  $json->display_defaults->region->{'empty:hover'}->{'fillColor'}       ?? $display_defaults_region['empty']['fillColor'],
+            "fillOpacity"   =>  $json->display_defaults->region->{'empty:hover'}->{'fillOpacity'}     ?? $display_defaults_region['empty']['fillOpacity'],
+        ];
+
+        $display_defaults_region['present'] = [
+            "stroke"        =>  $json->display_defaults->region->{'present'}->{'stroke'}          ?? $display_defaults_region['empty']['stroke'],
+            "borderColor"   =>  $json->display_defaults->region->{'present'}->{'borderColor'}     ?? $display_defaults_region['empty']['borderColor'],
+            "borderWidth"   =>  $json->display_defaults->region->{'present'}->{'borderWidth'}     ?? $display_defaults_region['empty']['borderWidth'],
+            "borderOpacity" =>  $json->display_defaults->region->{'present'}->{'borderOpacity'}   ?? $display_defaults_region['empty']['borderOpacity'],
+            "fill"          =>  $json->display_defaults->region->{'present'}->{'fill'}            ?? $display_defaults_region['empty']['fill'],
+            "fillColor"     =>  $json->display_defaults->region->{'present'}->{'fillColor'}       ?? $display_defaults_region['empty']['fillColor'],
+            "fillOpacity"   =>  $json->display_defaults->region->{'present'}->{'fillOpacity'}     ?? $display_defaults_region['empty']['fillOpacity'],
+        ];
+
+        $display_defaults_region['present_hover'] = [
+            "stroke"        =>  $json->display_defaults->region->{'present:hover'}->{'stroke'}          ?? $display_defaults_region['present']['stroke'],
+            "borderColor"   =>  $json->display_defaults->region->{'present:hover'}->{'borderColor'}     ?? $display_defaults_region['present']['borderColor'],
+            "borderWidth"   =>  $json->display_defaults->region->{'present:hover'}->{'borderWidth'}     ?? $display_defaults_region['present']['borderWidth'],
+            "borderOpacity" =>  $json->display_defaults->region->{'present:hover'}->{'borderOpacity'}   ?? $display_defaults_region['present']['borderOpacity'],
+            "fill"          =>  $json->display_defaults->region->{'present:hover'}->{'fill'}            ?? $display_defaults_region['present']['fill'],
+            "fillColor"     =>  $json->display_defaults->region->{'present:hover'}->{'fillColor'}       ?? $display_defaults_region['present']['fillColor'],
+            "fillOpacity"   =>  $json->display_defaults->region->{'present:hover'}->{'fillOpacity'}     ?? $display_defaults_region['present']['fillOpacity'],
+        ];
+
+        $display_defaults_poi = [];
+        $display_defaults_poi['empty'] = [
+            'iconClass'     =>  $json->display_defaults->poi->{'empty'}->{'iconClass'}          ?? 'fa-fort-awesome',
+            'markerColor'     =>  $json->display_defaults->poi->{'empty'}->{'markerColor'}      ?? 'black',
+            'iconColor'     =>  $json->display_defaults->poi->{'empty'}->{'iconColor'}          ?? 'white',
+            'iconXOffset'     =>  $json->display_defaults->poi->{'empty'}->{'iconXOffset'}      ?? -1,
+            'iconYOffset'     =>  $json->display_defaults->poi->{'empty'}->{'iconYOffset'}      ?? 0,
+        ];
+        $display_defaults_poi['empty_hover'] = [
+            'iconClass'     =>  $json->display_defaults->poi->{'empty:hover'}->{'iconClass'}    ?? $display_defaults_poi['empty']['iconClass'],
+            'markerColor'   =>  $json->display_defaults->poi->{'empty:hover'}->{'markerColor'}  ?? $display_defaults_poi['empty']['markerColor'],
+            'iconColor'     =>  $json->display_defaults->poi->{'empty:hover'}->{'iconColor'}    ?? $display_defaults_poi['empty']['iconColor'],
+            'iconXOffset'   =>  $json->display_defaults->poi->{'empty:hover'}->{'iconXOffset'}  ?? $display_defaults_poi['empty']['iconXOffset'],
+            'iconYOffset'   =>  $json->display_defaults->poi->{'empty:hover'}->{'iconYOffset'}  ?? $display_defaults_poi['empty']['iconYOffset'],
+        ];
+        $display_defaults_poi['present'] = [
+            'iconClass'     =>  $json->display_defaults->poi->{'present'}->{'iconClass'}        ?? $display_defaults_poi['empty']['iconClass'],
+            'markerColor'   =>  $json->display_defaults->poi->{'present'}->{'markerColor'}      ?? $display_defaults_poi['empty']['markerColor'],
+            'iconColor'     =>  $json->display_defaults->poi->{'present'}->{'iconColor'}        ?? $display_defaults_poi['empty']['iconColor'],
+            'iconXOffset'   =>  $json->display_defaults->poi->{'present'}->{'iconXOffset'}      ?? $display_defaults_poi['empty']['iconXOffset'],
+            'iconYOffset'   =>  $json->display_defaults->poi->{'present'}->{'iconYOffset'}      ?? $display_defaults_poi['empty']['iconYOffset'],
+        ];
+        $display_defaults_poi['present_hover'] = [
+            'iconClass'     =>  $json->display_defaults->poi->{'present:hover'}->{'iconClass'}    ?? $display_defaults_poi['present']['iconClass'],
+            'markerColor'   =>  $json->display_defaults->poi->{'present:hover'}->{'markerColor'}  ?? $display_defaults_poi['present']['markerColor'],
+            'iconColor'     =>  $json->display_defaults->poi->{'present:hover'}->{'iconColor'}    ?? $display_defaults_poi['present']['iconColor'],
+            'iconXOffset'   =>  $json->display_defaults->poi->{'present:hover'}->{'iconXOffset'}  ?? $display_defaults_poi['present']['iconXOffset'],
+            'iconYOffset'   =>  $json->display_defaults->poi->{'present:hover'}->{'iconYOffset'}  ?? $display_defaults_poi['present']['iconYOffset'],
+        ];
+
+        $t->assign("display_defaults", [
+            "region"    =>  $display_defaults_region,
+            "poi"       =>  $display_defaults_poi
+        ]);
 
         $t->assign('layers', $layers);
         $t->assign('regions', $paths_data);
