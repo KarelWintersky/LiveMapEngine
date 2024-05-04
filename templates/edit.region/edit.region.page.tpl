@@ -159,7 +159,7 @@
             <td>
                 <fieldset class="fields_area">
                     <div class="field">
-                        <label for="title">Название региона:</label>
+                        <label for="title">Название региона:</label> <br>
                         <input type="text" name="edit:region:title" id="title" size="90" value="{$region_title}" tabindex="1" required />
                         <span class="mark-required">*</span>
                     </div>

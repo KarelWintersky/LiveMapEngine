@@ -33,11 +33,17 @@ setup_MapCreate = function(target, theMap, options = {}) {
         crs: L.CRS.Simple,
         minZoom: theMap['display']['zoom_min'],
         maxZoom: theMap['display']['zoom_max'],
-        // preferCanvas: true,
-        // renderer: L.canvas(),
-        preferCanvas: false,
-        renderer: L.svg({ padding: 3 }), // должно быть, походу, maxzoom+1
     };
+
+    let use_canvas = true;
+
+    if (use_canvas) {
+        _options.preferCanvas = true;
+        _options.renderer = L.canvas();
+    } else {
+        _options.preferCanvas = false;
+        _options.renderer = L.svg({ padding: 3 }); // должно быть, походу, maxzoom+1
+    }
 
     switch (options['zoom_mode']) {
         case 'native': {
@@ -513,77 +519,79 @@ buildPolymap = function(theMap) {
         let region = theMap.regions[key];
         let type = region['type'];
         let coords = region['coords'];
+        let layer = region['layer'];
 
         // DEFAULTS for ALL polygons
-        let options = {
+        let options = Object.create(null);
+        options = {
             id: region.id,
             title: region.title || region.id,
             coords: coords,
             radius: region['radius'] || 10,
 
             // present или empty - нужно брать из данных о регионе (пока что берётся present для всех регионов)
-
             /* параметры по-умолчанию для создания региона. В дальнейшем (on('mouseout'), on('mouseover') будем брать из структуры region */
             /* Это изменяемые параметры для региона. Они будут использованы для его создания */
-            stroke: theMap.display.region.present.stroke,
-            color: theMap.display.region.present.borderColor,
-            width: theMap.display.region.present.borderWidth,
-            opacity: theMap.display.region.present.borderOpacity,
-            fill: theMap.display.region.present.fill,
-            fillColor: theMap.display.region.present.fillColor,
-            fillOpacity: theMap.display.region.present.fillOpacity,
+            stroke: region['stroke'] || theMap.display.region.present.stroke,
+            color: region['borderColor'] || theMap.display.region.present.borderColor,
+            width: region['borderWidth'] || theMap.display.region.present.borderWidth,
+            opacity: region['borderOpacity'] || theMap.display.region.present.borderOpacity,
+            fill: region['fill'] || theMap.display.region.present.fill,
+            fillColor: region['fillColor'] || theMap.display.region.present.fillColor,
+            fillOpacity: region['fillOpacity'] || theMap.display.region.present.fillOpacity,
 
             /*
             А это неизменяемые параметры, они будут использованы для изменения стилей при событиях
             on('mouseover') и on('mouseout')
             * */
-            region: {
-                default: {
-                    stroke: theMap.display.region.present.stroke,
-                    borderColor: theMap.display.region.present.borderColor,
-                    borderWidth: theMap.display.region.present.borderWidth,
-                    borderOpacity: theMap.display.region.present.borderOpacity,
-                    fill: theMap.display.region.present.fill,
-                    fillColor: theMap.display.region.present.fillColor,
-                    fillOpacity: theMap.display.region.present.fillOpacity,
+            display_defaults: {
+                region: {
+                    default: {
+                        stroke: region['stroke'] || theMap.display.region.present.stroke,
+                        color: region['borderColor'] || theMap.display.region.present.borderColor,
+                        width: region['borderWidth'] || theMap.display.region.present.borderWidth,
+                        opacity: region['borderOpacity'] || theMap.display.region.present.borderOpacity,
+                        fill: region['fill'] || theMap.display.region.present.fill,
+                        fillColor: region['fillColor'] || theMap.display.region.present.fillColor,
+                        fillOpacity: region['fillOpacity'] || theMap.display.region.present.fillOpacity,
+                    },
+                    hover: {
+                        stroke: theMap.display.region.present_hover.stroke,
+                        borderColor: theMap.display.region.present_hover.borderColor,
+                        borderWidth: theMap.display.region.present_hover.borderWidth,
+                        borderOpacity: theMap.display.region.present_hover.borderOpacity,
+                        fill: theMap.display.region.present_hover.fill,
+                        fillColor: theMap.display.region.present_hover.fillColor,
+                        fillOpacity: theMap.display.region.present_hover.fillOpacity,
+                    }
                 },
-                hover: {
-                    stroke: theMap.display.region.present_hover.stroke,
-                    borderColor: theMap.display.region.present_hover.borderColor,
-                    borderWidth: theMap.display.region.present_hover.borderWidth,
-                    borderOpacity: theMap.display.region.present_hover.borderOpacity,
-                    fill: theMap.display.region.present_hover.fill,
-                    fillColor: theMap.display.region.present_hover.fillColor,
-                    fillOpacity: theMap.display.region.present_hover.fillOpacity,
+                poi: {
+                    any: {
+                        iconClass: theMap.display.poi.any.iconClass,
+                        markerColor: theMap.display.poi.any.markerColor,
+                        iconColor: theMap.display.poi.any.iconColor,
+                        iconXOffset: theMap.display.poi.any.iconXOffset,
+                        iconYOffset: theMap.display.poi.any.iconYOffset,
+                    },
+                    /*default: {
+                        iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                        markerColor: 'green',
+                        iconColor: '#FFF',
+                        iconXOffset: -1,
+                        iconYOffset: 0
+                    },
+                    hover: {
+                        iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                        markerColor: 'red',
+                        iconColor: '#FFF',
+                        iconXOffset: -1,
+                        iconYOffset: 0
+                    }*/
                 }
             },
-            poi: {
-                any: {
-                    iconClass: theMap.display.poi.any.iconClass,
-                    markerColor: theMap.display.poi.any.markerColor,
-                    iconColor: theMap.display.poi.any.iconColor,
-                    iconXOffset: theMap.display.poi.any.iconXOffset,
-                    iconYOffset: theMap.display.poi.any.iconYOffset,
-                },
-                /*default: {
-                    iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
-                    markerColor: 'green',
-                    iconColor: '#FFF',
-                    iconXOffset: -1,
-                    iconYOffset: 0
-                },
-                hover: {
-                    iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
-                    markerColor: 'red',
-                    iconColor: '#FFF',
-                    iconXOffset: -1,
-                    iconYOffset: 0
-                }*/
-            }
         };
-        console.log(options);
 
-        let entity;
+        let entity = null;
         switch (type) {
             case 'polygon': {
                 options.type = 'polygon';
@@ -600,7 +608,8 @@ buildPolymap = function(theMap) {
                 entity = L.circle(coords, options);
                 break;
             }
-            case 'marker': {
+            /*case 'marker': {
+                break;
                 options.type = 'poi';
                 options.keyboard = false;
 
@@ -611,16 +620,6 @@ buildPolymap = function(theMap) {
                     iconXOffset: options.poi.any.iconXOffset,
                     iconYOffset: options.poi.any.iconYOffset
                 }
-                /*options.icon = L.icon.fontAwesome({
-                    iconClasses: `fa ${fa.icon}`,
-                    markerColor: fa.markerColor,
-                    iconColor: fa.iconColor,
-                    iconXOffset: fa.iconXOffset,
-                    iconYOffset: fa.iconYOffset,
-                });
-
-                entity = L.marker(coords, options);
-                console.log(entity);*/
 
                 // кроме проблем, упомянутых в
                 entity = L.marker(coords, {
@@ -638,26 +637,16 @@ buildPolymap = function(theMap) {
                     }),
                     poi: options.poi
                 });
-                /*
-                // и привязывать здесь не помогает
-                entity.on('mouseout', function () {
-                    console.log('out marker');
-
-                    entity.setIcon(L.icon.fontAwesome({
-                        iconClasses: `fa ${options.poi.default.iconClass}`,
-                        markerColor: options.poi.default.markerColor,
-                        iconColor: options.poi.default.iconColor,
-                        iconXOffset: options.poi.default.iconXOffset,
-                        iconYOffset: options.poi.default.iconYOffset,
-                    }))
-                });*/
 
                 break;
-            }
+            }*/
             //@todo: КАЖЕТСЯ СЮДА НАДО ДОБАВЛЯТЬ НОВЫЕ ТИПЫ ОБЪЕКТОВ НА КАРТЕ
         }
 
-        polymap[ key ] = entity;
+        if (entity) {
+            polymap[ key ] = entity;
+            console.log(entity);
+        }
     } );
 
     return polymap;
@@ -731,235 +720,3 @@ if (false) {
     });
 }
 
-/* global window, exports, define */
-
-!function() {
-    'use strict'
-
-    var re = {
-        not_string: /[^s]/,
-        not_bool: /[^t]/,
-        not_type: /[^T]/,
-        not_primitive: /[^v]/,
-        number: /[diefg]/,
-        numeric_arg: /[bcdiefguxX]/,
-        json: /[j]/,
-        not_json: /[^j]/,
-        text: /^[^\x25]+/,
-        modulo: /^\x25{2}/,
-        placeholder: /^\x25(?:([1-9]\d*)\$|\(([^)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxX])/,
-        key: /^([a-z_][a-z_\d]*)/i,
-        key_access: /^\.([a-z_][a-z_\d]*)/i,
-        index_access: /^\[(\d+)\]/,
-        sign: /^[+-]/
-    }
-
-    function sprintf(key) {
-        // `arguments` is not an array, but should be fine for this call
-        return sprintf_format(sprintf_parse(key), arguments)
-    }
-
-    function vsprintf(fmt, argv) {
-        return sprintf.apply(null, [fmt].concat(argv || []))
-    }
-
-    function sprintf_format(parse_tree, argv) {
-        let cursor = 1, tree_length = parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length,
-            is_positive, sign;
-        for (i = 0; i < tree_length; i++) {
-            if (typeof parse_tree[i] === 'string') {
-                output += parse_tree[i]
-            }
-            else if (typeof parse_tree[i] === 'object') {
-                ph = parse_tree[i] // convenience purposes only
-                if (ph.keys) { // keyword argument
-                    arg = argv[cursor]
-                    for (k = 0; k < ph.keys.length; k++) {
-                        if (arg == undefined) {
-                            throw new Error(sprintf('[sprintf] Cannot access property "%s" of undefined value "%s"', ph.keys[k], ph.keys[k-1]))
-                        }
-                        arg = arg[ph.keys[k]]
-                    }
-                }
-                else if (ph.param_no) { // positional argument (explicit)
-                    arg = argv[ph.param_no]
-                }
-                else { // positional argument (implicit)
-                    arg = argv[cursor++]
-                }
-
-                if (re.not_type.test(ph.type) && re.not_primitive.test(ph.type) && arg instanceof Function) {
-                    arg = arg()
-                }
-
-                if (re.numeric_arg.test(ph.type) && (typeof arg !== 'number' && isNaN(arg))) {
-                    throw new TypeError(sprintf('[sprintf] expecting number but found %T', arg))
-                }
-
-                if (re.number.test(ph.type)) {
-                    is_positive = arg >= 0
-                }
-
-                switch (ph.type) {
-                    case 'b':
-                        arg = parseInt(arg, 10).toString(2)
-                        break
-                    case 'c':
-                        arg = String.fromCharCode(parseInt(arg, 10))
-                        break
-                    case 'd':
-                    case 'i':
-                        arg = parseInt(arg, 10)
-                        break
-                    case 'j':
-                        arg = JSON.stringify(arg, null, ph.width ? parseInt(ph.width) : 0)
-                        break
-                    case 'e':
-                        arg = ph.precision ? parseFloat(arg).toExponential(ph.precision) : parseFloat(arg).toExponential()
-                        break
-                    case 'f':
-                        arg = ph.precision ? parseFloat(arg).toFixed(ph.precision) : parseFloat(arg)
-                        break
-                    case 'g':
-                        arg = ph.precision ? String(Number(arg.toPrecision(ph.precision))) : parseFloat(arg)
-                        break
-                    case 'o':
-                        arg = (parseInt(arg, 10) >>> 0).toString(8)
-                        break
-                    case 's':
-                        arg = String(arg)
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
-                        break
-                    case 't':
-                        arg = String(!!arg)
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
-                        break
-                    case 'T':
-                        arg = Object.prototype.toString.call(arg).slice(8, -1).toLowerCase()
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
-                        break
-                    case 'u':
-                        arg = parseInt(arg, 10) >>> 0
-                        break
-                    case 'v':
-                        arg = arg.valueOf()
-                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
-                        break
-                    case 'x':
-                        arg = (parseInt(arg, 10) >>> 0).toString(16)
-                        break
-                    case 'X':
-                        arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase()
-                        break
-                }
-                if (re.json.test(ph.type)) {
-                    output += arg
-                }
-                else {
-                    if (re.number.test(ph.type) && (!is_positive || ph.sign)) {
-                        sign = is_positive ? '+' : '-'
-                        arg = arg.toString().replace(re.sign, '')
-                    }
-                    else {
-                        sign = ''
-                    }
-                    pad_character = ph.pad_char ? ph.pad_char === '0' ? '0' : ph.pad_char.charAt(1) : ' '
-                    pad_length = ph.width - (sign + arg).length
-                    pad = ph.width ? (pad_length > 0 ? pad_character.repeat(pad_length) : '') : ''
-                    output += ph.align ? sign + arg + pad : (pad_character === '0' ? sign + pad + arg : pad + sign + arg)
-                }
-            }
-        }
-        return output
-    }
-
-    var sprintf_cache = Object.create(null)
-
-    function sprintf_parse(fmt) {
-        if (sprintf_cache[fmt]) {
-            return sprintf_cache[fmt]
-        }
-
-        let _fmt = fmt, match, parse_tree = [], arg_names = 0;
-        while (_fmt) {
-            if ((match = re.text.exec(_fmt)) !== null) {
-                parse_tree.push(match[0])
-            }
-            else if ((match = re.modulo.exec(_fmt)) !== null) {
-                parse_tree.push('%')
-            }
-            else if ((match = re.placeholder.exec(_fmt)) !== null) {
-                if (match[2]) {
-                    arg_names |= 1
-                    var field_list = [], replacement_field = match[2], field_match = []
-                    if ((field_match = re.key.exec(replacement_field)) !== null) {
-                        field_list.push(field_match[1])
-                        while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-                            if ((field_match = re.key_access.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1])
-                            }
-                            else if ((field_match = re.index_access.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1])
-                            }
-                            else {
-                                throw new SyntaxError('[sprintf] failed to parse named argument key')
-                            }
-                        }
-                    }
-                    else {
-                        throw new SyntaxError('[sprintf] failed to parse named argument key')
-                    }
-                    match[2] = field_list
-                }
-                else {
-                    arg_names |= 2
-                }
-                if (arg_names === 3) {
-                    throw new Error('[sprintf] mixing positional and named placeholders is not (yet) supported')
-                }
-
-                parse_tree.push(
-                    {
-                        placeholder: match[0],
-                        param_no:    match[1],
-                        keys:        match[2],
-                        sign:        match[3],
-                        pad_char:    match[4],
-                        align:       match[5],
-                        width:       match[6],
-                        precision:   match[7],
-                        type:        match[8]
-                    }
-                )
-            }
-            else {
-                throw new SyntaxError('[sprintf] unexpected placeholder')
-            }
-            _fmt = _fmt.substring(match[0].length)
-        }
-        return sprintf_cache[fmt] = parse_tree
-    }
-
-    /**
-     * export to either browser or node.js
-     */
-    /* eslint-disable quote-props */
-    if (typeof exports !== 'undefined') {
-        exports['sprintf'] = sprintf
-        exports['vsprintf'] = vsprintf
-    }
-    if (typeof window !== 'undefined') {
-        window['sprintf'] = sprintf
-        window['vsprintf'] = vsprintf
-
-        if (typeof define === 'function' && define['amd']) {
-            define(function() {
-                return {
-                    'sprintf': sprintf,
-                    'vsprintf': vsprintf
-                }
-            })
-        }
-    }
-    /* eslint-enable quote-props */
-}();

@@ -2,6 +2,7 @@ const focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.
 const focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
 const focus_timeout = theMap['display']['focus_timeout'] || 1500;
 const IS_DEBUG = false;
+const DEBUG_SET_STYLE_WHILE_HOVER = false;
 
 let current_infobox_region_id = '';
 let map;
@@ -10,8 +11,13 @@ let __InfoBox = null;
 let LGS = Object.create(null);
 let polymap = Object.create(null);
 
-$(function(){
+$(function() {
+    // let _mapManager = new MapManager(theMap);
+    // _mapManager.setBackgroundColor(".leaflet-container");
+
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
+
+    // map = _mapManager.createMap('map');
 
     map = setup_MapCreate('map', theMap, {
         zoom_mode: theMap['display']['zoom_mode']
@@ -42,56 +48,62 @@ $(function(){
 
         }).on('mouseover', function() {
             // выставляем стили для региона при наведении на него мышки, для маркера типа POI стиль не ставится
+            if (false === DEBUG_SET_STYLE_WHILE_HOVER) return;
+
             if (map_element.options.type != 'poi') {
                 map_element.setStyle({
-                    stroke: map_element.options.region.hover.stroke,
-                    color: map_element.options.region.hover.borderColor,
-                    weight: map_element.options.region.hover.borderWidth,
-                    opacity: map_element.options.region.hover.borderOpacity,
+                    stroke: map_element.options.display_defaults.region.hover.stroke,
+                    color: map_element.options.display_defaults.region.hover.borderColor,
+                    weight: map_element.options.display_defaults.region.hover.borderWidth,
+                    opacity: map_element.options.display_defaults.region.hover.borderOpacity,
 
-                    fill: map_element.options.region.hover.fill,
-                    fillColor: map_element.options.region.hover.fillColor,
-                    fillOpacity: map_element.options.region.hover.fillOpacity,
+                    fill: map_element.options.display_defaults.region.hover.fill,
+                    fillColor: map_element.options.display_defaults.region.hover.fillColor,
+                    fillOpacity: map_element.options.display_defaults.region.hover.fillOpacity,
                 });
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
-                /*map_element
+                return;
+                map_element
                     .setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.hover.iconClasses}`,
                     markerColor: map_element.options.poi.hover.markerColor,
                     iconColor: map_element.options.poi.hover.iconColor,
                     iconXOffset: map_element.options.poi.hover.iconXOffset,
                     iconYOffset: map_element.options.poi.hover.iconYOffset,
-                }));*/
+                }));
                 // обработчик события закомментирован, поскольку событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
                 // возможно это баг плагина FontAwesomeIcon
             }
 
-        }).on('mouseout', function(){
+        }).on('mouseout', function() {
+
+            if (false === DEBUG_SET_STYLE_WHILE_HOVER) return;
+
             // выставляем стили для региона при наведении при уходе с него мышки, для маркера типа POI стиль не ставится (по крайней мере не так)
             if (map_element.options.type != 'poi') {
                 // region.setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
 
                 map_element.setStyle({
-                    stroke: map_element.options.region.default.stroke,
-                    color: map_element.options.region.default.borderColor,
-                    weight: map_element.options.region.default.borderWidth,
-                    opacity: map_element.options.region.default.borderOpacity,
+                    stroke: map_element.options.display_defaults.region.default.stroke,
+                    color: map_element.options.display_defaults.region.default.borderColor,
+                    weight: map_element.options.display_defaults.region.default.borderWidth,
+                    opacity: map_element.options.display_defaults.region.default.borderOpacity,
 
-                    fill: map_element.options.region.default.fill,
-                    fillColor: map_element.options.region.default.fillColor,
-                    fillOpacity: map_element.options.region.default.fillOpacity,
+                    fill: map_element.options.display_defaults.region.default.fill,
+                    fillColor: map_element.options.display_defaults.region.default.fillColor,
+                    fillOpacity: map_element.options.display_defaults.region.default.fillOpacity,
                 });
             } else {
+                return
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
-                /*
                 map_element.setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.default.iconClass}`,
                     markerColor: map_element.options.poi.default.markerColor,
                     iconColor: map_element.options.poi.default.iconColor,
                     iconXOffset: map_element.options.poi.default.iconXOffset,
                     iconYOffset: map_element.options.poi.default.iconYOffset,
-                }));*/
+                }));
             }
 
         });

@@ -85,14 +85,14 @@ class RegionsController extends AbstractClass
         $filename
             = Path::create( getenv('PATH.STORAGE') )
             ->join($map_alias)
-            ->joinName('index.json')
+            ->joinName('index.json5')
             ->toString();
 
         if (!is_file($filename)) {
             throw new \RuntimeException("Map definition file not found, requested {$filename}");
         }
 
-        $json = json_decode( file_get_contents( $filename ) );
+        $json = json5_decode( file_get_contents( $filename ) );
 
         $edit_templates = [];
         $edit_templates_options = [];
