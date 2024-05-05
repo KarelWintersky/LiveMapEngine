@@ -21,6 +21,9 @@
     <script src="/frontend/jquery/jquery-3.2.1_min.js"></script>
     <script src="/frontend/leaflet/leaflet.js"></script>
     <script src="/frontend/scripts.js"></script>
+    <script src="/frontend/MapManager.js"></script>
+    <script src="/frontend/MapControls.js"></script>
+    <script src="/frontend/MapContent.js"></script>
 
     <script src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
     <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css">
@@ -109,7 +112,7 @@
 {/if}
 
 {if $sections_present.backward}
-    <section id="section-backward" class="invisible section-backward-viewbox">
+    <section id="section-backward" class="invisible section-backward-viewbox" {* data-leaflet-control-position=... *}>
         <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button>
         <span id="section-backward-content" class="invisible section-backward-content">
         <button style="display: inline-block" type="button" data-action="redirect" data-url="{$html_callback}">&lt;&lt;&lt; К списку карт</button>
@@ -118,7 +121,7 @@
 {/if}
 
 {if $sections_present.title}
-    <section id="section-region-title" class="invisible section-region-title-viewbox">
+    <section id="section-region-title" class="invisible section-region-title-viewbox" {* data-leaflet-control-position=... *}>
         <span>Selected region: </span><strong id="section-region-title-content" class="section-region-title-content"></strong>
     </section>
 {/if}

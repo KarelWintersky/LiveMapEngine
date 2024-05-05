@@ -7,37 +7,42 @@ const DEBUG_SET_STYLE_WHILE_HOVER = false;
 let current_infobox_region_id = '';
 let map;
 let base_map_bounds;
-let __InfoBox = null;
 let LGS = Object.create(null);
-let polymap = Object.create(null);
+let regionsDataset = Object.create(null);
+
+/**
+ * Инстанс infoBox
+ * @type {null}
+ * @private
+ */
+var __InfoBox = null;
 
 $(function() {
-    // let _mapManager = new MapManager(theMap);
-    // _mapManager.setBackgroundColor(".leaflet-container");
+    let _mapManager = new MapManager(theMap);
+    let _mapContent = new MapContent(theMap);
 
-    $(".leaflet-container").css('background-color', theMap['display']['background_color']);
+    _mapManager.setBackgroundColor(".leaflet-container");
 
-    // map = _mapManager.createMap('map');
+    map = _mapManager.createMap('map');
 
-    map = setup_MapCreate('map', theMap, {
-        zoom_mode: theMap['display']['zoom_mode']
-    });
+    base_map_bounds = _mapManager.getBounds();
 
-    base_map_bounds = setup_MapSetMaxBounds(map, theMap);
-
-    let image = setup_MapCreateOverlay(map, theMap, base_map_bounds);
+    let image = _mapManager.createImageOverlay(base_map_bounds);
+    image.addTo(map);
 
     map.setZoom( theMap['display']['zoom'] );
 
     // строим массив всех регионов
-    polymap = buildPolymap( theMap );
+    regionsDataset = _mapManager.buildRegionsDataset();
 
     // биндим к каждому объекту функцию, показывающую информацию
-    Object.keys( polymap ).forEach(function(id_region){
+    Object.keys( regionsDataset ).forEach(function(id_region){
         // обернуть в функцию и отрефакторить
-        let map_element = polymap[id_region];
+        let map_element = regionsDataset[id_region];
 
         map_element.on('click', function() {
+            // альтернатива - менять window.location.hash
+            // а ниже отлавливать его изменения
 
             if (current_infobox_region_id == id_region) {
                 manageInfoBox('toggle', id_region);
@@ -63,7 +68,7 @@ $(function() {
                 });
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
-                return;
+                return false;
                 map_element
                     .setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.hover.iconClasses}`,
@@ -95,7 +100,7 @@ $(function() {
                     fillOpacity: map_element.options.display_defaults.region.default.fillOpacity,
                 });
             } else {
-                return
+                return false;
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
                 map_element.setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.default.iconClass}`,
@@ -110,7 +115,7 @@ $(function() {
     });
 
     // раскладываем регионы по layer-группам
-    Object.keys( polymap ).forEach(function(id_region){
+    Object.keys( regionsDataset ).forEach(function(id_region){
         let id_layer = theMap['regions'][id_region]['layer'];
 
         if (!(id_layer in LGS)) {
@@ -123,7 +128,7 @@ $(function() {
                 zoom_max: theMap['layers'][id_layer]['zoom_max'],
             };
         }
-        LGS[id_layer].actor.addLayer( polymap[id_region] );
+        LGS[id_layer].actor.addLayer( regionsDataset[id_region] );
     });
 
     // показываем layer-группы или скрываем нужные
@@ -142,12 +147,12 @@ $(function() {
 
     map.fitBounds(base_map_bounds);
 
-    createControl_RegionsBox();
-    createControl_InfoBox();
-    createControl_Backward();
+    MapControls.declareControl_RegionsBox();
+    MapControls.declareControl_InfoBox();
+    MapControls.declareControl_Backward();
 
-    // не показываем контрол "назад" если страница загружена в iframe
     if (! (window != window.top || document != top.document || self.location != top.location)) {
+        // не показываем контрол "назад" если страница загружена в iframe
         map.addControl( new L.Control.Backward() );
     }
 
@@ -158,7 +163,7 @@ $(function() {
 
     // анализируем window.location.hash
     if (true) {
-        let wlh_options = wlhBased_GetAction(polymap);
+        let wlh_options = MapManager.WLH_getAction(regionsDataset);
         if (wlh_options) {
             // было бы более интересным решением имитировать триггером клик по ссылке на регионе, но.. оно не работает
             // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
@@ -175,7 +180,6 @@ $(function() {
     map.on('zoomend', function() {
         let currentZoom = map.getZoom();
         console.log("Current zoom: " + currentZoom);
-        if (IS_DEBUG) console.log("zoom at zoomend -> " + currentZoom);
 
         Object.keys( LGS ).forEach(function(lg){
             let zmin = LGS[lg].zoom_min;
@@ -198,41 +202,27 @@ $(function() {
     document.location.href = `/edit/region?map=${map_alias}&id=${region_id}`;
 
 }).on('click', '#actor-regions-toggle', function (el) {
-
-    toggleRegionsBox(this);
-
+    MapControls.toggle_Regions(this);
 }).on('click', '#actor-viewbox-toggle', function (el) {
-
-    toggleInfoBox(this);
-
+    MapControls.toggle_Info(this);
 }).on('click', "#actor-backward-toggle", function (el) {
-
-    toggle_BackwardBox(this);
-
+    MapControls.toggle_Backward(this);
 }).on('change', "#sort-select", function(e){
 
-    let must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-    let must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
-    $(must_hide).hide();
-    $(must_display).show();
-
-}).on('change', "#sort-select", function(e){
-
-    let must_display = (e.target.value == 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
-    let must_hide = (e.target.value == 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
+    let must_display = (e.target.value === 'total') ? "#data-ordered-alphabet" : "#data-ordered-latest";
+    let must_hide = (e.target.value === 'total') ? "#data-ordered-latest" : "#data-ordered-alphabet";
     $(must_hide).hide();
     $(must_display).show();
 
 }).on('click', '.action-focus-at-region', function(){
     // клик на ссылке в списке регионов
     let id_region = $(this).data('region-id');
-    if (IS_DEBUG) console.log("CLICK action-focus-at-region' -> " + id_region);
     console.log("current_infobox_region_id = " + current_infobox_region_id);
 
     onclick_FocusRegion(id_region);
     manageInfoBox('show', id_region);
 
-    window.location.hash = "#view=[" + id_region + "]";
+    window.location.hash = MapManager.WLH_makeLink(id_region);
     return false;
 
 }).on('click', '#actor-section-infobox-toggle', function(){

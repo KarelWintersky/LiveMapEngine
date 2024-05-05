@@ -22,144 +22,6 @@ $.fn.escape = function (callback) {
         });
     });
 };
-/* ==================================================== create map =================================================== */
-setup_MapCreate = function(target, theMap, options = {}) {
-    let map = null;
-
-    let use_zoom_slider;
-    let use_zoom_slider_position = options['zoom_slider_position'] || 'bottomright';
-
-    let _options = {
-        crs: L.CRS.Simple,
-        minZoom: theMap['display']['zoom_min'],
-        maxZoom: theMap['display']['zoom_max'],
-    };
-
-    let use_canvas = true;
-
-    if (use_canvas) {
-        _options.preferCanvas = true;
-        _options.renderer = L.canvas();
-    } else {
-        _options.preferCanvas = false;
-        _options.renderer = L.svg({ padding: 3 }); // должно быть, походу, maxzoom+1
-    }
-
-    switch (options['zoom_mode']) {
-        case 'native': {
-            _options.zoomControl = true;
-            use_zoom_slider = false;
-            break;
-        }
-        case 'smooth': {
-            _options.scrollWheelZoom = false;   // disable original zoom function
-            _options.smoothWheelZoom = true;    // enable smooth zoom
-            _options.smoothSensitivity = 1;     // zoom speed. default is 1
-            use_zoom_slider = false;
-            _options.zoomControl = true;
-            break;
-        }
-        default: {
-            _options.zoomControl = false;
-            use_zoom_slider = true;
-        }
-    }
-
-    switch (theMap.map.type) {
-        case 'bitmap': {
-            map = L.map(target, _options);
-
-            if (use_zoom_slider) {
-                map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
-            }
-
-            break;
-        }
-        case 'vector': {
-            map = L.map(target, _options);
-
-            if (use_zoom_slider) {
-                map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
-            }
-
-            break;
-        }
-        case 'tileset': {
-            //@todo
-            break;
-        }
-    }
-
-    return map;
-}
-
-setup_MapSetMaxBounds = function(map, theMap) {
-    let bounds = [
-        [0, 0],
-        [theMap['map']['height'], theMap['map']['width']]
-    ];
-
-    /*if (theMap['display']['maxbounds']) {
-        let mb = theMap['display']['maxbounds'];
-
-        bounds = [
-            [
-                // mb['topleft_h'] * theMap['map']['height'],
-                // mb['topleft_w'] * theMap['map']['width']
-                0, 0
-            ],
-            [
-                mb['bottomright_h'] * theMap['map']['height'],
-                mb['bottomright_w'] * theMap['map']['width']
-            ]
-        ];
-
-    }*/
-    // map.setMaxBounds(bounds);
-
-    // map.setView();
-
-    return bounds;
-}
-
-/**
- * Должно возвращать новый слой, который мы должны добавлять на карту вне функции
- *
- *
- * @param map
- * @param theMap
- * @param bounds
- * @returns {null}
- */
-setup_MapCreateOverlay = function(map, theMap, bounds) {
-    let image = null;
-
-    switch (theMap.map.type) {
-        case 'bitmap': {
-            image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
-            break;
-        }
-        case 'vector': {
-            image = L.imageOverlay( theMap['map']['imagefile'], base_map_bounds).addTo(map);
-            break;
-        }
-        case 'tileset': {
-            //@todo: почему ESO-то?
-            // storage/ID/tiles/z/x_y.jpg - наверное так должно быть?
-            L.tileLayer('eso/{z}/{x}/{y}.jpg', {
-                minZoom: theMap['display']['zoom_min'],
-                maxZoom: theMap['display']['zoom_max'],
-                attribution: 'ESO/INAF-VST/OmegaCAM',
-                tms: true
-            }).addTo(map);
-
-            break;
-        }
-    }
-
-    return image;
-
-};
 
 
 /* ==================================================== show content ================================================= */
@@ -195,8 +57,8 @@ showContentColorbox = function(id_region , title) {
 }
 
 do_LoadContent = function(id_region) {
-    if (!(id_region in polymap)) {
-        console.log("[" + id_region + "] not found at polymap.");
+    if (!(id_region in regionsDataset)) {
+        console.log("[" + id_region + "] not found at regionsDataset.");
         return false;
     }
 
@@ -219,23 +81,20 @@ do_LoadContent = function(id_region) {
 }
 
 manageInfoBox = function(event, id_region) {
-    if (!__InfoBox) {
-        __InfoBox = new L.Control.InfoBox();
-        map.addControl( __InfoBox );
+    if (!MapManager.__InfoBox) {
+        MapManager.__InfoBox = new L.Control.InfoBox();
+        map.addControl( MapManager.__InfoBox );
     }
 
     let $infobox = $("#section-infobox");
     let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
     let current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
 
-    // if (IS_DEBUG) console.log("Event: " + event + " for region " + id_region);
-    // if (IS_DEBUG) console.log('Current infobox visibility state: ' + current_infobox_visible_state);
-
     switch (event) {
         case 'show': {
             do_LoadContent(id_region);
 
-            window.location.hash = "#view=[" + id_region + "]";
+            window.location.hash = MapManager.WLH_makeLink(id_region);
 
             current_infobox_visible_state = true;
 
@@ -256,12 +115,13 @@ manageInfoBox = function(event, id_region) {
                 current_infobox_visible_state = false;
             } else {
                 current_infobox_visible_state = true;
-                window.location.hash = "#view=[" + id_region + "]";
+                window.location.hash = MapManager.WLH_makeLink(id_region);
             }
             $infobox.toggle();
             break;
         }
     }
+
     $infobox_toggle_buttpon.data('content-visibility', current_infobox_visible_state);
 }
 
@@ -285,28 +145,28 @@ onclick_FocusRegion = function(id_region){
     // if (IS_DEBUG) console.log( LGS[id_layer].actor );
 
     // сохраняем оригинальный стиль региона
-    let old_style = polymap[id_region].options['fillColor'];
+    let old_style = regionsDataset[id_region].options['fillColor'];
 
     if (!is_visible) {
         map.setZoom( theMap['layers'][id_layer]['zoom'], {
             animate: false
         } );
-        bounds = polymap[id_region].getBounds();
+        bounds = regionsDataset[id_region].getBounds();
 
-        polymap[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
+        regionsDataset[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
 
         map.panTo( bounds.getCenter(), { animate: true, duration: 1, noMoveStart: true});
     } else {
-        bounds = polymap[id_region].getBounds();
+        bounds = regionsDataset[id_region].getBounds();
 
-        polymap[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
+        regionsDataset[ id_region ].setStyle({fillColor: focus_highlight_color}); // подсвечиваем (перенести в функцию/метод объекта)
 
         map.panTo( bounds.getCenter(), { animate: true, duration: 1, noMoveStart: true});
     }
 
     // восстанавливаем по таймауту
     setTimeout(function(){
-        polymap[id_region].setStyle({fillColor: old_style});
+        regionsDataset[id_region].setStyle({fillColor: old_style});
     }, focus_timeout);
 
 
@@ -345,7 +205,7 @@ wlh_FocusRegion = function(id_region){
     } );
 
     // пан
-    let region = polymap[id_region];
+    let region = regionsDataset[id_region];
 
     if (region.options.value == 'poi') {
         bounds = region._latlng;
@@ -396,118 +256,15 @@ createControl_RegionTitle = function(position){
     });
 };
 
-/**
- * Создает в объекте L Control-элемент: список регионов
- */
-createControl_RegionsBox = function() {
-    if ($("#section-regions").length == 0) {
-        return false;
-    }
 
-    L.Control.RegionsBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: $("#section-regions").data('leaflet-control-position')
-        },
-        onAdd: function(map) {
-            let div = L.DomUtil.get('section-regions');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-};
 
-/**
- * Создает в объекте L Control элемент: информация о регионе
- */
-createControl_InfoBox = function(){
-    if ($("#section-infobox").length == 0) {
-        return false;
-    }
-
-    L.Control.InfoBox = L.Control.extend({
-        is_content_visible: false,
-        options: {
-            position: $("#section-infobox").data('leaflet-control-position')
-        },
-        onAdd: function(map) {
-            let div = L.DomUtil.get('section-infobox');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomUtil.enableTextSelection();
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map) {}
-    });
-};
-
-/**
- * Создает в объекте L Control элемент: кнопка "назад"
- */
-createControl_Backward = function(position){
-    if ($("#section-backward").length == 0) {
-        return false;
-    }
-
-    L.Control.Backward = L.Control.extend({
-        options: {
-            position: position || 'bottomleft'
-        },
-        onAdd: function(map) {
-            let div = L.DomUtil.get('section-backward');
-            L.DomUtil.removeClass(div, 'invisible');
-            L.DomEvent.disableScrollPropagation(div);
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        },
-        onRemove: function(map){}
-    });
-};
 
 /* ==================================================== end: create controls ========================================= */
-
-/* ==================================================== toggles ====================================================== */
-
-toggleRegionsBox = function(el) {
-    let state = $(el).data('content-is-visible');
-    let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-    $(el).html(text);
-
-    let data = $(el).data('content');
-    $('#' + data).toggle();
-    $('#sort-select').toggle();
-    $(el).data('content-is-visible', !state);
-};
-
-toggleInfoBox = function(el) {
-    let state = $(el).data('content-is-visible');
-    let text = (state == false) ? '&nbsp;Скрыть&nbsp;' : 'Показать';
-    $(el).html(text);
-
-    let data = $(el).data('content');
-    $('#' + data).toggle();
-    $(el).data('content-is-visible', !state);
-}
-
-toggle_BackwardBox = function(el){
-    let state = $(el).data('content-is-visible');
-    let text = (state == false) ? '&lt;' : '&gt;';
-    $(this).html(text);
-
-    let data = $(el).data('content');
-    $('#' + data).toggle();
-    $(this).data('content-is-visible', !state);
-}
-/* ==================================================== end: toggles ================================================= */
 
 /* ==================================================== create map regions =========================================== */
 /**
  * Возвращает объект, содержащий все регионы.
+ * Используется только в folio и colorbox
  *
  * @param theMap
  * @returns {Object}
@@ -521,12 +278,12 @@ buildPolymap = function(theMap) {
         let coords = region['coords'];
         let layer = region['layer'];
 
-        // DEFAULTS for ALL polygons
         let options = Object.create(null);
         options = {
             id: region.id,
             title: region.title || region.id,
             coords: coords,
+            layer: layer,
             radius: region['radius'] || 10,
 
             // present или empty - нужно брать из данных о регионе (пока что берётся present для всех регионов)
@@ -645,7 +402,6 @@ buildPolymap = function(theMap) {
 
         if (entity) {
             polymap[ key ] = entity;
-            console.log(entity);
         }
     } );
 
@@ -655,37 +411,6 @@ buildPolymap = function(theMap) {
 /* ==================================================== end: create map regions ====================================== */
 
 /* ==================================================== Window Location Hash based =================================== */
-
-/**
- * Анализируетм Window.Location.Hash и определяем опции фокусировки/показа региона.
- * Возвращаем опции действия.
- *
- * Следует учитывать, что на карте может не быть региона, переданного в параметрах. Для обработки этой ситуации
- * передается массив карты и имя текущего слоя.
- *
- * @param polymap
- * @param layer
- * @returns {boolean}
- */
-wlhBased_GetAction = function(polymap) {
-    let wlh = window.location.hash;
-    let wlh_params = wlh.match(/(view|focus)=\[(.*)\]/);
-    let options = false;
-
-    if (
-        ((wlh.length > 1) && (wlh_params !== null))
-        &&
-        (((wlh_params[1] == 'view') || (wlh_params[1] == 'focus')) && (wlh_params[2] != ''))
-        &&
-        ( wlh_params[2] in polymap )
-    ) {
-        options = {};
-        options.action = wlh_params[1];
-        options.id_region = wlh_params[2];
-        // options.layer = wlh_params[3];
-    }
-    return options;
-}
 
 /* ===================================== РЕФАКТОРИНГ ============================ */
 

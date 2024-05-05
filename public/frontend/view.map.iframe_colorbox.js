@@ -37,6 +37,8 @@ $(function(){
         poly_layer.addLayer(
             polymap[ id_region ].on('click', function(){
 
+                // window.location.hash = MapManager.WLH_makeLink(id_region);
+
                 window.location.hash = 'view=[' + id_region + ']';
                 const t = (theMap['regions'][id_region]['title'] != '')
                     ? theMap['regions'][id_region]['title']
@@ -49,7 +51,7 @@ $(function(){
 
     poly_layer.addTo(map);
 
-    createControl_Backward();
+    MapControls.declareControl_Backward();
 
     // не показываем контрол "назад" если страница загружена в iframe
     if (! (window != window.top || document != top.document || self.location != top.location)) {
@@ -57,7 +59,7 @@ $(function(){
     }
 
     if (true) {
-        const wlh_options = wlhBased_GetAction(polymap);
+        const wlh_options = MapManager.WLH_getAction(polymap);
 
         map.fitBounds(current_bounds);
 

@@ -34,11 +34,11 @@ $(function(){
 
     // не показываем контрол "назад" если страница загружена в iframe
     if (! (window != window.top || document != top.document || self.location != top.location)) {
-        createControl_Backward();
+        MapControls.declareControl_Backward();
         map.addControl( new L.Control.Backward() );
     }
 
-    createControl_RegionTitle('topleft');
+    MapControls.declareControl_RegionTitle();
     map.addControl( new L.Control.Title() );
 
 
