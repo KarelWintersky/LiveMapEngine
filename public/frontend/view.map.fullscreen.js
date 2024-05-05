@@ -18,17 +18,16 @@ $(function() {
     base_map_bounds = _mapManager.getBounds();
 
     let image = _mapManager.createImageOverlay(base_map_bounds);
-    image.addTo(map);
+    image.addTo(_mapManager.map);
 
-    map.setZoom( window.theMap['display']['zoom'] );
+    _mapManager.map.setZoom( window.theMap['display']['zoom'] );
 
     // строим массив всех регионов
-    regionsDataset = _mapManager.buildRegionsDataset(); // убираем внутрь mapManager
+    _mapManager.buildRegionsDataset();
 
     // биндим к каждому объекту функцию, показывающую информацию
-    Object.keys( regionsDataset ).forEach(function(id_region){ // итерируем _mapManager.regionsDataset
-        // обернуть в функцию и отрефакторить
-        let map_element = regionsDataset[id_region]; // _mapManager.getRegionDefinition()
+    Object.keys( _mapManager.regionsDataset ).forEach(function(id_region){
+        let map_element = _mapManager.getMapElement(id_region);
 
         map_element.on('click', function() {
             // альтернатива - менять window.location.hash
@@ -60,14 +59,14 @@ $(function() {
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
                 return false;
-                map_element
+                /*map_element
                     .setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.hover.iconClasses}`,
                     markerColor: map_element.options.poi.hover.markerColor,
                     iconColor: map_element.options.poi.hover.iconColor,
                     iconXOffset: map_element.options.poi.hover.iconXOffset,
                     iconYOffset: map_element.options.poi.hover.iconYOffset,
-                }));
+                }));*/
                 // обработчик события закомментирован, поскольку событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
                 // возможно это баг плагина FontAwesomeIcon
             }
@@ -90,51 +89,54 @@ $(function() {
             } else {
                 return false;
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
-                map_element.setIcon(L.icon.fontAwesome({
+                /*map_element.setIcon(L.icon.fontAwesome({
                     iconClasses: `fa ${map_element.options.poi.default.iconClass}`,
                     markerColor: map_element.options.poi.default.markerColor,
                     iconColor: map_element.options.poi.default.iconColor,
                     iconXOffset: map_element.options.poi.default.iconXOffset,
                     iconYOffset: map_element.options.poi.default.iconYOffset,
-                }));
+                }));*/
             }
 
         });
     });
 
     // раскладываем регионы по layer-группам
-    Object.keys( regionsDataset ).forEach(function(id_region){
+    Object.keys( _mapManager.regionsDataset ).forEach(function(id_region){
         let id_layer = window.theMap['regions'][id_region]['layer'];
 
-        // -> _mapManager.LGS (layer groups dataset)
-        if (!(id_layer in LGS)) {
-            let lg = new L.LayerGroup();
-            LGS[ id_layer ] = {
-                actor: lg,
+        let zoom_default = window.theMap['layers'][id_layer]['zoom'];
+        let zoom_min = window.theMap['layers'][id_layer]['zoom_min'];
+        let zoom_max = window.theMap['layers'][id_layer]['zoom_max'];
+
+        // Создаем слой с нужными параметрами в структуре LGS
+        if (!(id_layer in _mapManager.LGS)) {
+            _mapManager.LGS[ id_layer ] = {
+                actor: new L.LayerGroup(),
                 visible: false, // все слои скрыты
-                zoom: window.theMap['layers'][id_layer]['zoom'],
-                zoom_min: window.theMap['layers'][id_layer]['zoom_min'],
-                zoom_max: window.theMap['layers'][id_layer]['zoom_max'],
+                zoom: zoom_default,
+                zoom_min: zoom_min,
+                zoom_max: zoom_max,
             };
         }
-        LGS[id_layer].actor.addLayer( regionsDataset[id_region] );
+        _mapManager.LGS[id_layer].actor.addLayer( _mapManager.regionsDataset[id_region] );
     });
 
     // показываем layer-группы или скрываем нужные
-    Object.keys( LGS ).forEach(function(lg) {
+    Object.keys( _mapManager.LGS ).forEach(function(lg) {
         if (
-            map.getZoom().inbound( LGS[lg].zoom_min, LGS[lg].zoom_max )
+            _mapManager.map.getZoom().inbound( _mapManager.LGS[lg].zoom_min, _mapManager.LGS[lg].zoom_max )
         ) {
-            map.addLayer( LGS[lg].actor );
-            LGS[lg].visible = true;
+            _mapManager.map.addLayer( _mapManager.LGS[lg].actor );
+            _mapManager.LGS[lg].visible = true;
         } else {
-            LGS[lg].actor.addTo(map);
-            LGS[lg].actor.remove(); // map.addLayer( LGS[lg].actor );
-            LGS[lg].visible = false;
+            _mapManager.LGS[lg].actor.addTo(map);
+            _mapManager.LGS[lg].actor.remove(); // map.addLayer( LGS[lg].actor );
+            _mapManager.LGS[lg].visible = false;
         }
     });
 
-    map.fitBounds(base_map_bounds);
+    _mapManager.map.fitBounds(base_map_bounds);
 
     MapControls.declareControl_RegionsBox();
     MapControls.declareControl_InfoBox();
@@ -142,23 +144,24 @@ $(function() {
 
     if (! MapControls.isLoadedToIFrame()) {
         // не показываем контрол "назад" если страница загружена в iframe
-        map.addControl( new L.Control.Backward() );
+        _mapManager.map.addControl( new L.Control.Backward() );
     }
 
     // показываем список регионов только если он не пуст
     if (regions_with_content_ids.length) {
-        map.addControl( new L.Control.RegionsBox() );
+        _mapManager.map.addControl( new L.Control.RegionsBox() );
     }
 
     // анализируем window.location.hash
+    // (_mapManager.options.checkWLH_onStart)
     if (true) {
-        let wlh_options = MapManager.WLH_getAction(regionsDataset);
+        let wlh_options = MapManager.WLH_getAction(_mapManager.regionsDataset);
         if (wlh_options) {
             // было бы более интересным решением имитировать триггером клик по ссылке на регионе, но.. оно не работает
             // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
 
             if (wlh_options.id_region != null) {
-                _mapManager.wlhFocusRegion(map, wlh_options.id_region, LGS);
+                _mapManager.wlhFocusRegion(_mapManager.map, wlh_options.id_region, _mapManager.LGS);
                 _mapManager.manageInfoBox('show', wlh_options.id_region);
             }
 
@@ -166,22 +169,23 @@ $(function() {
         }
     }
 
-    // отлавливаем зум
-    map.on('zoomend', function() {
-        let currentZoom = map.getZoom();
+    // Событие на зуме
+    _mapManager.map.on('zoomend', function() {
+        let currentZoom = _mapManager.map.getZoom();
         console.log("Current zoom: " + currentZoom);
 
-        Object.keys( LGS ).forEach(function(lg){
-            let zmin = LGS[lg].zoom_min;
-            let zmax = LGS[lg].zoom_max;
+        Object.keys( _mapManager.LGS ).forEach(function(lg){
+            let zmin = _mapManager.LGS[lg].zoom_min;
+            let zmax = _mapManager.LGS[lg].zoom_max;
+            let actor = _mapManager.LGS[lg].actor;
 
             if (currentZoom.inbound(zmin, zmax)) {
-                map.addLayer( LGS[lg].actor );
-                LGS[lg].visible = true;
+                _mapManager.map.addLayer( actor );
+                _mapManager.LGS[lg].visible = true;
             }
             else {
-                map.removeLayer( LGS[lg].actor );
-                LGS[lg].visible = false;
+                _mapManager.map.removeLayer( actor );
+                _mapManager.LGS[lg].visible = false;
             }
         });
     });

@@ -14,17 +14,46 @@ class MapManager {
     static current_infobox_region_id = null;
 
     /**
-     *
-     * @type {{}}
-     */
-    regionsDataset = {};
-
-    /**
      * ID карты
      *
      * @type {null}
      */
     map_alias = null;
+
+    /* ====================================================================== */
+    /**
+     * Исходное определение карты
+     *
+     * @type {{}}
+     */
+    theMap = {};
+
+    /**
+     * Глобальный объект карты
+     *
+     * @type {null}
+     */
+    map = null;
+
+    /**
+     * Объект глобальной декларации регионов на карте. Включает параметры по каждому региону и созданные на их основе Leaflet Vector Layers
+     * @type {{}}
+     */
+    regionsDataset = {};
+
+    /**
+     * Layers Group Set для карты
+     *
+     * @type {{}}
+     */
+    LGS = {};
+
+    /**
+     * Базовые границы карты
+     *
+     * @type {{}}
+     */
+    baseMapBounds = {};
 
     /**
      *
@@ -43,6 +72,10 @@ class MapManager {
         this.theMap = mapDefinition;
         this.IS_DEBUG = is_debug;
         this.map_alias = this.theMap.map.id;
+
+        this.LGS = {};
+        this.regionsDataset = {};
+        this.baseMapBounds = {};
     }
 
     /**
@@ -110,6 +143,8 @@ class MapManager {
                     map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
                 }
 
+                map.attributionControl.setPrefix(this.theMap.map.attribution || '');
+
                 break;
             }
             case 'vector': {
@@ -119,16 +154,30 @@ class MapManager {
                     map.addControl(new L.Control.Zoomslider({position: use_zoom_slider_position}));
                 }
 
+                map.attributionControl.setPrefix(this.theMap.map.attribution || '');
+
                 break;
             }
-            case 'tileset': {
+            /*case 'tileset': {
                 //@todo
                 break;
-            }
+            }*/
         }
+
+        this.map = map;
 
         return map;
     } // -createMap
+
+    /**
+     * Отдает интерактивный элемент карты из массива regionsDataset по ID
+     *
+     * @param id_region
+     * @returns {*|Object}
+     */
+    getMapElement(id_region) {
+        return this.regionsDataset[id_region];
+    }
 
     /**
      * Возвращает bounds карты. И вроде бы не используется для именно setBounds()
@@ -157,6 +206,7 @@ class MapManager {
             ]
         ];
         }*/
+        this.baseMapBounds = bounds;
         return bounds;
     }
 

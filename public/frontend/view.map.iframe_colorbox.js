@@ -1,13 +1,16 @@
-let current_infobox_region_id;
-let polymap;
+let map;
 
 /* ========================================= */
-$(function(){
+$(function() {
+    let _mapManager = window._mapManager;
+    map = _mapManager.createMap('map');
+    _mapManager.setBackgroundColor(".leaflet-container");
+
     $(".leaflet-container").css('background-color', theMap['display']['background_color']);
 
     polymap = buildPolymap(theMap);
 
-    const map = L.map('map', {
+    let map = L.map('map', {
         crs: L.CRS.Simple,
         minZoom: -3,
         maxZoom: 2,
