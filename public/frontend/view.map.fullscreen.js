@@ -139,7 +139,7 @@ $(function() {
     MapControls.declareControl_InfoBox();
     MapControls.declareControl_Backward();
 
-    if (! (window != window.top || document != top.document || self.location != top.location)) {
+    if (! MapControls.isLoadedToIFrame()) {
         // не показываем контрол "назад" если страница загружена в iframe
         map.addControl( new L.Control.Backward() );
     }
@@ -157,7 +157,7 @@ $(function() {
             // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
 
             if (wlh_options.id_region != null) {
-                wlh_FocusRegion(wlh_options.id_region);
+                _mapManager.wlhFocusRegion(map, wlh_options.id_region, LGS);
                 _mapManager.manageInfoBox('show', wlh_options.id_region);
             }
 
@@ -209,9 +209,9 @@ $(function() {
     let _mapManager = window._mapManager;
     // клик на ссылке в списке регионов
     let id_region = $(this).data('region-id');
-    console.log("current_infobox_region_id = " + MapManager.current_infobox_region_id);
+    console.log(`current_infobox_region_id = ${MapManager.current_infobox_region_id}`);
 
-    onclick_FocusRegion(id_region);
+    _mapManager.onClickFocusRegion(map, id_region, LGS);
     _mapManager.manageInfoBox('show', id_region);
 
     window.location.hash = MapManager.WLH_makeLink(id_region);

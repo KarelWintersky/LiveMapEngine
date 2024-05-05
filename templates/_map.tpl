@@ -23,12 +23,10 @@
     <script src="/frontend/scripts.js"></script>
     <script src="/frontend/MapManager.js"></script>
     <script src="/frontend/MapControls.js"></script>
-    <script src="/frontend/MapContent.js"></script>
 
     <script src="/frontend/leaflet/L.Control.Zoomslider.js"></script>
     <link rel="stylesheet" href="/frontend/leaflet/L.Control.Zoomslider.css">
 
-    <!-- danwild/leaflet-fa-markers -->
     <script src="/frontend/leaflet/L.Icon.FontAwesome.js"></script>
     <link href="/frontend/leaflet/L.Icon.FontAwesome.css" rel="stylesheet">
 
@@ -39,23 +37,22 @@
         <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
     {/if}
 
-    <script>
+    <script data-comment="init">
         window.theMap = { };
         window.REGION_URLS = {
             "view": "{Arris\AppRouter::getRouter('view.region.info')}",
             "edit": "{Arris\AppRouter::getRouter('edit.region.info')}"
         };
-    </script>
 
-    <script src="/map:js/{$map_alias}.js" id="the-map-data"></script>
-    <script src="/frontend/livemap.view.js" id="livemap-view-map-methods"></script>
-
-    <script type="text/javascript" id="init">
         let map_alias = '{$map_alias}';
 
         let template_orientation = -1; // инфо слева: -1, инфо справа: +1
         let map_centring_panning_step = Number("{$panning_step|default:0}");  // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
+    </script>
 
+    <script src="/map:js/{$map_alias}.js" data-comment="the-map-data"></script>
+
+    <script data-comment="regions">
         let regions_with_content_ids = [
             {$regions_with_content_ids}
         ];

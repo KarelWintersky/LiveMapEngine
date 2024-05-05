@@ -163,6 +163,15 @@ class MapControls {
         $(el).data('content-is-visible', !state);
     }
 
+    /**
+     * Проверяет, загружена ли страница в ифрейм?
+     *
+     * @returns {boolean}
+     */
+    static isLoadedToIFrame() {
+        return (window != window.top || document != top.document || self.location != top.location);
+    }
+
 
 
 
