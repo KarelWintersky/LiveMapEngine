@@ -20,6 +20,13 @@ class MapManager {
     regionsDataset = {};
 
     /**
+     * ID карты
+     *
+     * @type {null}
+     */
+    map_alias = null;
+
+    /**
      *
      * @param mapDefinition - определение карты, полученное из JS-запроса `/map:js/ID.js`
      * @param options
@@ -35,6 +42,7 @@ class MapManager {
 
         this.theMap = mapDefinition;
         this.IS_DEBUG = is_debug;
+        this.map_alias = this.theMap.map.id;
     }
 
     /**
@@ -395,7 +403,7 @@ class MapManager {
         if (this.IS_DEBUG) console.log(`Called do_LoadContent for ${id_region}`);
 
         if (MapManager.current_infobox_region_id !== id_region) {
-            let url = MapManager.makeURL('view', this.theMap['id'], id_region, false);
+            let url = MapManager.makeURL('view', this.theMap.map['id'], id_region, false);
 
             $target.html('');
 

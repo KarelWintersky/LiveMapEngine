@@ -186,11 +186,10 @@ $(function() {
     });
 
 }).on('click', '#actor-edit', function(){
+    let _mapManager = window._mapManager;
 
     let region_id = $(this).data('region-id');
-    // let url = MapManager.makeURL('edit', map_alias, region_id);
-    // document.location.href = `/edit/region?map=${map_alias}&id=${region_id}`;
-    document.location.href = MapManager.makeURL('edit', map_alias, region_id);
+    document.location.href = MapManager.makeURL('edit', _mapManager.map_alias, region_id);
 
 }).on('click', '#actor-regions-toggle', function (el) {
     MapControls.toggle_Regions(this);

@@ -44,10 +44,10 @@
             "edit": "{Arris\AppRouter::getRouter('edit.region.info')}"
         };
 
-        let map_alias = '{$map_alias}';
+        var map_alias = '{$map_alias}';
 
-        let template_orientation = -1; // инфо слева: -1, инфо справа: +1
-        let map_centring_panning_step = Number("{$panning_step|default:0}");  // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
+        var template_orientation = -1; // инфо слева: -1, инфо справа: +1
+        var map_centring_panning_step = Number("{$panning_step|default:0}");  // на сколько пикселей при позиционировании региона "по центру" он будет сдвинут
     </script>
 
     <script src="/map:js/{$map_alias}.js" data-comment="the-map-data"></script>
@@ -57,7 +57,6 @@
             {$regions_with_content_ids}
         ];
         window._mapManager = new MapManager(window.theMap);
-        window._mapContent = new MapContent(window.theMap);
     </script>
 </head>
 <body>
