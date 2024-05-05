@@ -305,13 +305,13 @@ class MapsController extends AbstractClass
         ];
 
         $display_defaults_region['present_hover'] = [
-            "stroke"        =>  $json->display_defaults->region->{'present:hover'}->{'stroke'}          ?? $display_defaults_region['empty_hover']['stroke'],
-            "borderColor"   =>  $json->display_defaults->region->{'present:hover'}->{'borderColor'}     ?? $display_defaults_region['empty_hover']['borderColor'],
-            "borderWidth"   =>  $json->display_defaults->region->{'present:hover'}->{'borderWidth'}     ?? $display_defaults_region['empty_hover']['borderWidth'],
-            "borderOpacity" =>  $json->display_defaults->region->{'present:hover'}->{'borderOpacity'}   ?? $display_defaults_region['empty_hover']['borderOpacity'],
-            "fill"          =>  $json->display_defaults->region->{'present:hover'}->{'fill'}            ?? $display_defaults_region['empty_hover']['fill'],
-            "fillColor"     =>  $json->display_defaults->region->{'present:hover'}->{'fillColor'}       ?? $display_defaults_region['empty_hover']['fillColor'],
-            "fillOpacity"   =>  $json->display_defaults->region->{'present:hover'}->{'fillOpacity'}     ?? $display_defaults_region['empty_hover']['fillOpacity'],
+            "stroke"        =>  $json->display_defaults->region->{'present:hover'}->{'stroke'}          ?? $display_defaults_region['present']['stroke'],
+            "borderColor"   =>  $json->display_defaults->region->{'present:hover'}->{'borderColor'}     ?? $display_defaults_region['present']['borderColor'],
+            "borderWidth"   =>  $json->display_defaults->region->{'present:hover'}->{'borderWidth'}     ?? $display_defaults_region['present']['borderWidth'],
+            "borderOpacity" =>  $json->display_defaults->region->{'present:hover'}->{'borderOpacity'}   ?? $display_defaults_region['present']['borderOpacity'],
+            "fill"          =>  $json->display_defaults->region->{'present:hover'}->{'fill'}            ?? $display_defaults_region['present']['fill'],
+            "fillColor"     =>  $json->display_defaults->region->{'present:hover'}->{'fillColor'}       ?? $display_defaults_region['present']['fillColor'],
+            "fillOpacity"   =>  $json->display_defaults->region->{'present:hover'}->{'fillOpacity'}     ?? $display_defaults_region['present']['fillOpacity'],
         ];
 
         $display_defaults_poi = [];

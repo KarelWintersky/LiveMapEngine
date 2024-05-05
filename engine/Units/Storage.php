@@ -17,7 +17,11 @@ class Storage extends AbstractClass
     public function getPublicMapsList(): array
     {
         $maps_list = [];
+
         $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json')->toString();
+        if (!is_readable($indexfile)) {
+            $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json5')->toString();
+        }
 
         if (!is_readable($indexfile)) {
             throw new \RuntimeException("Index file not readable");
@@ -39,7 +43,7 @@ class Storage extends AbstractClass
         foreach ($json->maps as $map) {
             $alias = $map->alias;
             $title = $map->title;
-            $key = str_replace('.', '~', $alias);
+            $key = str_replace('.', '~', $alias); // зачем?
 
             $maps_list[ $key ] = [
                 'alias' =>  $alias,

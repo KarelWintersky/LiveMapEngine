@@ -208,6 +208,9 @@ class MapManager {
             let type = region['type'];
             let coords = region['coords'];
             let layer = region['layer'];
+            let is_have_content = region.hasOwnProperty('title');
+            let dd_key = is_have_content ? 'present' : 'empty';
+            let dd_key_hover = is_have_content ? 'present_hover' : 'empty_hover';
 
             let options = Object.create(null);
             options = {
@@ -220,13 +223,13 @@ class MapManager {
                 // present или empty - нужно брать из данных о регионе (пока что берётся present для всех регионов).
                 /* Параметры по-умолчанию для создания региона. В дальнейшем (on('mouseout'), on('mouseover') будем брать из структуры region */
                 /* Это изменяемые параметры для региона. Они будут использованы для его создания */
-                stroke: region['stroke'] || defaultDisplaySettings.region.present.stroke,
-                color: region['borderColor'] || defaultDisplaySettings.region.present.borderColor,
-                width: region['borderWidth'] || defaultDisplaySettings.region.present.borderWidth,
-                opacity: region['borderOpacity'] || defaultDisplaySettings.region.present.borderOpacity,
-                fill: region['fill'] || defaultDisplaySettings.region.present.fill,
-                fillColor: region['fillColor'] || defaultDisplaySettings.region.present.fillColor,
-                fillOpacity: region['fillOpacity'] || defaultDisplaySettings.region.present.fillOpacity,
+                stroke: region['stroke'] || defaultDisplaySettings.region[dd_key].stroke,
+                color: region['borderColor'] || defaultDisplaySettings.region[dd_key].borderColor,
+                width: region['borderWidth'] || defaultDisplaySettings.region[dd_key].borderWidth,
+                opacity: region['borderOpacity'] || defaultDisplaySettings.region[dd_key].borderOpacity,
+                fill: region['fill'] || defaultDisplaySettings.region[dd_key].fill,
+                fillColor: region['fillColor'] || defaultDisplaySettings.region[dd_key].fillColor,
+                fillOpacity: region['fillOpacity'] || defaultDisplaySettings.region[dd_key].fillOpacity,
                 display_defaults: {},
             };
 
@@ -246,13 +249,13 @@ class MapManager {
                         fillOpacity: options['fillOpacity'],
                     },
                     hover: {
-                        stroke: defaultDisplaySettings.region.present_hover.stroke,
-                        borderColor: defaultDisplaySettings.region.present_hover.borderColor,
-                        borderWidth: defaultDisplaySettings.region.present_hover.borderWidth,
-                        borderOpacity: defaultDisplaySettings.region.present_hover.borderOpacity,
-                        fill: defaultDisplaySettings.region.present_hover.fill,
-                        fillColor: defaultDisplaySettings.region.present_hover.fillColor,
-                        fillOpacity: defaultDisplaySettings.region.present_hover.fillOpacity,
+                        stroke: defaultDisplaySettings.region[dd_key_hover].stroke || defaultDisplaySettings.region[dd_key].stroke,
+                        borderColor: defaultDisplaySettings.region[dd_key_hover].borderColor || defaultDisplaySettings.region[dd_key].borderColor,
+                        borderWidth: defaultDisplaySettings.region[dd_key_hover].borderWidth || defaultDisplaySettings.region[dd_key].borderWidth,
+                        borderOpacity: defaultDisplaySettings.region[dd_key_hover].borderOpacity || defaultDisplaySettings.region[dd_key].borderOpacity,
+                        fill: defaultDisplaySettings.region[dd_key_hover].fill || defaultDisplaySettings.region[dd_key].fill,
+                        fillColor: defaultDisplaySettings.region[dd_key_hover].fillColor || defaultDisplaySettings.region[dd_key].fillColor,
+                        fillOpacity: defaultDisplaySettings.region[dd_key_hover].fillOpacity || defaultDisplaySettings.region[dd_key].fillOpacity,
                     }
                 },
                 poi: {

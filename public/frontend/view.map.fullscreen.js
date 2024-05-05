@@ -23,12 +23,12 @@ $(function() {
     map.setZoom( window.theMap['display']['zoom'] );
 
     // строим массив всех регионов
-    regionsDataset = _mapManager.buildRegionsDataset();
+    regionsDataset = _mapManager.buildRegionsDataset(); // убираем внутрь mapManager
 
     // биндим к каждому объекту функцию, показывающую информацию
-    Object.keys( regionsDataset ).forEach(function(id_region){
+    Object.keys( regionsDataset ).forEach(function(id_region){ // итерируем _mapManager.regionsDataset
         // обернуть в функцию и отрефакторить
-        let map_element = regionsDataset[id_region];
+        let map_element = regionsDataset[id_region]; // _mapManager.getRegionDefinition()
 
         map_element.on('click', function() {
             // альтернатива - менять window.location.hash
@@ -106,6 +106,7 @@ $(function() {
     Object.keys( regionsDataset ).forEach(function(id_region){
         let id_layer = window.theMap['regions'][id_region]['layer'];
 
+        // -> _mapManager.LGS (layer groups dataset)
         if (!(id_layer in LGS)) {
             let lg = new L.LayerGroup();
             LGS[ id_layer ] = {
