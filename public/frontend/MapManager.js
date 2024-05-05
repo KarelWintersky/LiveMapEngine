@@ -218,63 +218,64 @@ class MapManager {
                 // present или empty - нужно брать из данных о регионе (пока что берётся present для всех регионов).
                 /* Параметры по-умолчанию для создания региона. В дальнейшем (on('mouseout'), on('mouseover') будем брать из структуры region */
                 /* Это изменяемые параметры для региона. Они будут использованы для его создания */
-                stroke: region['stroke']        || defaultDisplaySettings.region.present.stroke,
-                color: region['borderColor']    || defaultDisplaySettings.region.present.borderColor,
-                width: region['borderWidth']    || defaultDisplaySettings.region.present.borderWidth,
+                stroke: region['stroke'] || defaultDisplaySettings.region.present.stroke,
+                color: region['borderColor'] || defaultDisplaySettings.region.present.borderColor,
+                width: region['borderWidth'] || defaultDisplaySettings.region.present.borderWidth,
                 opacity: region['borderOpacity'] || defaultDisplaySettings.region.present.borderOpacity,
-                fill: region['fill']            || defaultDisplaySettings.region.present.fill,
-                fillColor: region['fillColor']  || defaultDisplaySettings.region.present.fillColor,
+                fill: region['fill'] || defaultDisplaySettings.region.present.fill,
+                fillColor: region['fillColor'] || defaultDisplaySettings.region.present.fillColor,
                 fillOpacity: region['fillOpacity'] || defaultDisplaySettings.region.present.fillOpacity,
+                display_defaults: {},
+            };
 
-                /*
-                А это неизменяемые параметры, они будут использованы для изменения стилей при событиях
-                on('mouseover') и on('mouseout')
-                * */
-                display_defaults: {
-                    region: {
-                        default: {
-                            stroke: region['stroke']        || defaultDisplaySettings.region.present.stroke,
-                            color: region['borderColor']    || defaultDisplaySettings.region.present.borderColor,
-                            width: region['borderWidth']    || defaultDisplaySettings.region.present.borderWidth,
-                            opacity: region['borderOpacity'] || defaultDisplaySettings.region.present.borderOpacity,
-                            fill: region['fill']            || defaultDisplaySettings.region.present.fill,
-                            fillColor: region['fillColor']  || defaultDisplaySettings.region.present.fillColor,
-                            fillOpacity: region['fillOpacity'] || defaultDisplaySettings.region.present.fillOpacity,
-                        },
-                        hover: {
-                            stroke: defaultDisplaySettings.region.present_hover.stroke,
-                            borderColor: defaultDisplaySettings.region.present_hover.borderColor,
-                            borderWidth: defaultDisplaySettings.region.present_hover.borderWidth,
-                            borderOpacity: defaultDisplaySettings.region.present_hover.borderOpacity,
-                            fill: defaultDisplaySettings.region.present_hover.fill,
-                            fillColor: defaultDisplaySettings.region.present_hover.fillColor,
-                            fillOpacity: defaultDisplaySettings.region.present_hover.fillOpacity,
-                        }
+            /*
+            А это неизменяемые параметры, они будут использованы для изменения стилей при событиях
+            on('mouseover') и on('mouseout')
+            * */
+            options.display_defaults = {
+                region: {
+                    default: {
+                        stroke: options['stroke'],
+                        borderColor: options['color'],
+                        borderWidth: options['width'],
+                        borderOpacity: options['borderOpacity'],
+                        fill: options['fill'],
+                        fillColor: options['fillColor'],
+                        fillOpacity: options['fillOpacity'],
                     },
-                    poi: {
-                        any: {
-                            iconClass: defaultDisplaySettings.poi.any.iconClass,
-                            markerColor: defaultDisplaySettings.poi.any.markerColor,
-                            iconColor: defaultDisplaySettings.poi.any.iconColor,
-                            iconXOffset: defaultDisplaySettings.poi.any.iconXOffset,
-                            iconYOffset: defaultDisplaySettings.poi.any.iconYOffset,
-                        },
-                        /*default: {
-                            iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
-                            markerColor: 'green',
-                            iconColor: '#FFF',
-                            iconXOffset: -1,
-                            iconYOffset: 0
-                        },
-                        hover: {
-                            iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
-                            markerColor: 'red',
-                            iconColor: '#FFF',
-                            iconXOffset: -1,
-                            iconYOffset: 0
-                        }*/
+                    hover: {
+                        stroke: defaultDisplaySettings.region.present_hover.stroke,
+                        borderColor: defaultDisplaySettings.region.present_hover.borderColor,
+                        borderWidth: defaultDisplaySettings.region.present_hover.borderWidth,
+                        borderOpacity: defaultDisplaySettings.region.present_hover.borderOpacity,
+                        fill: defaultDisplaySettings.region.present_hover.fill,
+                        fillColor: defaultDisplaySettings.region.present_hover.fillColor,
+                        fillOpacity: defaultDisplaySettings.region.present_hover.fillOpacity,
                     }
                 },
+                poi: {
+                    any: {
+                        iconClass: defaultDisplaySettings.poi.any.iconClass,
+                        markerColor: defaultDisplaySettings.poi.any.markerColor,
+                        iconColor: defaultDisplaySettings.poi.any.iconColor,
+                        iconXOffset: defaultDisplaySettings.poi.any.iconXOffset,
+                        iconYOffset: defaultDisplaySettings.poi.any.iconYOffset,
+                    },
+                    /*default: {
+                        iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                        markerColor: 'green',
+                        iconColor: '#FFF',
+                        iconXOffset: -1,
+                        iconYOffset: 0
+                    },
+                    hover: {
+                        iconClasses: 'fa-brands fa-fort-awesome', // display.poi.any
+                        markerColor: 'red',
+                        iconColor: '#FFF',
+                        iconXOffset: -1,
+                        iconYOffset: 0
+                    }*/
+                }
             };
 
             let entity = null;

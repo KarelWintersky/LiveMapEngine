@@ -2,7 +2,7 @@ const focus_animate_duration = window.theMap['display']['focus_animate_duration'
 const focus_highlight_color = window.theMap['display']['focus_highlight_color'] || '#ff0000';
 const focus_timeout = window.theMap['display']['focus_timeout'] || 1500;
 const IS_DEBUG = false;
-const DEBUG_SET_STYLE_WHILE_HOVER = false;
+const DEBUG_SET_STYLE_WHILE_HOVER = true;
 
 let map;
 let base_map_bounds;
@@ -46,6 +46,10 @@ $(function() {
             if (false === DEBUG_SET_STYLE_WHILE_HOVER) return;
 
             if (map_element.options.type != 'poi') {
+                console.log('MouseOver', map_element);
+
+                // console.log(L.DomUtil.getStyle(map_element, 'color'));
+                // Если используется SVG renderer - можно делать через setStyle({ className: '' })
                 map_element.setStyle({
                     stroke: map_element.options.display_defaults.region.hover.stroke,
                     color: map_element.options.display_defaults.region.hover.borderColor,
@@ -56,6 +60,7 @@ $(function() {
                     fillColor: map_element.options.display_defaults.region.hover.fillColor,
                     fillOpacity: map_element.options.display_defaults.region.hover.fillOpacity,
                 });
+                map_element.redraw();
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
                 return false;
@@ -77,8 +82,6 @@ $(function() {
 
             // выставляем стили для региона при наведении при уходе с него мышки, для маркера типа POI стиль не ставится (по крайней мере не так)
             if (map_element.options.type != 'poi') {
-                // region.setStyle({stroke: false, color: '#000000', weight: 0, opacity: 0});
-
                 map_element.setStyle({
                     stroke: map_element.options.display_defaults.region.default.stroke,
                     color: map_element.options.display_defaults.region.default.borderColor,
@@ -89,6 +92,7 @@ $(function() {
                     fillColor: map_element.options.display_defaults.region.default.fillColor,
                     fillOpacity: map_element.options.display_defaults.region.default.fillOpacity,
                 });
+                map_element.redraw();
             } else {
                 return false;
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
