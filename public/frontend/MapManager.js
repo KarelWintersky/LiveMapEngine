@@ -484,7 +484,7 @@ class MapManager {
     manageInfoBox(event, id_region) {
         if (!MapManager.__InfoBox) {
             MapManager.__InfoBox = new L.Control.InfoBox();
-            map.addControl( MapManager.__InfoBox );
+            this.map.addControl( MapManager.__InfoBox );
         }
 
         let $infobox = $("#section-infobox");

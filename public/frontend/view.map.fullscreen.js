@@ -4,15 +4,12 @@ const focus_timeout = window.theMap['display']['focus_timeout'] || 1500;
 const IS_DEBUG = false;
 const DEBUG_SET_STYLE_WHILE_HOVER = true;
 
-let map;
 let base_map_bounds;
-let LGS = Object.create(null);
-let regionsDataset = Object.create(null);
 
 $(function() {
     let _mapManager = window._mapManager;
 
-    map = _mapManager.createMap('map');
+    _mapManager.createMap('map');
     _mapManager.setBackgroundColor(".leaflet-container");
 
     base_map_bounds = _mapManager.getBounds();
@@ -111,8 +108,9 @@ $(function() {
 
         // Создаем слой с нужными параметрами в структуре LGS
         if (!(id_layer in _mapManager.LGS)) {
+            let l = new L.LayerGroup();
             _mapManager.LGS[ id_layer ] = {
-                actor: new L.LayerGroup(),
+                actor: l,
                 visible: false, // все слои скрыты
                 zoom: zoom_default,
                 zoom_min: zoom_min,
@@ -130,7 +128,7 @@ $(function() {
             _mapManager.map.addLayer( _mapManager.LGS[lg].actor );
             _mapManager.LGS[lg].visible = true;
         } else {
-            _mapManager.LGS[lg].actor.addTo(map);
+            _mapManager.LGS[lg].actor.addTo(_mapManager.map);
             _mapManager.LGS[lg].actor.remove(); // map.addLayer( LGS[lg].actor );
             _mapManager.LGS[lg].visible = false;
         }
@@ -215,7 +213,7 @@ $(function() {
     let id_region = $(this).data('region-id');
     console.log(`current_infobox_region_id = ${MapManager.current_infobox_region_id}`);
 
-    _mapManager.onClickFocusRegion(map, id_region, LGS);
+    _mapManager.onClickFocusRegion(map, id_region, _mapManager.LGS);
     _mapManager.manageInfoBox('show', id_region);
 
     window.location.hash = MapManager.WLH_makeLink(id_region);
