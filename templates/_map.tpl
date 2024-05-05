@@ -38,8 +38,13 @@
         <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
         <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
     {/if}
+
     <script>
         window.theMap = { };
+        window.REGION_URLS = {
+            "view": "{Arris\AppRouter::getRouter('view.region.info')}",
+            "edit": "{Arris\AppRouter::getRouter('edit.region.info')}"
+        };
     </script>
 
     <script src="/map:js/{$map_alias}.js" id="the-map-data"></script>

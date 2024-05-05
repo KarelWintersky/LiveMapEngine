@@ -3,12 +3,6 @@
  */
 class MapManager {
     /**
-     *
-     * @type {string}
-     */
-    static URL_GET_REGION_CONTENT = '/region/get?map=';
-
-    /**
      * Инстанс инфобокса, null - когда не создан
      */
     static __InfoBox = null;
@@ -401,12 +395,12 @@ class MapManager {
         if (this.IS_DEBUG) console.log(`Called do_LoadContent for ${id_region}`);
 
         if (MapManager.current_infobox_region_id !== id_region) {
-            let url = `${MapManager.URL_GET_REGION_CONTENT + this.theMap['map_alias']}&id=${id_region}`;
+            let url = MapManager.makeURL('view', this.theMap['id'], id_region, false);
 
             $target.html('');
 
             $.get(url, function(){ }).done(function(data){
-                if (IS_DEBUG) console.log(`data loaded, length ${data.length}`);
+                if (this.IS_DEBUG) console.log(`data loaded, length ${data.length}`);
 
                 MapManager.current_infobox_region_id = id_region;
 
@@ -433,8 +427,8 @@ class MapManager {
         }
 
         let $infobox = $("#section-infobox");
-        let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
-        let current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
+        let $infobox_toggle_button = $('#actor-section-infobox-toggle');
+        let current_infobox_visible_state = $infobox_toggle_button.data('content-visibility');
 
         switch (event) {
             case 'show': {
@@ -468,7 +462,7 @@ class MapManager {
             }
         }
 
-        $infobox_toggle_buttpon.data('content-visibility', current_infobox_visible_state);
+        $infobox_toggle_button.data('content-visibility', current_infobox_visible_state);
     }
 
     /**
@@ -478,8 +472,12 @@ class MapManager {
      * @param title
      */
     showContentColorBox(id_region, title) {
-        let is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
-        let url = `${MapManager.URL_GET_REGION_CONTENT + this.theMap['map_alias']}&id=${id_region}&${is_iframe}`;
+        let url = MapManager.makeURL(
+            'view',
+            this.theMap['id'],
+            id_region,
+            ((window != window.top || document != top.document || self.location != top.location))
+        );
 
         $.get( url, function() {
 
@@ -497,6 +495,30 @@ class MapManager {
                 }
             });
         });
+    }
+
+    /**
+     * Генерирует URL для действия
+     *
+     * @param action
+     * @param map_alias
+     * @param id_region
+     * @param is_iframe
+     * @returns {string}
+     */
+    static makeURL(action = 'view', map_alias, id_region, is_iframe = false) {
+        let _act = null;
+        switch (action) {
+            case 'view': {
+                _act = window.REGION_URLS['view'];
+                break;
+            }
+            case 'edit': {
+                _act = window.REGION_URLS['edit'];
+                break;
+            }
+        }
+        return `${_act}?map=${map_alias}&id=${id_region}${ is_iframe ? '&resultType=iframe' : '' }`;
     }
 
 }

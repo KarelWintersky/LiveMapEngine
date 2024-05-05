@@ -34,7 +34,7 @@ $(function() {
             // альтернатива - менять window.location.hash
             // а ниже отлавливать его изменения
 
-            if (MapManager.current_infobox_region_id == id_region) {
+            if (MapManager.current_infobox_region_id === id_region) {
                 _mapManager.manageInfoBox('toggle', id_region);
             } else {
                 _mapManager.manageInfoBox('show', id_region);
@@ -45,10 +45,7 @@ $(function() {
             // выставляем стили для региона при наведении на него мышки, для маркера типа POI стиль не ставится
             if (false === DEBUG_SET_STYLE_WHILE_HOVER) return;
 
-            if (map_element.options.type != 'poi') {
-                console.log('MouseOver', map_element);
-
-                // console.log(L.DomUtil.getStyle(map_element, 'color'));
+            if (map_element.options.type !== 'poi') {
                 // Если используется SVG renderer - можно делать через setStyle({ className: '' })
                 map_element.setStyle({
                     stroke: map_element.options.display_defaults.region.hover.stroke,
@@ -60,7 +57,6 @@ $(function() {
                     fillColor: map_element.options.display_defaults.region.hover.fillColor,
                     fillOpacity: map_element.options.display_defaults.region.hover.fillOpacity,
                 });
-                map_element.redraw();
             } else {
                 // Событие MOUSEOVER для L.Marker'а ловится корректно и позволяет изменить иконку элемента, НО...
                 return false;
@@ -77,11 +73,10 @@ $(function() {
             }
 
         }).on('mouseout', function() {
-
             if (false === DEBUG_SET_STYLE_WHILE_HOVER) return;
 
             // выставляем стили для региона при наведении при уходе с него мышки, для маркера типа POI стиль не ставится (по крайней мере не так)
-            if (map_element.options.type != 'poi') {
+            if (map_element.options.type !== 'poi') {
                 map_element.setStyle({
                     stroke: map_element.options.display_defaults.region.default.stroke,
                     color: map_element.options.display_defaults.region.default.borderColor,
@@ -92,7 +87,6 @@ $(function() {
                     fillColor: map_element.options.display_defaults.region.default.fillColor,
                     fillOpacity: map_element.options.display_defaults.region.default.fillOpacity,
                 });
-                map_element.redraw();
             } else {
                 return false;
                 // событие MOUSEOUT НЕ ЛОВИТСЯ и поменять иконку обратно невозможно
@@ -162,8 +156,6 @@ $(function() {
             // было бы более интересным решением имитировать триггером клик по ссылке на регионе, но.. оно не работает
             // $("a.action-focus-at-region[data-region-id='" + wlh_options.id_region + "']").trigger('click');
 
-            console.log(wlh_options);
-
             if (wlh_options.id_region != null) {
                 wlh_FocusRegion(wlh_options.id_region);
                 _mapManager.manageInfoBox('show', wlh_options.id_region);
@@ -196,7 +188,9 @@ $(function() {
 }).on('click', '#actor-edit', function(){
 
     let region_id = $(this).data('region-id');
-    document.location.href = `/edit/region?map=${map_alias}&id=${region_id}`;
+    // let url = MapManager.makeURL('edit', map_alias, region_id);
+    // document.location.href = `/edit/region?map=${map_alias}&id=${region_id}`;
+    document.location.href = MapManager.makeURL('edit', map_alias, region_id);
 
 }).on('click', '#actor-regions-toggle', function (el) {
     MapControls.toggle_Regions(this);
