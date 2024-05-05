@@ -1,36 +1,26 @@
-const focus_animate_duration = theMap['display']['focus_animate_duration'] || 0.7;
-const focus_highlight_color = theMap['display']['focus_highlight_color'] || '#ff0000';
-const focus_timeout = theMap['display']['focus_timeout'] || 1500;
+const focus_animate_duration = window.theMap['display']['focus_animate_duration'] || 0.7;
+const focus_highlight_color = window.theMap['display']['focus_highlight_color'] || '#ff0000';
+const focus_timeout = window.theMap['display']['focus_timeout'] || 1500;
 const IS_DEBUG = false;
 const DEBUG_SET_STYLE_WHILE_HOVER = false;
 
-let current_infobox_region_id = '';
 let map;
 let base_map_bounds;
 let LGS = Object.create(null);
 let regionsDataset = Object.create(null);
 
-/**
- * Инстанс infoBox
- * @type {null}
- * @private
- */
-var __InfoBox = null;
-
 $(function() {
-    let _mapManager = new MapManager(theMap);
-    let _mapContent = new MapContent(theMap);
-
-    _mapManager.setBackgroundColor(".leaflet-container");
+    let _mapManager = window._mapManager;
 
     map = _mapManager.createMap('map');
+    _mapManager.setBackgroundColor(".leaflet-container");
 
     base_map_bounds = _mapManager.getBounds();
 
     let image = _mapManager.createImageOverlay(base_map_bounds);
     image.addTo(map);
 
-    map.setZoom( theMap['display']['zoom'] );
+    map.setZoom( window.theMap['display']['zoom'] );
 
     // строим массив всех регионов
     regionsDataset = _mapManager.buildRegionsDataset();
@@ -44,12 +34,12 @@ $(function() {
             // альтернатива - менять window.location.hash
             // а ниже отлавливать его изменения
 
-            if (current_infobox_region_id == id_region) {
-                manageInfoBox('toggle', id_region);
+            if (MapManager.current_infobox_region_id == id_region) {
+                _mapManager.manageInfoBox('toggle', id_region);
             } else {
-                manageInfoBox('show', id_region);
+                _mapManager.manageInfoBox('show', id_region);
             }
-            current_infobox_region_id = id_region;
+            MapManager.current_infobox_region_id = id_region;
 
         }).on('mouseover', function() {
             // выставляем стили для региона при наведении на него мышки, для маркера типа POI стиль не ставится
@@ -116,16 +106,16 @@ $(function() {
 
     // раскладываем регионы по layer-группам
     Object.keys( regionsDataset ).forEach(function(id_region){
-        let id_layer = theMap['regions'][id_region]['layer'];
+        let id_layer = window.theMap['regions'][id_region]['layer'];
 
         if (!(id_layer in LGS)) {
             let lg = new L.LayerGroup();
             LGS[ id_layer ] = {
                 actor: lg,
                 visible: false, // все слои скрыты
-                zoom: theMap['layers'][id_layer]['zoom'],
-                zoom_min: theMap['layers'][id_layer]['zoom_min'],
-                zoom_max: theMap['layers'][id_layer]['zoom_max'],
+                zoom: window.theMap['layers'][id_layer]['zoom'],
+                zoom_min: window.theMap['layers'][id_layer]['zoom_min'],
+                zoom_max: window.theMap['layers'][id_layer]['zoom_max'],
             };
         }
         LGS[id_layer].actor.addLayer( regionsDataset[id_region] );
@@ -170,8 +160,11 @@ $(function() {
 
             console.log(wlh_options);
 
-            wlh_FocusRegion(wlh_options.id_region);
-            manageInfoBox('show', wlh_options.id_region);
+            if (wlh_options.id_region != null) {
+                wlh_FocusRegion(wlh_options.id_region);
+                _mapManager.manageInfoBox('show', wlh_options.id_region);
+            }
+
         } else {
         }
     }
@@ -215,22 +208,24 @@ $(function() {
     $(must_display).show();
 
 }).on('click', '.action-focus-at-region', function(){
+    let _mapManager = window._mapManager;
     // клик на ссылке в списке регионов
     let id_region = $(this).data('region-id');
-    console.log("current_infobox_region_id = " + current_infobox_region_id);
+    console.log("current_infobox_region_id = " + MapManager.current_infobox_region_id);
 
     onclick_FocusRegion(id_region);
-    manageInfoBox('show', id_region);
+    _mapManager.manageInfoBox('show', id_region);
 
     window.location.hash = MapManager.WLH_makeLink(id_region);
     return false;
 
 }).on('click', '#actor-section-infobox-toggle', function(){
+    let _mapManager = window._mapManager;
 
-    manageInfoBox('hide', null);
+    _mapManager.manageInfoBox('hide', null);
 
 }).escape(function(){
+    let _mapManager = window._mapManager;
 
-    manageInfoBox('hide', null);
-
+    _mapManager.manageInfoBox('hide', null);
 });

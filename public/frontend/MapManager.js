@@ -3,9 +3,21 @@
  */
 class MapManager {
     /**
-     * @public
+     *
+     * @type {string}
+     */
+    static URL_GET_REGION_CONTENT = '/region/get?map=';
+
+    /**
+     * Инстанс инфобокса, null - когда не создан
      */
     static __InfoBox = null;
+
+    /**
+     * Текущий регион, для которого открыт инфобокс
+     * @type {null}
+     */
+    static current_infobox_region_id = null;
 
     /**
      *
@@ -28,7 +40,7 @@ class MapManager {
         jQuery.extend(this.options, options);
 
         this.theMap = mapDefinition;
-        this.is_debug = is_debug;
+        this.IS_DEBUG = is_debug;
     }
 
     /**
@@ -177,6 +189,8 @@ class MapManager {
 
     /**
      * Строит датасет регионов на карте с информацией о стилях отображения
+     * Бывший buildPolymap()
+     * @todo: Реализовать в folio и colorbox режимах
      *
      * @returns {null}
      */
@@ -344,13 +358,16 @@ class MapManager {
      * передается массив карты (и имя текущего слоя?).
      *
      * @param dataset
-     * @returns {boolean}
+     * @returns {action, id_region}
      */
     static WLH_getAction(dataset) {
         let regexp_pattern = /(view|focus)=\[(.*)\]/;
         let wlh = window.location.hash;
         let wlh_params = wlh.match(regexp_pattern);
-        let options = false;
+        let options = {
+            action: null,
+            id_region: null
+        };
 
         if (
             ((wlh.length > 1) && (wlh_params !== null))
@@ -364,6 +381,121 @@ class MapManager {
             options.id_region = wlh_params[2];
         }
         return options;
+    }
+
+    /**
+     * Загружает контент из БД и записывает его в контейнер infoBox
+     *
+     * @param target
+     * @param id_region
+     * @returns {boolean}
+     */
+    loadContent(id_region, target = 'section-infobox-content') {
+        if (!(id_region in this.regionsDataset)) {
+            console.log(`[${id_region}] not found at regionsDataset.`);
+            return false;
+        }
+        let $target = $(`#${target}`);
+
+        if (this.IS_DEBUG) console.log(`Called do_LoadContent for ${id_region}`);
+
+        if (MapManager.current_infobox_region_id !== id_region) {
+            let url = `${MapManager.URL_GET_REGION_CONTENT + this.theMap['map_alias']}&id=${id_region}`;
+
+            $target.html('');
+
+            $.get(url, function(){ }).done(function(data){
+                if (IS_DEBUG) console.log(`data loaded, length ${data.length}`);
+
+                MapManager.current_infobox_region_id = id_region;
+
+                $target
+                    .html(data)
+                    .scrollTop(0)
+                ;
+                // scroll box to top
+                // document.getElementById(target).scrollTop = 0;
+            });
+        }
+    }
+
+    /**
+     * Управляет поведением контейнера infoBox
+     *
+     * @param event
+     * @param id_region
+     */
+    manageInfoBox(event, id_region) {
+        if (!MapManager.__InfoBox) {
+            MapManager.__InfoBox = new L.Control.InfoBox();
+            map.addControl( MapManager.__InfoBox );
+        }
+
+        let $infobox = $("#section-infobox");
+        let $infobox_toggle_buttpon = $('#actor-section-infobox-toggle');
+        let current_infobox_visible_state = $infobox_toggle_buttpon.data('content-visibility');
+
+        switch (event) {
+            case 'show': {
+                this.loadContent(id_region);
+
+                window.location.hash = MapManager.WLH_makeLink(id_region);
+
+                current_infobox_visible_state = true;
+
+                $infobox.show();
+                break;
+            }
+            case 'hide': {
+                current_infobox_visible_state = false;
+
+                history.pushState('', document.title, window.location.pathname);
+
+                $infobox.hide();
+                break;
+            }
+            case 'toggle': {
+                if (current_infobox_visible_state) {
+                    history.pushState('', document.title, window.location.pathname);
+                    current_infobox_visible_state = false;
+                } else {
+                    current_infobox_visible_state = true;
+                    window.location.hash = MapManager.WLH_makeLink(id_region);
+                }
+                $infobox.toggle();
+                break;
+            }
+        }
+
+        $infobox_toggle_buttpon.data('content-visibility', current_infobox_visible_state);
+    }
+
+    /**
+     * Показывает контентное окно colorbox'ом
+     *
+     * @param id_region
+     * @param title
+     */
+    showContentColorBox(id_region, title) {
+        let is_iframe = ((window != window.top || document != top.document || self.location != top.location)) ? '&resultType=iframe' : '';
+        let url = `${MapManager.URL_GET_REGION_CONTENT + this.theMap['map_alias']}&id=${id_region}&${is_iframe}`;
+
+        $.get( url, function() {
+
+        }).done(function(data) {
+            let colorbox_width  = 800;
+            let colorbox_height = 600;
+
+            $.colorbox({
+                html: data,
+                width: colorbox_width,
+                height: colorbox_height,
+                title: title,
+                onClosed: function(){
+                    history.pushState('', document.title, window.location.pathname);
+                }
+            });
+        });
     }
 
 }

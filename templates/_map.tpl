@@ -54,6 +54,8 @@
         let regions_with_content_ids = [
             {$regions_with_content_ids}
         ];
+        window._mapManager = new MapManager(window.theMap);
+        window._mapContent = new MapContent(window.theMap);
     </script>
 </head>
 <body>

@@ -1,3 +1,26 @@
+Number.prototype.between = function(a, b) {
+    let min = Math.min.apply(Math, [a, b]),
+        max = Math.max.apply(Math, [a, b]);
+    return this > min && this < max;
+};
+
+Number.prototype.inbound = function(a, b) {
+    let min = Math.min.apply(Math, [a, b]),
+        max = Math.max.apply(Math, [a, b]);
+    return this >= min && this <= max;
+};
+
+$.fn.escape = function (callback) {
+    return this.each(function () {
+        $(document).on("keydown", this, function (e) {
+            let keycode = ((typeof e.keyCode != 'undefined' && e.keyCode) ? e.keyCode : e.which);
+            if (keycode === 27) {
+                callback.call(this, e);
+            }
+        });
+    });
+};
+
 $(document).ready(function() {
     // notifyFlashMessages(flash_messages);
 
@@ -35,68 +58,27 @@ $(document).ready(function() {
     */
 });
 
-/**
- * Notify bar helper: success
- *
- * @param messages array
- * @param timeout seconds
- */
-function notifySuccess(messages, timeout = 1) {
-    let msg = typeof messages == "string" ? [ messages ] : messages;
-    $.notifyBar({
-        html: msg.join('<br>'),
-        delay: timeout * 1000,
-        cssClass: 'success'
-    });
-}
+if (false) {
+    // id="bind-actor-click-inside-colorbox"
+// обрабатываем клик по ссылке внутри попап окна
+// (на самом деле надо проверять, это ссылка на ту же карту или нет?)
+//@todo: протестировать, отладить!
+    $(document).on('click', '#cboxLoadedContent a', function(){ // здесь другой элемент ловит событие!
+        let href = $(this).attr('href');
+        let wlh = window.location.href;
 
-/**
- * Notify bar helper: error
- *
- * @param messages
- * @param timeout
- */
-function notifyError(messages, timeout = 600) {
-    let msg = typeof messages == "string" ? [ messages ] : messages;
-    $.notifyBar({
-        html: msg.join('<br>'),
-        delay: timeout * 1000,
-        cssClass: 'error'
-    });
-}
-
-/**
- * Notify bar helper: custom class
- *
- * @param messages
- * @param timeout
- * @param custom_class
- */
-function notifyCustom(messages, timeout = 10, custom_class = '') {
-    let msg = typeof messages == "string" ? [ messages ] : messages;
-    $.notifyBar({
-        html: msg.join('<br>'),
-        delay: timeout * 1000,
-        cssClass: custom_class
-    });
-}
-
-function notifyFlashMessages(messages) {
-    console.log(messages);
-    $.each(messages, function (key, value) {
-        switch (key) {
-            case 'success': {
-                notifySuccess(value);
-                break;
+        if (href.indexOf( '#view' ) == 0) { // если href содержит ссылку на блок с информацией...
+            let href_params = href.match(/view=\[(.*)\]/);
+            if (href_params != null) {
+                history.pushState('', document.title, window.location.pathname + href);
+                // toggleContentViewBox(href_params[1], '');
             }
-            case 'error': {
-                notifyError(value);
-                break;
-            }
-            default: {
-                notifyCustom(value)
-                break;
-            }
+        } else {
+            window.location.assign(href);
+            window.location.reload(true);
         }
+
+        return false;
     });
 }
+

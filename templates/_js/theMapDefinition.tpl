@@ -2,7 +2,7 @@ window.theMap = {
     {if $JSBuilderError}"JSBuilderError": "{$JSBuilderError}",{/if}
 
     "map": {
-
+        "id"                :   "{$map.alias}",
         "title"             :   "{$map.title}",
         "type"              :   "{$map.type}",
         "imagefile"         :   "/storage/{$map.alias}/{$map.imagefile}",
