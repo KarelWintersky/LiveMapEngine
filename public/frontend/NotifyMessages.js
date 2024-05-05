@@ -1,7 +1,7 @@
 class NotifyMessages {
 
     static display(messages) {
-        console.log(messages);
+        console.log('Notify messages:', messages);
         $.each(messages, function (key, value) {
             switch (key) {
                 case 'success': {

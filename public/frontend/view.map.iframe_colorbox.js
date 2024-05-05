@@ -1,53 +1,68 @@
 let map;
 
 /* ========================================= */
+/* получается это FOLIO-карта */
 $(function() {
     let _mapManager = window._mapManager;
-    map = _mapManager.createMap('map');
-    _mapManager.setBackgroundColor(".leaflet-container");
 
-    $(".leaflet-container").css('background-color', theMap['display']['background_color']);
+    $(".leaflet-container").css('background-color', window.theMap['display']['background_color']);
 
-    polymap = buildPolymap(theMap);
-
-    let map = L.map('map', {
+    let options = {
         crs: L.CRS.Simple,
         minZoom: -3,
         maxZoom: 2,
         preferCanvas: true,
         renderer: L.canvas(),
-        zoomControl: false,
-    });
-    map.attributionControl.setPrefix('');
-    map.scrollWheelZoom.disable();
+        scrollWheelZoom: true,
+        smoothWheelZoom: true,
+        smoothSensitivity: 1,
+        zoomControl: true,
+    };
 
-    map.addControl(new L.Control.Zoomslider({position: 'bottomright'}));
+    let map = L.map('map', options);
+    map.scrollWheelZoom.disable(); //@todo: нужен, если используется плавный зум! Иначе всё дергается
+    map.setZoom( window.theMap['display']['zoom']);
+    map.attributionControl.setPrefix(window.theMap.map.attribution || '');
 
-    const current_bounds = [[0, 0], [theMap['map']['height'], theMap['map']['width']]];
+    let regionsDataset = _mapManager.buildRegionsDataset();
 
-    const image = L.imageOverlay(theMap['map']['imagefile'], current_bounds).addTo(map);
+    const current_bounds = [
+        [0, 0],
+        [window.theMap['map']['height'], window.theMap['map']['width']]
+    ];
+    map.fitBounds(current_bounds);
 
-    if (theMap['maxbounds']) {
-        var mb = theMap['maxbounds'];
-        map.setMaxBounds([ [ mb['topleft_h'] * theMap['map']['height'], mb['topleft_w'] * theMap['map']['width'] ]  , [ mb['bottomright_h'] * theMap['map']['height'], mb['bottomright_w'] * theMap['map']['width'] ] ]);
-    }
-    map.setZoom( theMap['display']['zoom'] );
+    let image = L.imageOverlay( window.theMap['map']['imagefile'], current_bounds);
+    image.addTo(map);
 
-    const poly_layer = new L.LayerGroup();
+    /*if (window.theMap['maxbounds']) {
+        let mb = window.theMap['maxbounds'];
+        map.setMaxBounds([
+            [
+                mb['topleft_h'] * window.theMap['map']['height'],
+                mb['topleft_w'] * window.theMap['map']['width']
+            ],
+            [
+                mb['bottomright_h'] * window.theMap['map']['height'],
+                mb['bottomright_w'] * window.theMap['map']['width']
+            ]
+        ]);
+    }*/
+
+    let poly_layer = new L.LayerGroup();
 
     // draw polygons on map, bind on-click function
-    Object.keys( polymap ).forEach(function( id_region ) {
+    Object.keys( regionsDataset ).forEach(function( id_region ) {
         poly_layer.addLayer(
-            polymap[ id_region ].on('click', function(){
+            regionsDataset[ id_region ].on('click', function(){
 
-                // window.location.hash = MapManager.WLH_makeLink(id_region);
+                window.location.hash = MapManager.WLH_makeLink(id_region);
 
-                window.location.hash = 'view=[' + id_region + ']';
-                const t = (theMap['regions'][id_region]['title'] != '')
-                    ? theMap['regions'][id_region]['title']
+                let title = (window.theMap['regions'][id_region]['title'] != '')
+                    ? window.theMap['regions'][id_region]['title']
                     : '';
 
-                showContentColorbox(id_region, t);
+                _mapManager.showContentColorBox(id_region, title);
             })
         );
     });
@@ -57,11 +72,11 @@ $(function() {
     MapControls.declareControl_Backward();
 
     // не показываем контрол "назад" если страница загружена в iframe
-    if (! (window != window.top || document != top.document || self.location != top.location)) {
+    if (! MapControls.isLoadedToIFrame()) {
         map.addControl( new L.Control.Backward() );
     }
 
-    if (true) {
+    /*if (true) {
         const wlh_options = MapManager.WLH_getAction(polymap);
 
         map.fitBounds(current_bounds);
@@ -72,12 +87,11 @@ $(function() {
         } else {
             map.fitBounds(current_bounds);
         }
-    }
+    }*/
 
     // zoom control (а если сектора нет?)
     map.on('zoomend', function() {
-        var currentZoom = map.getZoom();
-        console.log("Current zoom: " + currentZoom);
+        let currentZoom = map.getZoom();
         /*if (sector == null) return;
 
          if (currentZoom < sector_options.zoom_threshold) {
@@ -99,11 +113,11 @@ $(function() {
     $('#' + data).toggle();
     $(this).data('content-is-visible', !state);
 }).on('click', '.action-focus-at-region', function(){
-    do_RegionFocus({
+    /*do_RegionFocus({
         action: 'focus',
         region_id: $(this).data('region-id')
-    }, polymap);
+    }, polymap);*/
 }).on('click', '#actor-edit', function(){
-    const region_id = $(this).data('region-id');
-    document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;
+    /*const region_id = $(this).data('region-id');
+    document.location.href = '/edit/region?map=' + map_alias + '&id=' + region_id;*/
 });

@@ -226,8 +226,8 @@ class MapManager {
                 //@todo: почему ESO-то?
                 // storage/ID/tiles/z/x_y.jpg - наверное так должно быть?
                 L.tileLayer('eso/{z}/{x}/{y}.jpg', {
-                    minZoom: theMap['display']['zoom_min'],
-                    maxZoom: theMap['display']['zoom_max'],
+                    minZoom: this.theMap['display']['zoom_min'],
+                    maxZoom: this.theMap['display']['zoom_max'],
                     attribution: 'ESO/INAF-VST/OmegaCAM',
                     tms: true
                 });
@@ -535,7 +535,7 @@ class MapManager {
     showContentColorBox(id_region, title) {
         let url = MapManager.makeURL(
             'view',
-            this.theMap['id'],
+            this.theMap.map['id'],
             id_region,
             MapControls.isLoadedToIFrame()
         );

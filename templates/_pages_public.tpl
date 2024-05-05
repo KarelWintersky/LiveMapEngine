@@ -20,12 +20,15 @@
 
     <script src="/frontend/bootstrap/bootstrap.min.js"></script>
     <script src="/frontend/colorbox/jquery.colorbox-min.js"></script>
+    <script src="/frontend/MapManager.js"></script>
+    <script src="/frontend/MapControls.js"></script>
+    <script src="/frontend/NotifyMessages.js"></script>
 
     <script src="/frontend/scripts.js"></script>
     <script>
         const flash_messages = {$flash_messages};
         $(document).ready(function() {
-            notifyFlashMessages(flash_messages);
+            NotifyMessages.display(flash_messages);
         });
     </script>
 </head>
