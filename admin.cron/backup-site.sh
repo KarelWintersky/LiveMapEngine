@@ -9,7 +9,7 @@ else
 	SCRIPT_PATH=`echo ${PWD}`
 fi
 
-. ${SCRIPT_PATH}/../config/backup.conf
+. /etc/arris/livemap/backup.conf
 
 rar a -x@${SCRIPT_PATH}/${RARFILES_EXCLUDE_LIST} -m5 -mde -s -r ${TEMP_PATH}/${FILENAME_RAR} @${SCRIPT_PATH}/${RARFILES_INCLUDE_LIST}
 

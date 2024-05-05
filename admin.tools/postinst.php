@@ -45,6 +45,7 @@ HOWTOUSE
     $_path_install = Path::create( getenv('PATH.INSTALL'));
 
     if ($options['make:robots']) {
+        throw new Exception("Not implemented");
         $host = getenv('DOMAIN');
         $fqdn = getenv('DOMAIN.FQDN');
 
@@ -64,6 +65,10 @@ HOWTOUSE
         fwrite($f, $template);
         fclose($f);
         CLIConsole::say(" <font color='green'>{$target} file generated</font>");
+    }
+
+    if ($options['clear:smarty']) {
+
     }
 
 } catch (Exception $e) {

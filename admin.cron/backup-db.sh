@@ -9,7 +9,7 @@ else
 	SCRIPT_PATH=`echo ${PWD}`
 fi
 
-. ${SCRIPT_PATH}/../config/backup.conf
+. /etc/arris/livemap/backup.conf
 
 for DB in "${DATABASES[@]}"
 do

@@ -14,5 +14,5 @@ mkdir --parents ${INSTALL_PATH}/public/sitemaps
 
 # @todo: подумать о разрешении перестраивать sitemap только если есть флаг (/config.site/need_rebuid_sitemap.flag) с удалением флага после
 
-/usr/local/bin/sitemapgenerator --config /var/www/livemap/config/sitemap.ini
+/usr/local/bin/sitemapgenerator --config /etc/arris/livemap/sitemap.ini
 
