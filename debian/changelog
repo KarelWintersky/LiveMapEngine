@@ -1,3 +1,9 @@
+livemap (1.99.99) stable; urgency=medium
+
+  * [R] Release Candidate 2.0 Storymaps
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Sun, 05 May 2024 18:45:56 +0300
+
 livemap (1.0.9) stable; urgency=medium
 
   * [*] localize fonts and scripts
