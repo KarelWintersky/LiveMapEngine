@@ -55,11 +55,15 @@ try {
     AppRouter::get('/map/{id:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'],    'view.map.fullscreen');
     AppRouter::get('/map:js/{id:[\w\.]+}.js',       [\Livemap\Controllers\MapJSController::class, 'view_js_map_definition',  'view.map.js']);
 
-    // роуты для дополнительного функционала
+    // роуты для дополнительного функционала карт
     AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'],            'view.map.iframe');
     AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'],         'view.map.folio');
 
+    // роут получения информации о регионе на карте
     AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
+
+    // проекты
+    AppRouter::get('/project/{id:[\w]+}[/]', [ \Livemap\Controllers\ProjectsController::class, 'view_project'], 'view.project');
 
     // логин-логаут
     AppRouter::get('/auth/login', 'AuthController@view_form_login', 'view.form.login');
@@ -101,8 +105,10 @@ try {
             AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update', 'callback.user.profile.update'); // обновить текущий профиль
 
             // редактировать регион: форма и коллбэк
-            AppRouter::get('/region/edit', 'RegionsController@view_region_edit_form', 'edit.region.info');
-            AppRouter::post('/region/edit', 'RegionsController@callback_update_region', 'update.region.info');
+            // В принципе, проверку "может ли редактировать" можно было бы возложить на посредника, который будет проверять ACL::simpleCheckCanEdit().
+            // Но это проблема - посредник должен использовать map_alias, который ему не передать просто вот так просто...
+            AppRouter::get('/region/edit', [\Livemap\Controllers\RegionsController::class, 'view_region_edit_form'], 'edit.region.info');
+            AppRouter::post('/region/edit', [\Livemap\Controllers\RegionsController::class, 'callback_update_region'], 'update.region.info');
         }
     );
 
@@ -123,11 +129,19 @@ try {
             AppRouter::post('/users/update', [\Livemap\Controllers\AdminController::class, 'callback_update'], 'admin.users.callback.update');
             AppRouter::get('/users/delete', [\Livemap\Controllers\AdminController::class, 'callback_delete'], 'admin.users.callback.delete');
 
-            // редактирование списка карт?
+            // редактирование списка карт (разве что публичного списка...)
+            //@todo: возможно, на данном этапе лучше засасывать конфиги карт в БД и редис и брать данные оттуда. А при обновлении дефиниций вызывать
+            //toolkit-script типа reimport maps...
             AppRouter::get('/maps/list', [\Livemap\Controllers\AdminController::class, 'view_list_maps' ], 'admin.maps.view.list');
-            AppRouter::get('/maps/create', [\Livemap\Controllers\AdminController::class, 'view_map_create' ], 'admin.maps.view.create');
+            AppRouter::get('/maps/create', [\Livemap\Controllers\AdminController::class, 'view_map_create' ], 'admin.maps.view.create'); //@todo: view_manage_map & admin.map.view.form
             AppRouter::post('/maps/insert', [\Livemap\Controllers\AdminController::class, 'callback_map_insert' ], 'admin.maps.callback.insert');
-            AppRouter::post('/maps/upload', [\Livemap\Controllers\AdminController::class, 'callback_map_upload' ], 'admin.maps.callback.upload');
+            AppRouter::post('/maps/upload', [\Livemap\Controllers\AdminController::class, 'callback_map_upload' ], 'admin.maps.callback.upload'); //@todo: а не update ?
+
+            // Работа с проектами
+            AppRouter::get('/projects/list', [\Livemap\Controllers\AdminController::class, 'view_list_projects'], 'admin.projects.view.list');
+            AppRouter::get('/projects/create', [\Livemap\Controllers\AdminController::class, 'view_manage_project'], 'admin.projects.view.form');
+            AppRouter::post('/projects/insert', [\Livemap\Controllers\AdminController::class, 'callback_project_insert'], 'admin.projects.callback.insert');
+            AppRouter::post('/projects/update', [\Livemap\Controllers\AdminController::class, 'callback_project_update'], 'admin.projects.callback.update');
 
             // Прочие
 

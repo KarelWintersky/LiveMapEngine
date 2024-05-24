@@ -32,7 +32,7 @@ class PagesController extends AbstractClass
         $this->template->assign("is_logged_in", config('auth.is_logged_in'));
         $this->template->assign("logged_email", config('auth.email'));
 
-        $this->template->assign("og", OpenGraph::getInfo(null));
+        $this->template->assign("og", OpenGraph::makeForMap(null));
 
     }
 

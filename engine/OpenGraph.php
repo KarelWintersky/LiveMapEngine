@@ -26,7 +26,7 @@ class OpenGraph
      * @param \stdClass|null $map
      * @return array
      */
-    public static function getInfo(string $map_alias = null, \stdClass $map = null)
+    public static function makeForMap(string $map_alias = null, \stdClass $map = null)
     {
         $OG_DEFAULT = self::getDefault();
 
@@ -63,6 +63,11 @@ class OpenGraph
         $OG['image'] = $OG['logo'] = $og_file;
 
         return $OG;
+    }
+
+    public static function makeForProject()
+    {
+
     }
 
 }

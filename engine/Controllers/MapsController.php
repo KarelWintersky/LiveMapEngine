@@ -42,7 +42,7 @@ class MapsController extends AbstractClass
         $map->loadConfig($map_alias);
         $map->loadMap($map_alias);
 
-        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
+        $this->template->assign("og", OpenGraph::makeForMap($map_alias, $this->mapConfig));
 
         // assign data
         $this->template->assign('map_alias', $map_alias);
@@ -116,7 +116,7 @@ class MapsController extends AbstractClass
         $this->template->assign('html_title', $this->mapConfig->title);
         $this->template->assign('html_callback', '/');
 
-        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
+        $this->template->assign("og", OpenGraph::makeForMap($map_alias, $this->mapConfig));
 
         $this->template->assign("sections_present", [
             'infobox'   =>  false,
@@ -144,7 +144,7 @@ class MapsController extends AbstractClass
         $this->template->assign('html_title', $this->mapConfig->title);
         $this->template->assign('html_callback', '/');
 
-        $this->template->assign("og", OpenGraph::getInfo($map_alias, $this->mapConfig));
+        $this->template->assign("og", OpenGraph::makeForMap($map_alias, $this->mapConfig));
 
         $this->template->assign("sections_present", [
             'infobox'   =>  false,
