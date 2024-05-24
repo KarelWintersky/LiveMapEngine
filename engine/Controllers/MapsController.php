@@ -65,12 +65,25 @@ class MapsController extends AbstractClass
 
         // может быть перекрыто настройкой из конфига.
         $this->template->assign("sections_present", [
-            'infobox'   =>  true && ( $this->mapConfig->display->sections->infobox ?? true ),
+            'infobox'   =>  true,
             'regions'   =>  true && ( $this->mapConfig->display->sections->regions ?? true ),
             'backward'  =>  true && ( $this->mapConfig->display->sections->backward ?? true ),
             'title'     =>  false,
             'colorbox'  =>  false,
         ]);
+
+        // Backward имеет нестандартное определение в конфиге (непустое)
+        $backward_buttons = [];
+        if (!empty($this->mapConfig->display->sections->backward)) {
+            foreach ((array)$this->mapConfig->display->sections->backward as $backward_element) {
+                $backward_buttons[] = [
+                    'text'  =>  $backward_element->{'text'} ?? 'Назад',
+                    'link'  =>  $backward_element->{'link'} ?? '/'
+                ];
+            }
+        }
+        $this->template->assign("section_backward_content", $backward_buttons);
+
         // главный обслуживающий скрипт
         $this->template->assign('main_js_file', '/frontend/view.map.fullscreen.js');
         $this->template->assign('main_css_file', '/frontend/view.map.fullscreen.css');
@@ -144,4 +157,7 @@ class MapsController extends AbstractClass
         $this->template->assign('main_js_file', '/frontend/view.map.folio.js');
         $this->template->assign('main_css_file', '/frontend/view.map.folio.css');
     }
+
+    // @todo: добавить интерактивность, в частности, colorbox с информацией из SVG-атрибутов для folio:interactive
+
 }

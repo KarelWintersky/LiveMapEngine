@@ -115,12 +115,28 @@
 {/if}
 
 {if $sections_present.backward}
-    <section id="section-backward" class="invisible section-backward-viewbox" {* data-leaflet-control-position=... *}>
-        <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button>
-        <span id="section-backward-content" class="invisible section-backward-content">
-        <button style="display: inline-block" type="button" data-action="redirect" data-url="{$html_callback}">&lt;&lt;&lt; К списку карт</button>
-    </span>
-    </section>
+    {* Если имеет место быть кастомный контент контрола "backward", это поле НЕ пусто *}
+    {if $section_backward_content}
+        <section id="section-backward" class="invisible section-backward-viewbox" {* data-leaflet-control-position=... *}>
+            <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button>
+            <span id="section-backward-content" class="invisible section-backward-content">
+                &nbsp;
+                {foreach $section_backward_content as $section_backward_content_button}
+                <button style="display: inline-block" type="button" data-action="redirect" data-url="{$section_backward_content_button.link}">&lt;&lt;&lt; {$section_backward_content_button.text}</button>
+                {if !$section_backward_content_button@last}&nbsp;|&nbsp;{/if} {* вставляем | только если это НЕ последний элемент в этом форыче.  *}
+            {/foreach}
+            </span>
+        </section>
+    {else}
+        {* Значение по-умолчанию контрола "backward" *}
+        {* Хотя можно было бы сделать форыч всегда и значение по-дефолту передавать из MapsController, я оставлю этот механизм. Он нагляднее *}
+        <section id="section-backward" class="invisible section-backward-viewbox" {* data-leaflet-control-position=... *}>
+            <button id="actor-backward-toggle" class="action-toggle-div-visibility" data-content="section-backward-content" data-content-is-visible="false">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button>
+            <span id="section-backward-content" class="invisible section-backward-content">
+                <button style="display: inline-block" type="button" data-action="redirect" data-url="{$html_callback}">&lt;&lt;&lt; К списку карт</button>
+            </span>
+        </section>
+    {/if}
 {/if}
 
 {if $sections_present.title}

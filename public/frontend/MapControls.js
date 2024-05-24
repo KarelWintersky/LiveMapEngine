@@ -29,6 +29,7 @@ class MapControls {
             },
             onRemove: function(map){}
         });
+        return true;
     }
 
     /**
@@ -59,6 +60,7 @@ class MapControls {
             },
             onRemove: function(map) {}
         });
+        return true;
     }
 
     /**
@@ -88,6 +90,7 @@ class MapControls {
             },
             onRemove: function(map) {}
         });
+        return true;
     }
 
     /**
@@ -115,6 +118,7 @@ class MapControls {
             },
             onRemove: function(map){}
         });
+        return true;
     }
 
     /**
@@ -124,12 +128,12 @@ class MapControls {
      */
     static toggle_Backward(el) {
         let state = $(el).data('content-is-visible');
-        let text = (state == false) ? '&lt;' : '&gt;';
-        $(this).html(text);
+        let text = (state == false) ? '&nbsp;&nbsp;&lt;&nbsp;&nbsp;' : '&nbsp;&nbsp;&gt;&nbsp;&nbsp;';
+        $(el).html(text);
 
         let data = $(el).data('content');
         $(`#${data}`).toggle();
-        $(this).data('content-is-visible', !state);
+        $(el).data('content-is-visible', !state);
     }
 
     /**

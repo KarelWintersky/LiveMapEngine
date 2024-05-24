@@ -137,18 +137,24 @@ $(function() {
 
 
 
-    MapControls.declareControl_RegionsBox();
-    MapControls.declareControl_InfoBox();
-    MapControls.declareControl_Backward();
+    let controlRegionsBoxPresent    = MapControls.declareControl_RegionsBox();
+    let controlInfoBoxPresent       = MapControls.declareControl_InfoBox();
+    let controlBackwardPresent      = MapControls.declareControl_Backward();
 
+    // не показываем контрол "назад" если страница загружена в iframe
     if (! MapControls.isLoadedToIFrame()) {
-        // не показываем контрол "назад" если страница загружена в iframe
-        _mapManager.map.addControl( new L.Control.Backward() );
+        // и контрол создан
+        if (controlBackwardPresent) {
+            _mapManager.map.addControl( new L.Control.Backward() );
+        }
     }
 
     // показываем список регионов только если он не пуст
     if (regions_with_content_ids.length) {
-        _mapManager.map.addControl( new L.Control.RegionsBox() );
+        // и контрол создан
+        if (controlRegionsBoxPresent) {
+            _mapManager.map.addControl( new L.Control.RegionsBox() );
+        }
     }
 
     // анализируем window.location.hash
