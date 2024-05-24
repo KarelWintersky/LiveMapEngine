@@ -5,6 +5,7 @@ namespace Livemap\Units;
 use Arris\Entity\Result;
 use Arris\Helpers\Server;
 use Livemap\App;
+use Livemap\Exceptions\AccessDeniedException;
 use PDO;
 use Psr\Log\LoggerInterface;
 
@@ -249,8 +250,10 @@ SELECT
 
         $role_can_edit = ACL::isValidRole( $role, 'EDITOR');*/
 
-        $role_can_edit = true;
-        $role_can_edit = config('auth.is_admin'); //@todo: временно редактировать могут только админы
+        $this->loadConfig($map_alias);
+        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
+        $allowed_editors = array_merge($this->mapConfig->can_edit, $admin_emails);
+        $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
 
         $info = [];
 
@@ -316,6 +319,15 @@ SELECT
     public function storeMapRegionData(string $map_alias, string $region_id, array $request):Result
     {
         $result = new Result();
+
+        $this->loadConfig($map_alias);
+        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
+        $allowed_editors = array_merge($this->mapConfig->can_edit, $admin_emails);
+        $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+
+        if (false == $role_can_edit) {
+            throw new AccessDeniedException("Обновление региона недоступно, недостаточно прав доступа");
+        }
 
         $query = "
         INSERT INTO map_data_regions

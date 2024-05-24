@@ -17,10 +17,11 @@ $(function() {
     let image = _mapManager.createImageOverlay(base_map_bounds);
     image.addTo(_mapManager.map);
 
-    _mapManager.map.setZoom( window.theMap['display']['zoom'] );
-
     // строим массив всех регионов
     _mapManager.buildRegionsDataset();
+
+    _mapManager.map.fitBounds(base_map_bounds);
+    _mapManager.map.setZoom( window.theMap['display']['zoom'] );
 
     // биндим к каждому объекту функцию, показывающую информацию
     Object.keys( _mapManager.regionsDataset ).forEach(function(id_region){
@@ -134,7 +135,7 @@ $(function() {
         }
     });
 
-    _mapManager.map.fitBounds(base_map_bounds);
+
 
     MapControls.declareControl_RegionsBox();
     MapControls.declareControl_InfoBox();

@@ -38,7 +38,6 @@
         "ajur-media/template.flash": "^0.1.0",
         "mobiledetect/mobiledetectlib": "^3.74",
         "kuria/error": "^4.2",
-        "pecee/simple-router": "5.4.1.7",
         "slim/psr7": "^1.6",
         "ajur-media/kcaptcha": "^1.1",
         "colinodell/json5": "^2.3",

@@ -1,3 +1,11 @@
+livemap (2.0) stable; urgency=medium
+
+  * [R] Release 2.0 Storymaps
+  * [+] Временный механизм вычисления доступа к редактированию карты
+  * [*] обновление документации
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Fri, 24 May 2024 18:09:05 +0300
+
 livemap (1.99.99) stable; urgency=medium
 
   * [R] Release Candidate 2.0 Storymaps

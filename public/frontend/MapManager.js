@@ -103,8 +103,6 @@ class MapManager {
             crs: L.CRS.Simple,
             minZoom: this.theMap['display']['zoom_min'],
             maxZoom: this.theMap['display']['zoom_max'],
-            preferCanvas: false,
-            renderer: L.svg({ padding: Number(this.theMap['display']['zoom_max']) + 1 }), // должно быть, походу, maxzoom+1
         };
 
         if (this.options.use_canvas) {
@@ -112,7 +110,7 @@ class MapManager {
             _options.renderer = L.canvas();
         } else {
             _options.preferCanvas = false;
-            _options.renderer = L.svg({ padding: 3 }); // должно быть, походу, maxzoom+1
+            _options.renderer = L.svg({ padding: Number(this.theMap['display']['zoom_max']) + 1 }); // должно быть, походу, maxzoom+1
         }
 
         switch (this.theMap['display']['zoom_mode']) {
@@ -669,7 +667,7 @@ class MapManager {
         });
 
         // пан
-        let region = regionsDataset[id_region];
+        let region = this.regionsDataset[id_region];
 
         if (region.options.value == 'poi') { // ? value
             bounds = region._latlng;

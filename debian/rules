@@ -15,6 +15,9 @@ build-stamp: configure-stamp
 	dh_testdir
 	touch build-stamp
 
+override_dh_builddeb:
+	dh_builddeb -- -Zgzip
+
 clean:
 	dh_testdir
 	dh_testroot
