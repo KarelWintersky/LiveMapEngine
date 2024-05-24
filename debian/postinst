@@ -9,29 +9,35 @@ ANSI_RESET='\033[0m'
 PATH_PROJECT=/var/www/livemap
 PATH_STORAGE=/var/www/livemap.storage
 PATH_PUBLIC=/var/www/livemap/public
-PATH_CONFIG=${PATH_PROJECT}/config
+PATH_CONFIG=/etc/arris/livemap
 PATH_STORAGE_LINKED=${PATH_PUBLIC}/storage
-
-PATH_CACHE_SMARTY=/dev/shm/livemap_cache_smarty/
-PATH_CACHE_NGINX=/dev/shm/livemap_cache_fastcgi/
+PATH_CACHE_SMARTY=${PATH_PROJECT}/cache
 
 case "$1" in
     configure)
         echo "\n ${ANSI_YELLOW} Running LIVEMAP post-install tasks... ${ANSI_RESET} \n"
 
-        echo "Checking _ENV config... "
+        echo "Checking Application config... "
         if [ -e "${PATH_CONFIG}/common.conf" ]; then
             echo "${ANSI_GREEN} COMMON.CONF file found ${ANSI_RESET}";
         else
             echo "${ANSI_RED} COMMON.CONF file not found! ${ANSI_RESET}" ;
         fi
 
-        echo "Checking symlink from '${PATH_STORAGE}' to '${PATH_STORAGE_LINKED}' directory"
+        echo "Checking symlink from '${PATH_STORAGE}' to '${PATH_PUBLIC}/storage' directory"
         if [ ! -L "${PATH_STORAGE_LINKED}" ] ; then
-            ln -s ${PATH_STORAGE} ${PATH_STORAGE_LINKED} ;
+            ln -s ${PATH_STORAGE} ${PATH_PUBLIC}/storage ;
             echo "${ANSI_YELLOW} Created. ${ANSI_RESET}"
         else
             echo "${ANSI_GREEN} Present. ${ANSI_RESET}"
+        fi
+
+        echo "Checking favicon symlink... "
+        if [ ! -L "${PATH_PUBLIC}/favicon.ico" ] ; then
+            ln -s ${PATH_PUBLIC}/frontend/favicons/favicon.ico ${PATH_PUBLIC}/favicon.ico ;
+            echo "${ANSI_YELLOW} Favicon symlink created. ${ANSI_RESET}"
+        else
+            echo "${ANSI_GREEN} Favicon symlink present. ${ANSI_RESET}"
         fi
 
         echo "Cleaning SMARTY Cache..."
@@ -39,16 +45,6 @@ case "$1" in
             rm -f ${PATH_CACHE_SMARTY}/*
             echo "${ANSI_GREEN} Cleared. ${ANSI_RESET}"
         fi
-
-        echo "Validating and clearing nginx cache..."
-        if [ ! -d "${PATH_CACHE_NGINX}" ]; then
-            mkdir -p ${PATH_CACHE_NGINX} ;
-            echo "${ANSI_YELLOW} Created. ${ANSI_RESET}"
-        else
-            rm -rf ${PATH_CACHE_NGINX}/*
-            echo "${ANSI_GREEN} Present and cleared. ${ANSI_RESET}"
-        fi
-        chown www-data:www-data ${PATH_CACHE_NGINX}
 
         echo "Fixing access rights..."
         chown -R www-data:www-data ${PATH_PROJECT}/*
@@ -68,7 +64,5 @@ case "$1" in
         exit 1
     ;;
 esac
-
-#DEBHELPER#
 
 exit 0

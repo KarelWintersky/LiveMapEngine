@@ -50,9 +50,9 @@ install: 	##@system Install package. Don't run it manually!!!
 	cp -r templates $(PATH_PROJECT)
 	cp -r composer.json $(PATH_PROJECT)
 	cp debian/makefile.production $(PATH_PROJECT)/makefile
-#	git rev-parse --short HEAD > $(PATH_PROJECT)/_version
-#	git log --oneline --format=%B -n 1 HEAD | head -n 1 >> $(PATH_PROJECT)/_version
-#	git log --oneline --format="%at" -n 1 HEAD | xargs -I{} date -d @{} +%Y-%m-%d >> $(PATH_PROJECT)/_version
+	git rev-parse --short HEAD > $(PATH_PROJECT)/_version
+	git log --oneline --format=%B -n 1 HEAD | head -n 1 >> $(PATH_PROJECT)/_version
+	git log --oneline --format="%at" -n 1 HEAD | xargs -I{} date -d @{} +%Y-%m-%d >> $(PATH_PROJECT)/_version
 	cd $(PATH_PROJECT)/ && composer install && rm composer.json
 	mkdir -p $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)
 #	cp -r config.searchd/* $(DESTDIR)/etc/$(SEARCH_ENGINE_DIR)/conf.d/$(SEARCH_ENGINE_PROJECT)/
