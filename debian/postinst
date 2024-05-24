@@ -32,13 +32,11 @@ case "$1" in
             echo "${ANSI_GREEN} Present. ${ANSI_RESET}"
         fi
 
-        echo "Checking favicon symlink... "
-        if [ ! -L "${PATH_PUBLIC}/favicon.ico" ] ; then
-            ln -s ${PATH_PUBLIC}/frontend/favicons/favicon.ico ${PATH_PUBLIC}/favicon.ico ;
-            echo "${ANSI_YELLOW} Favicon symlink created. ${ANSI_RESET}"
-        else
-            echo "${ANSI_GREEN} Favicon symlink present. ${ANSI_RESET}"
-        fi
+        # https://stackoverflow.com/questions/5767062/how-to-check-if-a-symlink-exists
+        echo "Relinking favicon.ico"
+        rm -f ${PATH_PUBLIC}/favicon.ico
+        ln -s ${PATH_PUBLIC}/frontend/favicons/favicon.ico ${PATH_PUBLIC}/favicon.ico ;
+        echo "${ANSI_YELLOW} Favicon symlink created. ${ANSI_RESET}"
 
         echo "Cleaning SMARTY Cache..."
         if [ -d "${PATH_CACHE_SMARTY}" ]; then

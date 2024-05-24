@@ -462,6 +462,24 @@ class SVGParser {
 
         $data['layer'] = $this->layer_name;
 
+        // get interactive values
+        $data['interactive'] = [];
+        foreach (
+            [
+                'onclick',
+                'onmouseover',
+                'onmouseout',
+                'onmousedown',
+                'onmousemove',
+                'onfocusin',
+                'onfocusout',
+                'onload'
+            ] as $interactive_field) {
+            if ($element_attributes[$interactive_field]) {
+                $data['interactive'][ $interactive_field ] = $element_attributes[$interactive_field];
+            }
+        }
+
         return $data;
     }
 

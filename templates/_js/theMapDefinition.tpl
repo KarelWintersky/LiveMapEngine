@@ -99,15 +99,14 @@ window.theMap = {
             "type"      : "{$region.type}",
             "coords"    : {$region.js},
             "layer"     : "{$region.layer}",
+            "label"     : "{$region.label}",
 
             {* вот эти стили должны присваиваться региону на основании: дефолтных настроек карты, переопределений слоя и наличия контента в регионе *}
             {* сейчас используется общая настройка для карты *}
 
-            "style_default": { },
+            {*"style_default": { },
             "style_hover": { },
-            "style_icon": { },
-
-
+            "style_icon": { },*}
 
             {if $region.fillColor}"fillColor" : "{$region.fillColor}", {/if}
 
@@ -130,6 +129,8 @@ window.theMap = {
             {if $region.radius}"radius": "{$region.radius}",{/if}
 
             {if $region.is_excludelists}"is_excludelists": "{$region.is_excludelists}",{/if}
+
+            {if $region.interactive}"interactive": {$region.interactive|json_encode}{/if}
 
         },
 
