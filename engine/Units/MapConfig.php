@@ -97,7 +97,10 @@ class MapConfig extends \Livemap\AbstractClass
         } elseif (is_readable($fn)) {
             $this->json_config_filename = $fn;
         } else {
-            throw new AppRouterNotFoundException("Карта не найдена");
+            throw new AppRouterNotFoundException("Карта не найдена", 404, null, [
+                'method'    =>  'GET',
+                'map'       =>  $this->map_id
+            ]);
         }
 
         if (!is_file($this->json_config_filename)) {

@@ -192,12 +192,6 @@ try {
     AppLogger::scope('main')->error("AppRouter::NotAllowed", [ $e->getMessage(), $e->getInfo() ] );
     http_response_code(405);
 
-} catch (\AjurMedia\MediaBox\Exceptions\AccessDeniedException $e) {
-
-    AppLogger::scope('access.denied')->notice($e->getMessage(), [ $_SERVER['REQUEST_URI'], config('auth.ipv4') ] );
-    App::$template->assign('message', $e->getMessage());
-    App::$template->setTemplate("_errors/403.tpl");
-
 } catch (\PDOException|\RuntimeException|\JsonException|SmartyException|\Exception $e) {
     AppLogger::scope('main')->error("Other exception", [ $e->getMessage(), $e->getFile(), $e->getLine() ]);
     http_response_code(500);
