@@ -81,23 +81,25 @@ class App extends \Arris\App
 
     public static function initErrorHandler()
     {
+        $is_debug = !_env('IS.PRODUCTION', false, 'bool');
         $errorHandler = new ErrorHandler();
-        $errorHandler->setDebug(true);
+        $errorHandler->setDebug($is_debug);
         error_reporting(E_ALL & ~E_NOTICE);
         $errorHandler->register();
 
+        // https://github.com/kuria/error
+
         // добавлено правильное сообщение об ошибке для прода
         // смотри https://github.com/kuria/error/issues/2
-        if (getenv('IS.PRODUCTION') == 1) {
+        /*if (getenv('IS.PRODUCTION') == 1) {
             $errorScreen = $errorHandler->getErrorScreen();
             if (!$errorHandler->isDebugEnabled() && $errorScreen instanceof WebErrorScreen) {
                 $errorScreen->on(WebErrorScreenEvents::RENDER, static function ($event) {
-                    $event['heading'] = 'MediaBox';
+                    $event['heading'] = 'Livemap';
                     $event['text'] = 'У нас что-то сломалось. Мы уже чиним.';
                 });
             }
-        }
-
+        }*/
     }
 
     /**

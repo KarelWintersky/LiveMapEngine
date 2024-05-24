@@ -9,3 +9,5 @@ public/storage
 composer.lock
 debian/livemap/*
 debian/livemap.debhelper.log
+
+_credentials.md

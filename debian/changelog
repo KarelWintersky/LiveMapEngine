@@ -1,3 +1,11 @@
+livemap (2.0.3) stable; urgency=medium
+
+  * добавлена возможность скрывать панели через конфиг (display->sections->{infobox,regions,backward})
+  * исправлена ошибка с доступом на редактирование если для карты в конфиге не указаны редакторы
+  * обновлен пример конфига и документация
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Fri, 24 May 2024 20:17:30 +0300
+
 livemap (2.0) stable; urgency=medium
 
   * [R] Release 2.0 Storymaps

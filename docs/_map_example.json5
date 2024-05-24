@@ -46,7 +46,22 @@
       'wide:infobox>regionbox', 'wide:regionbox>infobox',
       'infobox>regionbox', 'regionbox>infobox'
     */
-    "viewmode": "folio"
+    "viewmode": "folio",
+    /*
+    Настройки видимости панелей. Допустимы значения true|false. Если отсутствует - трактуется как TRUE
+    */
+    "sections": {
+      /* Панель списка регионов */
+      "regions": false,
+      /* Панель кнопки назад */
+      "backward": false,
+      /* Панель информации по региону (не рекомендуется указывать) */
+      "infobox": false,
+      /* Панель информации по региону в режиме IFRAME (colorbox) */
+      "colorbox": false,
+      /* Инфо о регионе в режиме FOLIO */
+      "title": false
+    }
   },
   /* Список тех, кто может редактировать регионы на карте вдобавок к списку админов, заданному через КОНФИГ: AUTH.ADMIN_EMAILS */
   "can_edit": [

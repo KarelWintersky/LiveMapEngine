@@ -252,7 +252,8 @@ SELECT
 
         $this->loadConfig($map_alias);
         $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
-        $allowed_editors = array_merge($this->mapConfig->can_edit, $admin_emails);
+        $can_edit_emails = $this->mapConfig->can_edit ?? [];
+        $allowed_editors = array_merge($this->mapConfig->can_edit ?? [], $admin_emails);
         $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
 
         $info = [];
@@ -322,7 +323,7 @@ SELECT
 
         $this->loadConfig($map_alias);
         $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
-        $allowed_editors = array_merge($this->mapConfig->can_edit, $admin_emails);
+        $allowed_editors = array_merge($this->mapConfig->can_edit ?? [], $admin_emails);
         $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
 
         if (false == $role_can_edit) {

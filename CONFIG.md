@@ -10,15 +10,16 @@ DB.PORT         = 3306
 DB.USERNAME     = ""
 DB.PASSWORD     = ""
 DB.NAME         = ""
-
 DB.SLOW_QUERY_THRESHOLD = 0.1
+
+# SearchD
 
 SEARCH.HOST         =   "127.0.0.1"
 SEARCH.PORT         =   9306
 SEARCH.USER         =   "root"
 SEARCH.PASSWORD     =   ""
 
-# REDIS
+# Redis
 
 REDIS.ENABLED = 0
 REDIS.HOST = 'localhost'
@@ -36,24 +37,19 @@ PATH.SMARTY_TEMPLATES = ${PATH.INSTALL}templates/
 PATH.SMARTY_CACHE = ${PATH.INSTALL}cache/
 
 # DB.Tables
-
 DB.TABLE.MAP_DATA_REGIONS = 'map_data_regions'
 
-AUTH.PHPAUTH_ENABLED         = true
-AUTH.LOGIN_ENABLED           = true
-AUTH.AUTO_ACTIVATION         = true
+# Auth
+AUTH.EXPIRE_TIME = 86400 
 
-AUTH.LOGGED.DURATION    = 18000
-
-# [cookies]
-AUTH.COOKIES.NEW_REGISTRED_USERNAME  = 'kw_livemap_new_registred_username'
-AUTH.COOKIES.LAST_LOGGED_USER        = 'kw_livemap_last_logged_user'
+# Region editor cookies
 
 AUTH.COOKIES.FILEMANAGER_STORAGE_PATH = 'kw_livemap_filemanager_storagepath'
 AUTH.COOKIES.FILEMANAGER_CURRENT_MAP  = 'kw_livemap_filemanager_current_map'
 
 # [copyright]
 COPYRIGHT   = 'Livemap Engine version 0.10.0 "Aerlis"'
+
 ```
 
 ## backup.conf 

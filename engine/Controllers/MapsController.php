@@ -404,10 +404,11 @@ class MapsController extends AbstractClass
         $this->template->assign('map_regions_order_by_date', $map->mapRegionWithInfoOrderByDate);
         $this->template->assign('map_regions_count', count($map->mapRegionsWithInfo));
 
+        // может быть перекрыто настройкой из конфига.
         $this->template->assign("sections_present", [
-            'infobox'   =>  true,
-            'regions'   =>  true,
-            'backward'  =>  true,
+            'infobox'   =>  true && ( $this->mapConfig->display->sections->infobox ?? true ),
+            'regions'   =>  true && ( $this->mapConfig->display->sections->regions ?? true ),
+            'backward'  =>  true && ( $this->mapConfig->display->sections->backward ?? true ),
             'title'     =>  false,
             'colorbox'  =>  false,
         ]);
@@ -448,9 +449,9 @@ class MapsController extends AbstractClass
         $this->template->assign("sections_present", [
             'infobox'   =>  false,
             'regions'   =>  false,
-            'backward'  =>  true,
+            'backward'  =>  true && ( $this->mapConfig->display->sections->backward ?? true ),
             'title'     =>  false,
-            'colorbox'  =>  true,
+            'colorbox'  =>  true && ( $this->mapConfig->display->sections->colorbox ?? true ),
         ]);
         // главный обслуживающий скрипт
         $this->template->assign('main_js_file', '/frontend/view.map.iframe_colorbox.js');
@@ -476,8 +477,8 @@ class MapsController extends AbstractClass
         $this->template->assign("sections_present", [
             'infobox'   =>  false,
             'regions'   =>  false,
-            'backward'  =>  true,
-            'title'     =>  true,
+            'backward'  =>  true && ( $this->mapConfig->display->sections->backward ?? true ),
+            'title'     =>  true && ( $this->mapConfig->display->sections->title ?? true ),
             'colorbox'  =>  false,
         ]);
         // главный обслуживающий скрипт

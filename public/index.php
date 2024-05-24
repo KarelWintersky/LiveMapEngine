@@ -51,13 +51,13 @@ try {
 
     // публичный показ карты
 
-    AppRouter::get('/', 'PagesController@view_frontpage', 'view.frontpage');
-    AppRouter::get('/map/{id:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'], 'view.map.fullscreen');
-    AppRouter::get('/map:js/{id:[\w\.]+}.js',       [\Livemap\Controllers\MapsController::class, 'view_js_map_definition', 'view.map.js']);
+    AppRouter::get('/',                             [\Livemap\Controllers\PagesController::class,'view_frontpage'],         'view.frontpage');
+    AppRouter::get('/map/{id:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'],    'view.map.fullscreen');
+    AppRouter::get('/map:js/{id:[\w\.]+}.js',       [\Livemap\Controllers\MapsController::class, 'view_js_map_definition',  'view.map.js']);
 
     // роуты для дополнительного функционала
-    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'], 'view.map.iframe');
-    AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'], 'view.map.folio');
+    AppRouter::get('/map:iframe/{id:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'],            'view.map.iframe');
+    AppRouter::get('/map:folio/{id:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'],         'view.map.folio');
 
     AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
 
@@ -165,40 +165,29 @@ try {
     App::$template->setTemplate("_errors/404.tpl");
     App::$template->assign("message", $e->getMessage());
 
-} catch (\RuntimeException|\Exception $e) {
+}/* catch (\RuntimeException|\Exception $e) {
+// Пока не внедрим кастомную страницу для Kuria + логгирование там же
+// для прода этот блок надо раскомментировать
+// для дева - закомментировать (чтобы исключения ловила курия)
+// пока что кастомная страницы Курии НИКАКАЯ (и не ведет логи)
 
     AppLogger::scope('main')->notice("Runtime Error", [ $e->getMessage() ] );
     http_response_code(500);
     App::$template->setTemplate("_errors/500.tpl");
     App::$template->assign("message", $e->getMessage());
 
-    /*echo "<h1>(RUNTIME) EXCEPTION</h1>";
-    echo "<h3>_REQUEST</h3>";
-    d($_REQUEST);
-    echo "<h3>REQUEST_URI</h3>";
-    d($_SERVER['REQUEST_URI']);
-    echo "<h3>EXCEPTION DUMP</h3>";
-    // \Arris\Util\Debug::ddt($e->getTrace());
-    dd($e);*/
-}
-
-/*  catch (AppRouterHandlerError $e) {
-
-    AppLogger::scope('main')->error("AppRouter::InvalidRoute", [ $e->getMessage(), $e->getInfo() ] );
-    http_response_code(500);
-
-} catch (AppRouterMethodNotAllowedException $e){
-
-    AppLogger::scope('main')->error("AppRouter::NotAllowed", [ $e->getMessage(), $e->getInfo() ] );
-    http_response_code(405);
-
-} catch (\PDOException|\RuntimeException|\JsonException|SmartyException|\Exception $e) {
-    AppLogger::scope('main')->error("Other exception", [ $e->getMessage(), $e->getFile(), $e->getLine() ]);
-    http_response_code(500);
-
-    App::$template->assign('message', $e->getMessage());
-    App::$template->setTemplate("_errors/500.tpl");
+    if (getenv('IS.PRODUCTION') == 0) {
+        echo "<h1>(RUNTIME) EXCEPTION</h1>";
+        echo "<h3>_REQUEST</h3>";
+        d($_REQUEST);
+        echo "<h3>REQUEST_URI</h3>";
+        d($_SERVER['REQUEST_URI']);
+        echo "<h3>EXCEPTION DUMP</h3>";
+        \Arris\Util\Debug::ddt($e->getTrace());
+        dd($e);
+    }
 }*/
+
 
 $render = App::$template->render();
 if ($render) {
