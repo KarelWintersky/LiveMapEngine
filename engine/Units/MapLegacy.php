@@ -250,11 +250,7 @@ SELECT
 
         $role_can_edit = ACL::isValidRole( $role, 'EDITOR');*/
 
-        $this->loadConfig($map_alias);
-        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
-        $can_edit_emails = $this->mapConfig->can_edit ?? [];
-        $allowed_editors = array_merge($this->mapConfig->can_edit ?? [], $admin_emails);
-        $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+        $role_can_edit = ACL::simpleCheckCanEdit($map_alias);
 
         $info = [];
 
@@ -321,13 +317,10 @@ SELECT
     {
         $result = new Result();
 
-        $this->loadConfig($map_alias);
-        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
-        $allowed_editors = array_merge($this->mapConfig->can_edit ?? [], $admin_emails);
-        $role_can_edit = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+        $role_can_edit = ACL::simpleCheckCanEdit($map_alias);
 
         if (false == $role_can_edit) {
-            throw new AccessDeniedException("Обновление региона недоступно, недостаточно прав доступа");
+            throw new AccessDeniedException("Обновление региона недоступно, недостаточный уровень допуска");
         }
 
         $query = "

@@ -11,11 +11,30 @@ class ACL extends \Livemap\AbstractClass
 
     const ROLE_TO_POWER = [
         'ANYONE'        =>  0,
-        'VISITOR'       =>  1,
-        'EDITOR'        =>  10,
-        'OWNER'         =>  100,
-        'ROOT'          =>  1000
+        'VISITOR'       =>  4,
+        'EDITOR'        =>  16,
+        'OWNER'         =>  64,
+        'ROOT'          =>  1024
     ];
+
+    /**
+     * Временная проверка возможности редактирования регионов на карте
+     *
+     * Делается на основе списка админских емейлов и списка емейлов в поле `can_edit` определения карты
+     *
+     * @todo: передавать первым аргументом конфиг карты
+     *
+     * @param $map_alias
+     * @return bool
+     */
+    public static function simpleCheckCanEdit($map_alias)
+    {
+        $map = (new MapConfig($map_alias))->loadConfig()->getConfig();
+        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
+        $allowed_editors = array_merge($map->can_edit ?? [], $admin_emails);
+
+        return !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+    }
 
     /**
      * Простая проверка роли

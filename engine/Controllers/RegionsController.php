@@ -8,6 +8,8 @@ use Arris\AppRouter;
 use Arris\Path;
 use Livemap\AbstractClass;
 use Livemap\App;
+use Livemap\Exceptions\AccessDeniedException;
+use Livemap\Units\ACL;
 use Livemap\Units\MapLegacy;
 
 class RegionsController extends AbstractClass
@@ -65,19 +67,9 @@ class RegionsController extends AbstractClass
         // $current_role = ACL::getRole($userinfo['uid'], $map_alias);
         // $can_edit = ACL::isValidRole($current_role, 'EDITOR');
 
-        $can_edit = true; //@todo
-        $can_edit = config('auth.is_admin'); //@todo: временно редактировать могут только админы
-
         // Это задача middleware
-        if (!$can_edit) {
-            die('Not enough access rights for update info!');
-        }
-
         $map_alias = $_REQUEST['map'];
         $region_id = $_REQUEST['id'];
-
-        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');
-        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_CURRENT_MAP'), $map_alias, 0, '/');
 
         $map_engine = new MapLegacy();
         $region_data = $map_engine->getMapRegionData($map_alias, $region_id);
@@ -90,6 +82,11 @@ class RegionsController extends AbstractClass
 
         if (!is_file($filename)) {
             throw new \RuntimeException("Map definition file not found, requested {$filename}");
+        }
+
+        $can_edit = ACL::simpleCheckCanEdit($map_alias);
+        if (!$can_edit) {
+            throw new AccessDeniedException("Обновление региона недоступно, недостаточный уровень допуска");
         }
 
         $json = json5_decode( file_get_contents( $filename ) );
@@ -162,6 +159,10 @@ class RegionsController extends AbstractClass
             'is_exludelists'    =>  $region_data['is_exludelists'] ?? 'N',
             'is_publicity'      =>  $region_data['is_publicity'] ?? 'ANYONE',
         ]);
+
+        // ставим куки для файлменеджера
+        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');
+        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_CURRENT_MAP'), $map_alias, 0, '/');
     }
 
     /**
