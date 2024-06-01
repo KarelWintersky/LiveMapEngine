@@ -46,6 +46,7 @@
         "sbwerewolf/xml-navigator": "^7.0"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "rector/rector": "*"
     }
 }

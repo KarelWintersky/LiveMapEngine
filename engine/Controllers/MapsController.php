@@ -2,21 +2,15 @@
 
 namespace Livemap\Controllers;
 
-use AJUR\Template\Template;
-use AJUR\Template\TemplateInterface;
-use Arris\Path;
-use JsonException;
+use AllowDynamicProperties;
 use Livemap\AbstractClass;
 use Livemap\App;
 use Livemap\OpenGraph;
 use Livemap\Units\MapLegacy;
 use Livemap\Units\MapConfig;
-use Livemap\Units\SVGParser;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
-use SmartyException;
-use stdClass;
 
+#[AllowDynamicProperties]
 class MapsController extends AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)

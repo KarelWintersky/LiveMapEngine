@@ -2,6 +2,7 @@
 
 namespace Livemap;
 
+#[AllowDynamicProperties]
 final class DBConfigTables
 {
     public $folders;
@@ -15,6 +16,8 @@ final class DBConfigTables
     public $log_actions;
 
     public $users;
+
+    public string $map_data_regions;
 
     public function __construct()
     {
@@ -30,6 +33,7 @@ final class DBConfigTables
         /**
          * Livemap Engine tables
          */
+        $this->map_data_regions = 'map_data_regions';
 
     }
 

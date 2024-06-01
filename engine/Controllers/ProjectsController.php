@@ -13,10 +13,10 @@ class ProjectsController extends AbstractClass
         $this->template->setTemplate("_project.tpl");
     }
 
-    public function view_project($project_id)
+    public function view_project($id)
     {
         $this->template->assign("project", [
-            'id'    =>  $project_id
+            'id'    =>  $id
         ]);
     }
 

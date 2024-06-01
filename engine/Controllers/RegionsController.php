@@ -12,6 +12,7 @@ use Livemap\Exceptions\AccessDeniedException;
 use Livemap\Units\ACL;
 use Livemap\Units\MapLegacy;
 
+#[AllowDynamicProperties]
 class RegionsController extends AbstractClass
 {
     /**
@@ -139,7 +140,7 @@ class RegionsController extends AbstractClass
 
             'region_title'      =>  ($region_data['is_present'] == 1) ? htmlspecialchars($region_data['title'],  ENT_QUOTES | ENT_HTML5) : '',
             'region_text'       =>  $region_data['content'],
-            'region_restricted' =>  htmlspecialchars($region_data['content_restricted'], ENT_QUOTES | ENT_HTML5),
+            'region_restricted' =>  htmlspecialchars($region_data['content_restricted'] ?? '', ENT_QUOTES | ENT_HTML5),
 
 
             'is_present'        =>  $region_data['is_present'],      // 1 - регион существует, 0 - новый регион

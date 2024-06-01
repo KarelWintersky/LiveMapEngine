@@ -16,8 +16,12 @@ use RuntimeException;
 use SmartyException;
 use stdClass;
 
+#[AllowDynamicProperties]
 class MapJSController extends AbstractClass
 {
+    private $error;
+    private $error_message;
+
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
@@ -44,7 +48,7 @@ class MapJSController extends AbstractClass
             'ox'        =>  0,
             'oy'        =>  0
         );
-        $max_bounds = NULL;
+        $max_bounds = null;
 
         $paths_data = [];
         $layers = [];
@@ -55,6 +59,7 @@ class MapJSController extends AbstractClass
             }
 
             $image_info = [];
+            // это данные по сдвигу из конфига карты
             if (!empty($json->image)) {
                 $image_info = [
                     'width'     =>  $json->image->width,
@@ -92,6 +97,7 @@ class MapJSController extends AbstractClass
 
             // image layer from file
             // надо проверить наличие слоёв в массиве определений
+            //@todo: предполагается, что слой с изображением ВСЕГДА будет "Image" - это может быть не так?
             $layer_name = "Image";
             $_svgParserClass->parseImages( $layer_name );
 
@@ -123,7 +129,7 @@ class MapJSController extends AbstractClass
                  * @var stdClass $layer_config
                  */
                 if (!empty($json->layers->{$layer})) {
-                    $layer_config = $json->layers->$layer;
+                    $layer_config = $json->layers->{$layer};
                 }
 
                 $_svgParserClass->parseLayer($layer);   // парсит слой (определяет атрибут трансформации слоя и конвертит в объекты все элементы)

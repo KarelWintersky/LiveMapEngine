@@ -9,6 +9,7 @@ use Livemap\Units\Storage;
 /**
  * Контроллер отвечает за главную страницу и прочие информационные
  */
+#[AllowDynamicProperties]
 class PagesController extends AbstractClass
 {
     public function __construct()

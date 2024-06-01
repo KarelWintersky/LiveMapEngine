@@ -29,6 +29,8 @@ class AbstractClass
      */
     public $logger;
 
+    public bool $is_internal_request;
+
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         $this->app = App::factory();

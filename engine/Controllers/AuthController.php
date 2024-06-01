@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Страницы и коллбэки авторизации
  */
+#[AllowDynamicProperties]
 class AuthController extends \Livemap\AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)

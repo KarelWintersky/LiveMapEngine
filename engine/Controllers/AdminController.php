@@ -6,6 +6,7 @@ use Livemap\App;
 use Livemap\AuthRoles;
 use Psr\Log\LoggerInterface;
 
+#[AllowDynamicProperties]
 class AdminController extends \Livemap\AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)

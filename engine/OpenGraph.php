@@ -2,6 +2,7 @@
 
 namespace Livemap;
 
+#[AllowDynamicProperties]
 class OpenGraph
 {
     private static function getDefault()
@@ -45,7 +46,7 @@ class OpenGraph
             : $OG_DEFAULT['title'];
 
         $OG['description']
-            = "STORYMAPS &mdash; " . ($map->description ?: $map->title);
+            = "STORYMAPS &mdash; " . ($map->description ?? $map->title);
 
         /*$OG['image']
             = $OG['logo']

@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Страницы и коллбэки пользователя
  */
+#[AllowDynamicProperties]
 class UsersController extends AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)

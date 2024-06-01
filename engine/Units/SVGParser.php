@@ -9,6 +9,7 @@ use stdClass;
  * User: Arris
  * Date: 15.01.2018, time: 18:47
  */
+#[AllowDynamicProperties]
 class SVGParser {
     
     public const VERSION                       = 2.2;
@@ -42,14 +43,14 @@ class SVGParser {
     );
 
     private $svg;
-    public  $svg_parsing_error = NULL;
+    public  $svg_parsing_error = null;
 
     // слой/массив изображений
     // слой-контейнер с изображениями
     private $layer_images = [];
 
     // сдвиг слоя-контейнера с изображениями
-    public $layer_images_translation = NULL;
+    public $layer_images_translation = null;
 
 
     // сдвиг слоя-контейнера с изображениями
@@ -57,7 +58,7 @@ class SVGParser {
 
     // данные трансляции из модели CSV XY в Screen CRS
     // = layer_paths_oxy
-    public $crs_translation_options = NULL;
+    public $crs_translation_options = null;
 
     // Имя текущего слоя-контейнера с данными
     private $layer_name = '';
@@ -66,13 +67,13 @@ class SVGParser {
     private $layer_elements = [];
 
     // Сдвиг (translate) элементов на текущем слое
-    private $layer_elements_translation = NULL;
+    private $layer_elements_translation = null;
 
     // Конфиг текущего слоя
     /**
      * @var stdClass null
      */
-    private $layer_elements_config = NULL;
+    private $layer_elements_config = null;
 
     /**
      * Создает экземпляр класса
@@ -123,6 +124,7 @@ class SVGParser {
                 return false;
             }
 
+            // анализируем атрибут transform="translate(0,1052.36)"
             if (!empty($images_layer_attrs->attributes()->{'transform'})) {
                 $this->layer_images_translation = $this->parseTransform( $images_layer_attrs->attributes()->{'transform'} );
             }
@@ -134,6 +136,9 @@ class SVGParser {
         }
 
         $this->layer_images = $this->svg->xpath($xpath_images);
+
+        // $this->layer_images - информация об изображении
+        // $this->layer_images_translation -- информация о трансляции изображения
 
         return true;
     }
@@ -149,23 +154,34 @@ class SVGParser {
 
     /**
      * Возвращает параметры сдвига при трансформации-переносе
+     * Атрибут
+     *
+     * transform="translate(0,1052.36)"
      *
      * @param $transform_definition
      * @return array [ ox, oy ]
      */
     private function parseTransform($transform_definition)
     {
-        if (1 == \preg_match('/translate\(\s*([^\s,)]+)[\s,]([^\s,)]+)/', $transform_definition, $translate_matches)) {
-            return [
-                'ox'    =>  (float)$translate_matches[1],
-                'oy'    =>  (float)$translate_matches[2]
-            ];
-        }
-    
-        return [
+        $default = [
             'ox'    =>  0,
             'oy'    =>  0
         ];
+
+        if (empty($transform_definition)) {
+            return $default;
+        }
+
+        if (1 == \preg_match('/translate\(\s*([^\s,)]+)[\s,]([^\s,)]+)/', $transform_definition, $translate_matches)) {
+            if (count($translate_matches) > 2) {
+                return [
+                    'ox'    =>  (float)$translate_matches[1],
+                    'oy'    =>  (float)$translate_matches[2]
+                ];
+            }
+        }
+
+        return $default;
     }
 
     /**
@@ -181,13 +197,25 @@ class SVGParser {
              */
             $an_image = $this->layer_images[ $index ];
 
-            return array(
-                'width'     =>  \round((float)$an_image->attributes()->{'width'}, self::ROUND_PRECISION),
-                'height'    =>  \round((float)$an_image->attributes()->{'height'}, self::ROUND_PRECISION),
-                'ox'        =>  \round((float)$an_image->attributes()->{'x'} + (float)$this->layer_images_translation['ox'], self::ROUND_PRECISION),
-                'oy'        =>  \round((float)$an_image->attributes()->{'y'} + (float)$this->layer_images_translation['oy'], self::ROUND_PRECISION),
-                'xhref'     =>              (string)$an_image->attributes('xlink', true)->{'href'}
-            );
+            // выносим в переменные, иначе может случится херня:
+            // (float)$an_image->attributes()->{'x'} ?? 0 + (float)$this->layer_images_translation['ox'] ?? 0 ;
+            // трактуется как
+            // (float)$an_image->attributes()->{'x'} ?? ( 0 + (float)$this->layer_images_translation['ox'] ?? 0  )
+            // то есть у ?? приоритет меньше чем у +
+
+            $an_image_offset_x = (float)$an_image->attributes()->{'x'} ?? 0;
+            $an_image_offset_y = (float)$an_image->attributes()->{'y'} ?? 0;
+
+            $an_image_translate_x = (float)$this->layer_images_translation['ox'] ?? 0;
+            $an_image_translate_y = (float)$this->layer_images_translation['oy'] ?? 0;
+
+            return [
+                'width'     =>  \round((float)$an_image->attributes()->{'width'} ?? 0, self::ROUND_PRECISION),
+                'height'    =>  \round((float)$an_image->attributes()->{'height'} ?? 0, self::ROUND_PRECISION),
+                'ox'        =>  \round($an_image_offset_x + $an_image_translate_x, self::ROUND_PRECISION),
+                'oy'        =>  \round($an_image_offset_y + $an_image_translate_y, self::ROUND_PRECISION),
+                'xhref'     =>  (string)$an_image->attributes('xlink', true)->{'href'} ?? ''
+            ];
         }
     
         return [];
@@ -216,7 +244,7 @@ class SVGParser {
             if (!empty($paths_layer_attrs->attributes()->{'transform'})) {
                 $this->layer_elements_translation = $this->parseTransform( $paths_layer_attrs->attributes()->{'transform'} );
             } else {
-                $this->layer_elements_translation = NULL;
+                $this->layer_elements_translation = null;
             }
 
             $xpath_paths    = '//svg:g[starts-with(@inkscape:label, "' . $layer_name . '")]'; // все возможные объекты
@@ -248,7 +276,7 @@ class SVGParser {
      * @param $oy
      * @param $image_height
      */
-    public function set_CRSSimple_TranslateOptions($ox = NULL , $oy = NULL, $image_height = NULL)
+    public function set_CRSSimple_TranslateOptions($ox = null , $oy = null, $image_height = null)
     {
         if (!( \is_null($ox) || \is_null($oy) || \is_null($image_height))) {
             $this->crs_translation_options = [
@@ -272,7 +300,6 @@ class SVGParser {
 
         $path_d     = (string)$element->attributes()->{'d'};
         $path_id    = (string)$element->attributes()->{'id'};
-        // $path_label = (string)$element->attributes()->{'inkscape:label'};
         $path_style = (string)$element->attributes()->{'style'};
 
         // только с помощью дополнительного парсера можно распознать расширенные свойства (потому что DTD для inkscape:* и sodipodi:* больше не работают)
@@ -419,28 +446,48 @@ class SVGParser {
 
         // кастомные значения для пустых регионов
         if ($this->layer_elements_config) {
-            if ($this->layer_elements_config->empty->fill && $this->layer_elements_config->empty->fill == 1) {
-
-                if ($this->layer_elements_config->empty->fillColor && !$data['fillColor']) {
+            if (
+                property_exists_recursive($this->layer_elements_config, 'empty->fill') &&
+                $this->layer_elements_config->empty->fill == 1
+            ) {
+                if (
+                    property_exists_recursive($this->layer_elements_config, 'empty->fillColor') &&
+                    $this->layer_elements_config->empty->fillColor && !$data['fillColor']
+                ) {
                     $data['fillColor'] = $this->layer_elements_config->empty->fillColor; //fillColor
                 }
 
-                if ($this->layer_elements_config->empty->fillOpacity && !$data['fillOpacity']) {
+                if (
+                    property_exists_recursive($this->layer_elements_config, 'empty->fillOpacity') &&
+                    $this->layer_elements_config->empty->fillOpacity && !$data['fillOpacity']
+                ) {
                     $data['fillOpacity'] = $this->layer_elements_config->empty->fillOpacity;
                 }
             } // if ... $this->layer_elements_config->empty->fill == 1)
 
-            if ($this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1) {
+            if (
+                property_exists_recursive($this->layer_elements_config, 'empty->stroke') &&
+                $this->layer_elements_config->empty->stroke && $this->layer_elements_config->empty->stroke == 1
+            ) {
 
-                if ($this->layer_elements_config->empty->borderColor && $data['borderColor']) {
+                if (
+                    property_exists_recursive($this->layer_elements_config, 'empty->borderColor') &&
+                    $this->layer_elements_config->empty->borderColor && $data['borderColor']
+                ) {
                     $data['borderColor'] = $this->layer_elements_config->empty->borderColor;
                 }
 
-                if ($this->layer_elements_config->empty->borderWidth && $data['borderWidth']) {
+                if (
+                    property_exists_recursive($this->layer_elements_config, 'empty->borderWidth') &&
+                    $this->layer_elements_config->empty->borderWidth && $data['borderWidth']
+                ) {
                     $data['borderWidth'] = $this->layer_elements_config->empty->borderWidth;
                 }
 
-                if ($this->layer_elements_config->empty->borderOpacity && $data['borderOpacity']) {
+                if (
+                    property_exists_recursive($this->layer_elements_config, 'empty->borderOpacity') &&
+                    $this->layer_elements_config->empty->borderOpacity && $data['borderOpacity']
+                ) {
                     $data['borderOpacity'] = $this->layer_elements_config->empty->borderOpacity;
                 }
 
@@ -464,18 +511,21 @@ class SVGParser {
 
         // get interactive values
         $data['interactive'] = [];
+        $possible_interactive_fields = [
+            'onclick',
+            'onmouseover',
+            'onmouseout',
+            'onmousedown',
+            'onmousemove',
+            'onfocusin',
+            'onfocusout',
+            'onload'
+        ];
         foreach (
-            [
-                'onclick',
-                'onmouseover',
-                'onmouseout',
-                'onmousedown',
-                'onmousemove',
-                'onfocusin',
-                'onfocusout',
-                'onload'
-            ] as $interactive_field) {
-            if ($element_attributes[$interactive_field]) {
+            $possible_interactive_fields as $interactive_field) {
+            if (
+                \array_key_exists($interactive_field, $element_attributes)
+            ) {
                 $data['interactive'][ $interactive_field ] = $element_attributes[$interactive_field];
             }
         }
@@ -550,7 +600,7 @@ class SVGParser {
         return $all_paths;
     }
 
-    public function setLayerDefaultOptions($options)
+    public function setLayerDefaultOptions(stdClass $options)
     {
         $this->layer_elements_config = $options;
     }
@@ -687,7 +737,7 @@ class SVGParser {
     // ====================================================================================================
 
     /**
-     * выполняет трансляцию узла в CRS-модель
+     * Выполняет трансляцию узла в CRS-модель
      *
      * @todo: @warning: ГРЯЗНЫЙ ХАК:
      * Тут мы сделали важное упрощение - сдвиг объектов на слое и трансляция данных в модель CRS делаются в одной функции,
@@ -779,16 +829,18 @@ class SVGParser {
         // получаем значение атрибута <path d="">
         $path     = (string)$element->attributes()->{'d'};
 
-        $xy = array();
+        $xy = [];
         $is_debug = false;
 
         // пуст ли путь?
-        if ($path === '') return array();
+        if ($path === '') {
+            return [];
+        }
 
         // если путь не заканчивается на z/Z - это какая-то херня, а не путь. Отбрасываем
         //@todo: [УЛУЧШИТЬ] PARSE_SVG -- unfinished paths may be correct?
         if ( 'z' !== \strtolower(\substr($path, -1)) ) {
-            return array();
+            return [];
         }
 
         // выясняем наличие атрибута transform:translate (другие варианты трансформации не обрабатываются)
@@ -804,7 +856,9 @@ class SVGParser {
 
 
         // есть ли в пути управляющие последовательности кривых Безье любых видов?
-        $charlist_unsupported_knots = 'CcSsQqTtAa'; // так быстрее, чем регулярка по '#(C|c|S|s|Q|q|T|t|A|a)#'
+        $charlist_unsupported_knots = 'CcSsQqTtAa';
+
+        // так быстрее, чем регулярка по '#(C|c|S|s|Q|q|T|t|A|a)#'
         if (\strpbrk($path, $charlist_unsupported_knots)) {
             return [];
         }
@@ -826,7 +880,9 @@ class SVGParser {
         do {
             $fragment = \array_splice($path_fragments, 0, 1)[0];
 
-            if ($is_debug) echo PHP_EOL, "Извлеченный фрагмент : ", $fragment, PHP_EOL;
+            if ($is_debug) {
+                echo PHP_EOL, "Извлеченный фрагмент : ", $fragment, PHP_EOL;
+            }
 
             if ( $fragment === 'Z') {
                 $fragment = 'z';

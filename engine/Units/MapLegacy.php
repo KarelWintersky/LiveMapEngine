@@ -69,6 +69,8 @@ class MapLegacy extends \Livemap\AbstractClass
 
     public function loadMap($map_alias)
     {
+        $viewmode = 'folio';
+
         if (!empty($this->mapConfig->display->viewmode)) {
             $viewmode = $this->mapConfig->display->viewmode;
         }
@@ -91,13 +93,13 @@ class MapLegacy extends \Livemap\AbstractClass
         $this->mapRegionsWithInfo_IDS = self::convertRegionsWithInfo_to_IDs_String($this->mapRegionsWithInfo);
 
         $this->mapRegionWithInfoOrderByTitle = $this->mapRegionsWithInfo;
-        usort($this->mapRegionWithInfoOrderByTitle, static function($value1, $value2){
-            return ($value1['title'] > $value2['title']);
+        \usort($this->mapRegionWithInfoOrderByTitle, static function($value1, $value2){
+            return ($value1['title'] <=> $value2['title']);
         });
 
         $this->mapRegionWithInfoOrderByDate = $this->mapRegionsWithInfo;
-        usort($this->mapRegionWithInfoOrderByDate, static function($value1, $value2){
-            return ($value1['edit_date'] > $value2['edit_date']);
+        \usort($this->mapRegionWithInfoOrderByDate, static function($value1, $value2){
+            return ($value1['edit_date'] <=> $value2['edit_date']);
         });
     }
 
@@ -105,22 +107,38 @@ class MapLegacy extends \Livemap\AbstractClass
      * Возвращает массив регионов, имеющих информацию. Массив содержит id региона и название, отсортирован по id_region
      * Входные параметры: алиас карты и список айдишников.
      *
+     * @todo: список айдишников передавать НЕ НУЖНО, если мы перепишем запрос:
+     *
+     *
      * @param $map_alias
      * @param $ids_list
      * @return array
      */
-    public static function getRegionsWithInfo($map_alias, $ids_list = '')
+    public static function getRegionsWithInfo($map_alias, array|string $ids_list)
     {
         $pdo = App::$pdo;
 
+        if (is_array($ids_list)) {
+            $ids_list = implode(', ', $ids_list);
+        }
+
         $in_subquery = !empty($ids_list) ? " AND id_region IN ({$ids_list})" : "";
         try {
+            /*$query = "
+SELECT id FROM map_data_regions AS mdr1
+ WHERE `alias_map` = :alias_map
+   AND id = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
+   HAVING MAX(id)
+  {$in_subquery}
+ ORDER BY id_region
+ ";*/
             $query = "
 SELECT id FROM map_data_regions AS mdr1
  WHERE `alias_map` = :alias_map
    AND id = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
   {$in_subquery}
  ORDER BY id_region";
+
             $sth = $pdo->prepare($query);
             $sth->bindValue('alias_map', $map_alias, PDO::PARAM_STR);
             $sth->execute();
@@ -153,11 +171,11 @@ SELECT
 
             $sth = $pdo->prepare($query_data);
             $sth->execute([
-                'alias_map' =>  $map_alias
+                // 'alias_map' =>  $map_alias
             ]);
 
             //@todo: HINT (преобразование PDO->fetchAll() в асс.массив, где индекс - значение определенного столбца каждой строки)
-            array_map( static function($row) use (&$all_regions) {
+            \array_map( static function($row) use (&$all_regions) {
                 $all_regions[ $row['id_region'] ] = $row;
             }, $sth->fetchAll());
 
