@@ -60,7 +60,7 @@ try {
     AppRouter::get('/map:folio/{map_alias:[\w\.]+}[/]',    [\Livemap\Controllers\MapsController::class, 'view_map_folio'],         'view.map.folio');
 
     // роут получения информации о регионе на карте
-    AppRouter::get('/region/get', 'RegionsController@view_region_info', 'view.region.info');
+    AppRouter::get('/region/get', [ \Livemap\Controllers\RegionsController::class, 'view_region_info'], 'view.region.info');
 
     // проекты
     AppRouter::get('/project/{id:[\w]+}[/]', [ \Livemap\Controllers\ProjectsController::class, 'view_project'], 'view.project');

@@ -141,9 +141,9 @@ class MapJSController extends AbstractClass
                 $paths_at_layer = $_svgParserClass->getElementsAll();
 
                 // теперь нам нужны айдишники этих элементов на слое. Их надо проверить в БД и заполнить значениями кастомных полей из БД
-                $paths_at_layers_ids = implode(", ", array_map( static function($item){
+                $paths_at_layers_ids = \implode(", ", \array_map( static function($item){
                     return "'{$item}'";
-                }, array_keys($paths_at_layer)));
+                }, \array_keys($paths_at_layer)));
 
                 // запросим БД на предмет кастомных значений и заполненности регионов
 
@@ -211,10 +211,10 @@ class MapJSController extends AbstractClass
 
                     }
 
-                    $path_present['title'] = htmlspecialchars($path_present['title'], ENT_QUOTES | ENT_HTML5);
+                    $path_present['title'] = \htmlspecialchars($path_present['title'], ENT_QUOTES | ENT_HTML5);
                     unset($path_present['edit_date']);
 
-                    $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path_present);
+                    $paths_at_layer[ $id_region ] = \array_merge($paths_at_layer[ $id_region ], $path_present);
                 }
 
                 $layers[] = [

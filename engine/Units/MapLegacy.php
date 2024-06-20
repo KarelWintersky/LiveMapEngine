@@ -122,14 +122,15 @@ class MapLegacy extends \Livemap\AbstractClass
             $ids_list = implode(', ', $ids_list);
         }
 
-        $in_subquery = !empty($ids_list) ? " AND id_region IN ({$ids_list})" : "";
+        $in_subquery = !empty($ids_list) ? " AND id_region IN ({$ids_list}) " : "";
         try {
             /*$query = "
 SELECT id FROM map_data_regions AS mdr1
  WHERE `alias_map` = :alias_map
    AND id = ( SELECT MAX(id) FROM map_data_regions AS mdr2 WHERE mdr1.id_region = mdr2.id_region )
-   HAVING MAX(id)
   {$in_subquery}
+   HAVING MAX(id)
+
  ORDER BY id_region
  ";*/
             $query = "
