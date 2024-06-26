@@ -10,14 +10,14 @@ use Livemap\AbstractClass;
 use Livemap\App;
 use Livemap\Units\MapConfig;
 use Livemap\Units\MapLegacy;
-use Livemap\Units\SVGParser;
+use LiveMapEngine\SVGParser;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SmartyException;
 use stdClass;
 
 #[AllowDynamicProperties]
-class MapJSController extends AbstractClass
+class JSController extends AbstractClass
 {
     private $error;
     private $error_message;
@@ -73,7 +73,11 @@ class MapJSController extends AbstractClass
             if (empty($json->layout->file)) {
                 throw new RuntimeException( "[JS Builder] Layout file not defined." );
             }
-            $svg_filename = Path::create( getenv('PATH.STORAGE'))->join($map_alias)->joinName($json->layout->file)->toString();
+            $svg_filename
+                = Path::create( getenv('PATH.STORAGE'))
+                ->join($map_alias)
+                ->joinName($json->layout->file)
+                ->toString();
 
             if (!is_file($svg_filename)) {
                 throw new RuntimeException( "[JS Builder] Layout file {$svg_filename} not found." );
@@ -91,8 +95,9 @@ class MapJSController extends AbstractClass
 
             // создаем инсанс парсера, передаем SVG-контент файла
             $_svgParserClass = new SVGParser( $svg_content );
-            if ($_svgParserClass->svg_parsing_error) {
-                throw new RuntimeException( "[JS Builder] SVG Parsing error " . $_svgParserClass->svg_parsing_error[ 'message' ] );
+
+            if ($_svgParserClass->parser_state->is_error) {
+                throw new RuntimeException( "[JS Builder] SVG Parsing error " . $_svgParserClass->parser_state->getMessage() );
             }
 
             // image layer from file

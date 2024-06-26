@@ -54,3 +54,12 @@
 - Импорт, чекбокс: «предположить наличие информации о регионах на основе атрибутов title и description»
 - В поле Title можно указать описание региона - то, что будет использовано для заголовка инфобокса если информация для региона не указана.
 
+
+
+---
+http://loremaps.azurewebsites.net/Maps/Faerun
+https://www.reddit.com/r/mapmaking/wiki/index/
+
+
+https://homebrewery.naturalcrit.com/share/H1W1oVKvNm
+

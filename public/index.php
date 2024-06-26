@@ -53,7 +53,7 @@ try {
 
     AppRouter::get('/',                             [\Livemap\Controllers\PagesController::class,'view_frontpage'],         'view.frontpage');
     AppRouter::get('/map/{map_alias:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'],    'view.map.fullscreen');
-    AppRouter::get('/map:js/{map_alias:[\w\.]+}.js',       [\Livemap\Controllers\MapJSController::class, 'view_js_map_definition',  'view.map.js']);
+    AppRouter::get('/map:js/{map_alias:[\w\.]+}.js',       [\Livemap\Controllers\JSController::class, 'view_js_map_definition',  'view.map.js']);
 
     // роуты для дополнительного функционала карт
     AppRouter::get('/map:iframe/{map_alias:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'],            'view.map.iframe');

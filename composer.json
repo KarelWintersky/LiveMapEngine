@@ -13,7 +13,7 @@
             "engine/_functions.php"
         ],
         "psr-4": {
-            "Livemap\\" : "engine/"
+            "Livemap\\": "engine/"
         }
     },
     "require": {
@@ -34,17 +34,18 @@
         "karelwintersky/arris.router": "^1.3",
         "karelwintersky/arris.logger": "^1.0",
         "karelwintersky/arris.delight-php-auth": "^0.9.1",
+        "karelwintersky/arris.database": "^0.9.10",
+        "karelwintersky/arris.cache": "^0.7.1",
+        "karelwintersky/arris.entity": "^0.9.3",
         "ajur-media/template": "^1.2",
         "ajur-media/template.flash": "^0.1.0",
+        "ajur-media/kcaptcha": "^1.1",
         "mobiledetect/mobiledetectlib": "^3.74",
         "kuria/error": "^4.2",
         "slim/psr7": "^1.6",
-        "ajur-media/kcaptcha": "^1.1",
         "colinodell/json5": "^2.3",
-        "karelwintersky/arris.cache": "^0.7.1",
-        "karelwintersky/arris.entity": "^0.9.3",
-        "sbwerewolf/xml-navigator": "^7.0",
-        "fluxsoft/php-turnstile": "^0.1.3"
+        "fluxsoft/php-turnstile": "^0.1.3",
+        "livemap/svg-parser": "^1"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
