@@ -2,14 +2,11 @@
 
 namespace Livemap\Controllers;
 
-use AJUR\Template\Template;
-use AJUR\Template\TemplateInterface;
 use Arris\AppRouter;
 use Arris\Path;
+use Arris\Presenter\Template;
 use Livemap\AbstractClass;
 use Livemap\App;
-use Livemap\Exceptions\AccessDeniedException;
-use Livemap\Units\ACL;
 use Livemap\Units\MapLegacy;
 
 #[AllowDynamicProperties]
@@ -30,7 +27,16 @@ class RegionsController extends AbstractClass
 
         $region_data = (new MapLegacy())->getMapRegionData($map_alias, $id_region);
 
-        $t = new Template(App::$smarty);
+        $t = new Template();
+        $t
+            ->setTemplateDir(config('smarty.path_template'))
+            ->setCompileDir(config('smarty.path_cache'))
+            ->setTemplate("_js/theMapDefinition.tpl")
+            // ->registerPlugin(Template::PLUGIN_MODIFIER, "json_decode", "json_decode")
+            // ->registerPlugin(Template::PLUGIN_MODIFIER, "json_encode", "json_encode")
+            // ->registerClass("Arris\AppRouter", "Arris\AppRouter")
+        ;
+
         $t->assign('is_present', $region_data['is_present']);
         $t->assign('map_alias', $map_alias);
         $t->assign('region_id', $id_region);
@@ -181,7 +187,7 @@ class RegionsController extends AbstractClass
         $result = (new MapLegacy())->storeMapRegionData($map_alias, $region_id, $_REQUEST);
 
         $this->template->assignRAW($result->serialize());
-        $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
+        $this->template->setRenderType(Template::CONTENT_TYPE_JS_RAW);
     }
 
 }

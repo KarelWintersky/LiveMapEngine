@@ -4,12 +4,12 @@ namespace Livemap\Controllers;
 
 use Arris\AppLogger;
 use Arris\AppRouter;
-use Arris\DelightAuth\Auth\AttemptCancelledException;
-use Arris\DelightAuth\Auth\AuthError;
-use Arris\DelightAuth\Auth\EmailNotVerifiedException;
-use Arris\DelightAuth\Auth\InvalidEmailException;
-use Arris\DelightAuth\Auth\InvalidPasswordException;
-use Arris\DelightAuth\Auth\TooManyRequestsException;
+use Arris\DelightAuth\Auth\Exceptions\AttemptCancelledException;
+use Arris\DelightAuth\Auth\Exceptions\AuthError;
+use Arris\DelightAuth\Auth\Exceptions\EmailNotVerifiedException;
+use Arris\DelightAuth\Auth\Exceptions\InvalidEmailException;
+use Arris\DelightAuth\Auth\Exceptions\InvalidPasswordException;
+use Arris\DelightAuth\Auth\Exceptions\TooManyRequestsException;
 use Livemap\App;
 use Livemap\Exceptions\AccessDeniedException;
 use Psr\Log\LoggerInterface;
@@ -108,7 +108,6 @@ class AuthController extends \Livemap\AbstractClass
      * @throws InvalidEmailException
      * @throws InvalidPasswordException
      * @throws TooManyRequestsException
-     * @throws \Arris\DelightAuth\Auth\UserAlreadyExistsException
      */
     public function callback_register()
     {

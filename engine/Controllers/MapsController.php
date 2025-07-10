@@ -2,17 +2,14 @@
 
 namespace Livemap\Controllers;
 
-use AJUR\Template\Template;
-use AJUR\Template\TemplateInterface;
 use AllowDynamicProperties;
 use Arris\AppRouter;
 use Arris\Entity\Result;
 use Arris\Helpers\Server;
+use Arris\Presenter\Template;
 use Livemap\AbstractClass;
 use Livemap\App;
-use Livemap\Exceptions\AccessDeniedException;
 use Livemap\OpenGraph;
-use Livemap\Units\ACL;
 use Livemap\Units\MapLegacy;
 use Livemap\Units\MapConfig;
 use Psr\Log\LoggerInterface;
@@ -92,7 +89,7 @@ VALUES
         }
 
         $this->template->assignRAW($result->serialize());
-        $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
+        $this->template->setRenderType(Template::CONTENT_TYPE_JS_RAW);
     }
 
     public function view_map_about()
@@ -101,7 +98,11 @@ VALUES
 
         $map_about = $this->engine->getMapAbout($map_alias);
 
-        $t = new Template(App::$smarty);
+        $t = new Template();
+        $t
+            ->setTemplateDir(config('smarty.path_template'))
+            ->setCompileDir(config('smarty.path_cache'));
+
         $t->assign('map_alias', $map_alias);
         $t->assign('is_can_edit', \Arris\config('auth.is_admin'));
         $t->assign("edit_button_url", AppRouter::getRouter('edit.map.about'));
@@ -140,7 +141,8 @@ VALUES
         $this->template->assign('map_alias', $map_alias);
 
         if (!empty($this->mapConfig->display->custom_css)) {
-            $this->template->assign('custom_css', "/storage/{$map_alias}/styles/{$this->mapConfig->display->custom_css}");
+            // $this->template->assign('custom_css', "/storage/{$map_alias}/styles/{$this->mapConfig->display->custom_css}");
+            $this->template->assign('custom_css_files', $this->mapConfig->display->custom_css);
         }
 
         $this->template->assign('panning_step', $map->mapConfig->display->panning_step ?? 70);

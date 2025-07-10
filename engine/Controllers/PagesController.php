@@ -2,6 +2,7 @@
 
 namespace Livemap\Controllers;
 
+use ColinODell\Json5\SyntaxError;
 use Livemap\AbstractClass;
 use Livemap\OpenGraph;
 use Livemap\Units\Storage;
@@ -9,7 +10,6 @@ use Livemap\Units\Storage;
 /**
  * Контроллер отвечает за главную страницу и прочие информационные
  */
-#[AllowDynamicProperties]
 class PagesController extends AbstractClass
 {
     public function __construct()
@@ -22,6 +22,7 @@ class PagesController extends AbstractClass
      * Главная страница сайта
      *
      * @return void
+     * @throws SyntaxError
      */
     public function view_frontpage()
     {

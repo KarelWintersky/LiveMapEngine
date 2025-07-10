@@ -14,8 +14,13 @@
     <link rel="stylesheet" href="/frontend/leaflet/leaflet.css">
     <link rel="stylesheet" href="{$main_css_file}">
 
-    {if !empty($custom_css)}
+    {*{if !empty($custom_css)}
     <link rel="stylesheet" href="{$custom_css}">
+    {/if}*}
+    {if !empty($custom_css_files)}
+        {foreach $custom_css_files as $file}
+    <link rel="stylesheet" href="/storage/{$map_alias}/styles/{$file}">
+        {/foreach}
     {/if}
 
     <script src="/frontend/jquery/jquery-3.2.1_min.js"></script>

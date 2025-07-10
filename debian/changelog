@@ -1,4 +1,10 @@
-livemap (2.3.0) stable; urgency=medium
+livemap (2.4.0) stable; urgency=medium
+
+  * [R] переход на библиотеки latest-версий, в том числе arris.presenter
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Thu, 10 Jul 2025 08:46:49 +0300
+
+livemap (2.3.0) unstable; urgency=medium
 
   * - в конфиг карты добавлена обработка опции `display.about`. Если она задана - её текст показывается на кнопке "About" (информация о карте)
   * - CRUD просмотра ABOUT карты

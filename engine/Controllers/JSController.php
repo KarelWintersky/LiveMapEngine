@@ -2,9 +2,9 @@
 
 namespace Livemap\Controllers;
 
-use AJUR\Template\Template;
-use AJUR\Template\TemplateInterface;
 use Arris\Path;
+use Arris\Presenter\Template;
+use Arris\Presenter\TemplateInterface;
 use JsonException;
 use Livemap\AbstractClass;
 use Livemap\App;
@@ -15,8 +15,12 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SmartyException;
 use stdClass;
+use function array_keys;
+use function array_merge;
+use function file_get_contents;
+use function htmlspecialchars;
+use function implode;
 
-#[AllowDynamicProperties]
 class JSController extends AbstractClass
 {
     private $error;
@@ -25,6 +29,11 @@ class JSController extends AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
+    }
+
+    public function __invoke($map_alias)
+    {
+
     }
 
     /**
@@ -36,17 +45,17 @@ class JSController extends AbstractClass
      * @throws SmartyException
      * @route  /map:js/alias.js
      */
-    public function view_js_map_definition($map_alias)
+    public function view_js_map_definition($map_alias): void
     {
         $_map_config = new MapConfig($map_alias);
         $_map_config->loadConfig();
         $json = $_map_config->getConfig();
 
-        $image_info = array(
-            'width'     =>  0,
-            'height'    =>  0,
-            'ox'        =>  0,
-            'oy'        =>  0
+        $image_info = new SVGParser\Entity\ImageInfo(
+            width: 0,
+            height: 0,
+            ox: 0,
+            oy: 0
         );
         $max_bounds = null;
 
@@ -58,15 +67,14 @@ class JSController extends AbstractClass
                 throw new RuntimeException( "[JS Builder] Declared vectorized image-layer, but image definition not found." );
             }
 
-            $image_info = [];
             // это данные по сдвигу из конфига карты
             if (!empty($json->image)) {
-                $image_info = [
-                    'width'     =>  $json->image->width,
-                    'height'    =>  $json->image->height,
-                    'ox'        =>  $json->image->ox,
-                    'oy'        =>  $json->image->oy
-                ];
+                $image_info = new SVGParser\Entity\ImageInfo(
+                    width: $json->image->width,
+                    height: $json->image->height,
+                    ox: $json->image->ox,
+                    oy: $json->image->oy
+                );
             }
 
             /* ============ SVG load ============= */
@@ -82,7 +90,7 @@ class JSController extends AbstractClass
             if (!is_file($svg_filename)) {
                 throw new RuntimeException( "[JS Builder] Layout file {$svg_filename} not found." );
             }
-            $svg_content = \file_get_contents( $svg_filename );
+            $svg_content = file_get_contents( $svg_filename );
 
             if ($svg_content === '') {
                 throw new RuntimeException( "[JS Builder] Layout file is empty" );
@@ -115,9 +123,9 @@ class JSController extends AbstractClass
                 // $image_info['height'] = $json->image->height;
 
 
-                $_svgParserClass->set_CRSSimple_TranslateOptions( $image_info['ox'], $image_info['oy'], $image_info['height'] );
+                $_svgParserClass->set_CRSSimple_TranslateOptions( $image_info->ox, $image_info->oy, $image_info->height );
             } else {
-                $_svgParserClass->set_CRSSimple_TranslateOptions( 0, 0, $image_info['height'] );
+                $_svgParserClass->set_CRSSimple_TranslateOptions( 0, 0, $image_info->height );
             }
 
             /*if (!empty($json->layout->layers)) {
@@ -146,9 +154,9 @@ class JSController extends AbstractClass
                 $paths_at_layer = $_svgParserClass->getElementsAll();
 
                 // теперь нам нужны айдишники этих элементов на слое. Их надо проверить в БД и заполнить значениями кастомных полей из БД
-                $paths_at_layers_ids = \implode(", ", \array_map( static function($item){
+                $paths_at_layers_ids = implode(", ", \array_map( static function($item){
                     return "'{$item}'";
-                }, \array_keys($paths_at_layer)));
+                }, array_keys($paths_at_layer)));
 
                 // запросим БД на предмет кастомных значений и заполненности регионов
 
@@ -166,11 +174,11 @@ class JSController extends AbstractClass
                         // если определены параметры заполнения региона
                         if ($layer_config->display_defaults->present->fill && $layer_config->display_defaults->present->fill == 1) {
 
-                            if (!$path_present['fillColor'] && $layer_config->display_defaults->present->fillColor) {
+                            if (empty($path_present['fillColor']) && $layer_config->display_defaults->present->fillColor) {
                                 $path_present['fillColor'] = $layer_config->display_defaults->present->fillColor;
                             }
 
-                            if (!$path_present['fillOpacity'] && $layer_config->display_defaults->present->fillOpacity) {
+                            if (empty($path_present['fillOpacity']) && $layer_config->display_defaults->present->fillOpacity) {
                                 $path_present['fillOpacity'] = $layer_config->display_defaults->present->fillOpacity;
                             }
                         }
@@ -178,15 +186,15 @@ class JSController extends AbstractClass
                         // если определены параметры кастомной отрисовки границ региона
                         if ($layer_config->display_defaults->present->stroke && $layer_config->display_defaults->present->stroke == 1) {
 
-                            if (!$path_present['borderColor'] && $layer_config->display_defaults->present->borderColor) {
+                            if (empty($path_present['borderColor']) && $layer_config->display_defaults->present->borderColor) {
                                 $path_present['borderColor'] = $layer_config->display_defaults->present->borderColor;
                             }
 
-                            if (!$path_present['borderWidth'] && $layer_config->display_defaults->present->borderWidth) {
+                            if (empty($path_present['borderWidth']) && $layer_config->display_defaults->present->borderWidth) {
                                 $path_present['borderWidth'] = $layer_config->display_defaults->present->borderWidth;
                             }
 
-                            if (!$path_present['borderOpacity'] && $layer_config->display_defaults->present->borderOpacity) {
+                            if (empty($path_present['borderOpacity']) && $layer_config->display_defaults->present->borderOpacity) {
                                 $path_present['borderOpacity'] = $layer_config->display_defaults->present->borderOpacity;
                             }
                         }
@@ -194,37 +202,37 @@ class JSController extends AbstractClass
                     } else {
                         // иначе, конфиг слоя не определен, используются глобальные дефолтные значения
 
-                        if (!$path_present['fillColor']) {
+                        if (empty($path_present['fillColor'])) {
                             $path_present['fillColor'] = $json->display_defaults->present->fillColor ?: "#00ff00";
                         }
 
-                        if (!$path_present['fillOpacity']) {
+                        if (empty($path_present['fillOpacity'])) {
                             $path_present['fillOpacity'] = $json->display_defaults->present->fillOpacity ?: 0.1;
                         }
 
-                        if (!$path_present['borderColor']) {
+                        if (empty($path_present['borderColor'])) {
                             $path_present['borderColor'] = $json->display_defaults->present->borderColor ?: "#000000";
                         }
 
-                        if (!$path_present['borderWidth']) {
+                        if (empty($path_present['borderWidth'])) {
                             $path_present['borderWidth'] = $json->display_defaults->present->borderWidth ?: 0;
                         }
 
-                        if (!$path_present['borderOpacity']) {
+                        if (empty($path_present['borderOpacity'])) {
                             $path_present['borderOpacity'] = $json->display_defaults->present->borderOpacity ?: 0;
                         }
 
                     }
 
-                    $path_present['title'] = \htmlspecialchars($path_present['title'], ENT_QUOTES | ENT_HTML5);
+                    $path_present['title'] = htmlspecialchars($path_present['title'], ENT_QUOTES | ENT_HTML5);
                     unset($path_present['edit_date']);
 
-                    $paths_at_layer[ $id_region ] = \array_merge($paths_at_layer[ $id_region ], $path_present);
+                    $paths_at_layer[ $id_region ] = array_merge($paths_at_layer[ $id_region ], $path_present);
                 }
 
                 $layers[] = [
                     'id'        =>  $layer,
-                    'hint'      =>  \htmlspecialchars($layer_config->hint, ENT_QUOTES | ENT_HTML5),
+                    'hint'      =>  htmlspecialchars($layer_config->hint, ENT_QUOTES | ENT_HTML5),
                     'zoom'      =>  $layer_config->zoom ?? $json->display->zoom,
                     'zoom_min'  =>  $layer_config->zoom_min ?? -100,
                     'zoom_max'  =>  $layer_config->zoom_max ?? 100,
@@ -249,8 +257,15 @@ class JSController extends AbstractClass
             $this->error_message = $e->getMessage();
         }
 
-        $t = new Template(App::$smarty);
-        $t->setTemplate("_js/theMapDefinition.tpl");
+        $t = new Template();
+        $t
+            ->setTemplateDir(config('smarty.path_template'))
+            ->setCompileDir(config('smarty.path_cache'))
+            ->setTemplate("_js/theMapDefinition.tpl")
+            ->registerPlugin(Template::PLUGIN_MODIFIER, "json_decode", "json_decode")
+            ->registerPlugin(Template::PLUGIN_MODIFIER, "json_encode", "json_encode")
+        ;
+
 
         if ($this->error) {
             $t->assign('/JSBuilderError', $this->error_message);
@@ -261,10 +276,10 @@ class JSController extends AbstractClass
             'type'          =>  $json->type,
             'alias'         =>  $map_alias,
             'imagefile'     =>  $json->image->file,
-            'width'         =>  $image_info['width'],
-            'height'        =>  $image_info['height'],
-            'ox'            =>  $image_info['ox'],
-            'oy'            =>  $image_info['oy'],
+            'width'         =>  $image_info->width,
+            'height'        =>  $image_info->height,
+            'ox'            =>  $image_info->ox,
+            'oy'            =>  $image_info->oy,
         ]);
         $t->assign("display", [
             'zoom'                      =>  $json->display->zoom,
@@ -272,7 +287,7 @@ class JSController extends AbstractClass
             'zoom_min'                  =>  $json->display->zoom_min,
             'zoom_mode'                 =>  $json->display->zoom_mode ?? 'slider',
             'background_color'          =>  $json->display->background_color,
-            'custom_css'                =>  $json->display->custom_css ?? '',                       // файл кастомных стилей для карты
+            'custom_css'                =>  $json->display->custom_css ?? [],                       // файл кастомных стилей для карты
             'focus_animate_duration'    =>  $json->display->focus_animate_duration ?? 0.7,
             'focus_highlight_color'     =>  $json->display->focus_highlight_color ?? '#ff0000',
             'focus_timeout'             =>  $json->display->focus_timeout ?? 1000,
@@ -372,7 +387,7 @@ class JSController extends AbstractClass
         $content = \preg_replace('/^\h*\v+/m', '', $content); // удаляем лишние переводы строк
 
         $this->template->assignRAW($content);
-        $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
+        $this->template->setRenderType(Template::CONTENT_TYPE_JS_RAW);
     }
 
 }

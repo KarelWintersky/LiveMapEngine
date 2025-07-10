@@ -4,17 +4,16 @@ namespace Livemap;
 
 use Arris\App;
 use Arris\AppLogger;
-use Arris\Database\DBWrapper;
-use AJUR\Template\Template;
+use Arris\Presenter\Template;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Smarty;
 
-#[AllowDynamicProperties]
 class AbstractClass
 {
     public App $app;
 
-    public DBWrapper $pdo;
+    public PDO $pdo;
 
     public Smarty $smarty;
 
@@ -25,7 +24,7 @@ class AbstractClass
     public $tables;
 
     /**
-     * @var \Monolog\Logger
+     * @var LoggerInterface
      */
     public $logger;
 

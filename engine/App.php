@@ -2,15 +2,17 @@
 
 namespace Livemap;
 
-use AJUR\Template\FlashMessages;
-use AJUR\Template\Template;
-use AJUR\Template\TemplatePlugins;
 use Arris\AppLogger;
 use Arris\Core\Dot;
-use Arris\Database\DBWrapper;
+use Arris\Database\Config;
+use Arris\Database\Connector;
 use Arris\DelightAuth\Auth\Auth;
 use Arris\Helpers\Server;
 use Arris\Path;
+use Arris\Presenter\FlashMessages;
+use Arris\Presenter\Plugins;
+use Arris\Presenter\Template;
+use PDO;
 use Smarty;
 
 use Kuria\Error\ErrorHandler;
@@ -20,9 +22,9 @@ use Kuria\Error\Screen\WebErrorScreenEvents;
 class App extends \Arris\App
 {
     /**
-     * @var DBWrapper
+     * @var PDO
      */
-    public static DBWrapper $pdo;
+    public static PDO $pdo;
 
     /**
      * @var Smarty
@@ -122,33 +124,21 @@ class App extends \Arris\App
             'path_cache'        =>  config('path.cache'),
             'force_compile'     =>  _env('DEBUG.SMARTY_FORCE_COMPILE', false, 'bool')
         ]);
-        App::$smarty = new Smarty();
-        App::$smarty->setTemplateDir( config('smarty.path_template'));
-        App::$smarty->setCompileDir( config('smarty.path_cache'));
-        App::$smarty->setForceCompile(config('smarty.force_compile'));
-        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'dd', 'dd', false);
-        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'size_format', [ TemplatePlugins::class, 'size_format' ], false);
-        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", "convertDateTime");
-        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "json_decode", "json_decode");
-        App::$smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, "json_encode", "json_encode");
-        App::$smarty->registerClass("Arris\AppRouter", "Arris\AppRouter");
 
-        $app->addService(Smarty::class, App::$smarty);
-
-        // ******
-        // Smarty
-        // ******
-
-        // ********
-        // Template
-        // ********
-        App::$template = new Template(App::$smarty, $_REQUEST, [], AppLogger::scope('smarty')); // global template
+        App::$template = new \Arris\Presenter\Template();
+        App::$template
+            ->setTemplateDir(config('smarty.path_template'))
+            ->setCompileDir(config('smarty.path_cache'))
+            ->setForceCompile(config('smarty.force_compile'))
+            ->registerPlugin(Template::PLUGIN_MODIFIER, 'dd', 'dd', false)
+            ->registerPlugin(Smarty::PLUGIN_MODIFIER, 'size_format', [ Plugins::class, 'size_format' ], false)
+            ->registerPlugin(Smarty::PLUGIN_MODIFIER, "convertDateTime", "convertDateTime")
+            ->registerPlugin(Smarty::PLUGIN_MODIFIER, "json_decode", "json_decode")
+            ->registerPlugin(Smarty::PLUGIN_MODIFIER, "json_encode", "json_encode")
+            ->registerClass("Arris\AppRouter", "Arris\AppRouter");
 
         $app->addService(Template::class, App::$template);
 
-        // **********
-        // Slim flash
-        // **********
         App::$flash = new FlashMessages();
     }
 
@@ -183,7 +173,18 @@ class App extends \Arris\App
         ];
         config('db_credentials', $db_credentials);
 
-        App::$pdo = new DBWrapper(config('db_credentials'), [ 'slow_query_threshold' => 100 ], AppLogger::scope('mysql') );
+        $db_config = new Config(logger: AppLogger::scope('mysql'));
+        $db_config
+            ->setHost(getenv('DB.HOST'))
+            ->setPort(getenv('DB.PORT'))
+            ->setUsername(getenv('DB.USERNAME'))
+            ->setPassword(getenv('DB.PASSWORD'))
+            ->setDatabase(getenv('DB.NAME'))
+            ->setDriver(Config::DRIVER_MYSQL)
+        ;
+
+        App::$pdo = new Connector($db_config);
+
         $app->addService('pdo', App::$pdo);
     }
 
@@ -194,15 +195,7 @@ class App extends \Arris\App
         /**
          * Auth Delight
          */
-        App::$auth = new Auth(new \PDO(
-            sprintf(
-                "mysql:dbname=%s;host=%s;charset=utf8mb4",
-                config('db_credentials.database'),
-                config('db_credentials.hostname')
-            ),
-            config('db_credentials.username'),
-            config('db_credentials.password')
-        ));
+        App::$auth = new Auth(App::$pdo);
         $app->addService(Auth::class, App::$auth);
         config('auth', [
             'id'            =>  App::$auth->id(),
@@ -222,13 +215,6 @@ class App extends \Arris\App
 
     public static function initRedis()
     {
-        \Arris\Cache\Cache::init([
-            'enabled'   =>  getenv('REDIS.ENABLED'),
-            'host'      =>  getenv('REDIS.HOST'),
-            'port'      =>  getenv('REDIS.PORT'),
-            'password'  =>  getenv('REDIS.PASSWORD'),
-            'database'  =>  getenv('REDIS.DATABASE')
-        ], [ ], App::$pdo, AppLogger::scope('redis'));
     }
 
 

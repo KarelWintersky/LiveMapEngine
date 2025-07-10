@@ -5,6 +5,8 @@ use Arris\AppRouter;
 use Arris\Exceptions\AppRouterNotFoundException;
 use Dotenv\Dotenv;
 use Livemap\App;
+use Livemap\Controllers\AuthController;
+use Livemap\Controllers\UsersController;
 
 define('__PATH_ROOT__', dirname(__DIR__, 1));
 define('__PATH_CONFIG__', '/etc/arris/livemap/');
@@ -42,7 +44,7 @@ try {
      * Routing
      */
 
-    AppRouter::init(AppLogger::addScope('router'));
+    AppRouter::init(AppLogger::scope('router'));
     AppRouter::setDefaultNamespace('\Livemap\Controllers');
 
     /**********
@@ -53,7 +55,7 @@ try {
 
     AppRouter::get('/',                             [\Livemap\Controllers\PagesController::class,'view_frontpage'],         'view.frontpage');
     AppRouter::get('/map/{map_alias:[\w\.]+}[/]',          [\Livemap\Controllers\MapsController::class, 'view_map_fullscreen'],    'view.map.fullscreen');
-    AppRouter::get('/map:js/{map_alias:[\w\.]+}.js',       [\Livemap\Controllers\JSController::class, 'view_js_map_definition',  'view.map.js']);
+    AppRouter::get('/map:js/{map_alias:[\w\.]+}.js',       [\Livemap\Controllers\JSController::class, 'view_js_map_definition'],  'view.map.js');
 
     // роуты для дополнительного функционала карт
     AppRouter::get('/map:iframe/{map_alias:[\w\.]+}[/]',   [\Livemap\Controllers\MapsController::class, 'view_iframe'],            'view.map.iframe');
@@ -69,29 +71,27 @@ try {
     AppRouter::get('/project/{id:[\w]+}[/]', [ \Livemap\Controllers\ProjectsController::class, 'view_project'], 'view.project');
 
     // логин-логаут
-    AppRouter::get('/auth/login', 'AuthController@view_form_login', 'view.form.login');
-    AppRouter::post('/auth/login', 'AuthController@callback_login', 'callback.form.login');
-    AppRouter::get('/auth/logout', 'AuthController@callback_logout', 'view.form.logout');
+    AppRouter::get('/auth/login', [AuthController::class, 'view_form_login'], 'view.form.login');
+    AppRouter::post('/auth/login', [AuthController::class, 'callback_login'], 'callback.form.login');
+    AppRouter::get('/auth/logout', [AuthController::class, 'callback_logout'], 'view.form.logout');
 
     // Для доступа к роутам этой группы пользователь должен быть НЕ залогинен
     // Это проверяет метод AuthMiddleware@check_not_logged_in
     // Если пользователь залогинен - делается редирект в корень
     AppRouter::group(
-        [
-            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_not_logged_in'
-        ], static function() {
-            // Регистрация
-            AppRouter::get('/auth/register', 'AuthController@view_form_register', 'view.form.register');
-            AppRouter::post('/auth/register', 'AuthController@callback_register', 'callback.form.register');
+        before: [ \Livemap\Middlewares\AuthMiddleware::class, 'check_not_logged_in'],
+        callback: function() {
+            AppRouter::get('/auth/register', [AuthController::class, 'view_form_register'], 'view.form.register');
+            AppRouter::post('/auth/register', [AuthController::class, 'callback_register'], 'callback.form.register');
 
             // Активация аккаунта, заготовка
-            AppRouter::get('/auth/activate', 'AuthController@callback_activate_account');
+            AppRouter::get('/auth/activate', [AuthController::class, 'callback_activate_account']);
 
             // Восстановить пароль, заготовки
-            AppRouter::get('/auth/recover', 'AuthController@view_form_recover_password', 'view.auth.recover.form'); // форма восстановления пароля
-            AppRouter::post('/auth/recover', 'AuthController@callback_recover_password'); // обработчик формы, шлет запрос на почту
-            AppRouter::get('/auth/reset', 'AuthController@view_form_new_password'); // принимает ключ сброса пароля и предлагает ввести новый
-            AppRouter::post('/auth/reset', 'AuthController@callback_new_password'); // коллбэк: устанавливает новый пароль
+            AppRouter::get('/auth/recover', [AuthController::class, 'view_form_recover_password'], 'view.auth.recover.form'); // форма восстановления пароля
+            AppRouter::post('/auth/recover', [AuthController::class, 'callback_recover_password']); // обработчик формы, шлет запрос на почту
+            AppRouter::get('/auth/reset', [AuthController::class, 'view_form_new_password']); // принимает ключ сброса пароля и предлагает ввести новый
+            AppRouter::post('/auth/reset', [AuthController::class, 'callback_new_password']); // коллбэк: устанавливает новый пароль
         }
     );
 
@@ -100,38 +100,36 @@ try {
     // AuthMiddleware@check_is_logged_in
     // Если проверка неудачна - кидается исключение AccessDeniedException
     AppRouter::group(
-        [
-            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_logged_in'
-        ], static function() {
+        before: [\Livemap\Middlewares\AuthMiddleware::class, 'check_is_logged_in'],
+        callback: function() {
             // редактировать профиль (должно быть в группе "залогинен")
-            AppRouter::get('/user/profile', 'UsersController@view_form_profile', 'view.user.profile'); // показать текущий профиль
-            AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update', 'callback.user.profile.update'); // обновить текущий профиль
+            AppRouter::get('/user/profile', [UsersController::class, 'view_form_profile'], 'view.user.profile'); // показать текущий профиль
+            AppRouter::post('/user/profile:update', [UsersController::class, 'callback_profile_update'], 'callback.user.profile.update'); // обновить текущий профиль
 
             // пользуемся тем, что map_alias передается двумя путями: `POST edit:alias:map` или `GET map`
-            AppRouter::group([
-                'before'    =>  [ \Livemap\Middlewares\AuthMiddleware::class, 'check_can_edit']
-            ], static function(){
+            AppRouter::group(
+                before: [ \Livemap\Middlewares\AuthMiddleware::class, 'check_can_edit'],
+                callback: function(){
 
-                AppRouter::get('/region/edit', [\Livemap\Controllers\RegionsController::class, 'view_region_edit_form'], 'edit.region.info');
-                AppRouter::post('/region/edit', [\Livemap\Controllers\RegionsController::class, 'callback_update_region'], 'update.region.info');
+                    AppRouter::get('/region/edit', [\Livemap\Controllers\RegionsController::class, 'view_region_edit_form'], 'edit.region.info');
+                    AppRouter::post('/region/edit', [\Livemap\Controllers\RegionsController::class, 'callback_update_region'], 'update.region.info');
 
-                // редактирование ABOUT карты
-                AppRouter::get('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'view_map_edit_form'], 'edit.map.about');
-                AppRouter::post('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'callback_update_map'], 'update.map.about');
-            });
+                    // редактирование ABOUT карты
+                    AppRouter::get('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'view_map_edit_form'], 'edit.map.about');
+                    AppRouter::post('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'callback_update_map'], 'update.map.about');
+                }
+            );
         }
     );
-
 
     // админские роуты
     // Роуты этой группы доступны только СУПЕРАДМИНИСТРАТОРУ
     // Проверяет посредник AuthMiddleware@check_is_admin_logged
     // иначе кидается исключение AccessDeniedException
     AppRouter::group(
-        [
-            'before'    =>  '\Livemap\Middlewares\AuthMiddleware@check_is_admin_logged',
-            'prefix'    =>  '/admin'
-        ], static function() {
+        prefix: '/admin',
+        before: [ \Livemap\Middlewares\AuthMiddleware::class, 'check_is_admin_logged'],
+        callback: function() {
             AppRouter::get('[/]',           [\Livemap\Controllers\AdminController::class, 'view_main_page'], 'admin.main.page'); // можно пустую строчку, но я добавил необязательный элемент и убираю его регуляркой в роутере
             AppRouter::get('/users/list',   [\Livemap\Controllers\AdminController::class, 'view_list_users'], 'admin.users.view.list');
             AppRouter::get('/users/create', [\Livemap\Controllers\AdminController::class, 'form_create_user' ], 'admin.users.view.create');
@@ -160,7 +158,7 @@ try {
 
             // присвоение карте владельца (связь owner - map)
             // права доступа к карте
-    });
+        });
 
     App::$template->assign("routing", AppRouter::getRoutersNames());
 
@@ -169,7 +167,7 @@ try {
      *********/
     AppRouter::dispatch();
 
-    App::$template->assign("title", App::$template->makeTitle(" &mdash;"));
+    App::$template->assign("title", \Livemap\TemplateHelper::makeTitle(" &mdash;"));
 
     App::$template->assign("flash_messages", json_encode( App::$flash->getMessages() ));
 

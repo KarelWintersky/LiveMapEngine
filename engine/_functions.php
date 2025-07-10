@@ -43,14 +43,14 @@ function logSiteUsage(LoggerInterface $logger, $is_print = false)
     ];
 
     /**
-     * @var DBWrapper $pdo
+     * @var \Arris\Database\Connector $pdo
      */
     $pdo = (App::factory())->getService('pdo');
 
     if (!is_null($pdo)) {
-        $stats = $pdo->getStats();
-        $metrics['mysql.queries'] = $stats['total_queries'];
-        $metrics['mysql.time'] = $stats['total_time'];
+        $stats = $pdo->stats();
+        $metrics['mysql.queries'] = $stats->getQueryCount();
+        $metrics['mysql.time'] = $stats->getTotalQueryTime();
     }
 
     $metrics['ipv4'] = Server::getIP();
