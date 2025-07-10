@@ -1,3 +1,42 @@
+livemap (2.3.0) stable; urgency=medium
+
+  * - в конфиг карты добавлена обработка опции `display.about`. Если она задана - её текст показывается на кнопке "About" (информация о карте)
+  * - CRUD просмотра ABOUT карты
+  * - проверка возможности редактирования карты перенесена в Middleware
+  * - в JS:MapControls добавлен declare кнопки About
+  * - в JS:MapManager добавлен `showAboutColorbox()`
+  * - исправлен `MapManager::makeURL`
+  * - `view.map.fullscreen.js` - обработка onClick на кнопку About (если она есть)
+  * - добавлены роуты, роуты редактирования перенесены в группу с посредником проверки прав доступа на редактирование
+  * - добавлены шаблоны редактирования about карты
+  * - кнопка About добавлена к основному шаблону карты и показывается, если задана соотв. опция в конфиге 
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Thu, 10 Jul 2025 06:55:54 +0300
+
+livemap (2.2.0) unstable; urgency=medium
+
+  * фиксы и небольшие доделки
+  * SVGParser теперь берется из пакета `livemap/svg-parser`
+  * удалена зависимость sbwerewolf/xml-navigator
+  * добавлена зависимость karelwintersky/arris.database
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Thu, 10 Jul 2025 06:54:39 +0300
+
+livemap (2.1.0) unstable; urgency=medium
+
+  * - исправлена симлинковка `favicon.ico`
+  * в SVGParser добавлено распознавание атрибутов интерактивности для SVG-элементов. Они передаются в поле `interactive` свойств региона
+  * переносим обработчик JS Map Definition в отдельный класс
+  * исправлен механизм отключения панелей infobox, backward, regionsbox
+  * добавлен механизм кастомных кнопок в секции backward, задаются в конфиге карты (display.sections.backward)
+  * исправлен механизм проверки права доступа на редактирование карты
+  * добавлена заготовка механизма проектов
+  * Переходим на PHP 8.2+
+  * исправляем сортировку (теперь через `<=>`)
+  * исправляем SVGParser (везде параметры по-умолчанию)
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Thu, 10 Jul 2025 06:52:20 +0300
+
 livemap (2.0.3) stable; urgency=medium
 
   * добавлена возможность скрывать панели через конфиг (display->sections->{infobox,regions,backward})

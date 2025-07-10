@@ -62,6 +62,9 @@ try {
     // роут получения информации о регионе на карте
     AppRouter::get('/region/get', [ \Livemap\Controllers\RegionsController::class, 'view_region_info'], 'view.region.info');
 
+    // роут получения информации о карте
+    AppRouter::get('/map:about/', [ \Livemap\Controllers\MapsController::class, 'view_map_about'], 'view.map.about');
+
     // проекты
     AppRouter::get('/project/{id:[\w]+}[/]', [ \Livemap\Controllers\ProjectsController::class, 'view_project'], 'view.project');
 
@@ -104,13 +107,21 @@ try {
             AppRouter::get('/user/profile', 'UsersController@view_form_profile', 'view.user.profile'); // показать текущий профиль
             AppRouter::post('/user/profile:update', 'UsersController@callback_profile_update', 'callback.user.profile.update'); // обновить текущий профиль
 
-            // редактировать регион: форма и коллбэк
-            // В принципе, проверку "может ли редактировать" можно было бы возложить на посредника, который будет проверять ACL::simpleCheckCanEdit().
-            // Но это проблема - посредник должен использовать map_alias, который ему не передать просто вот так просто...
-            AppRouter::get('/region/edit', [\Livemap\Controllers\RegionsController::class, 'view_region_edit_form'], 'edit.region.info');
-            AppRouter::post('/region/edit', [\Livemap\Controllers\RegionsController::class, 'callback_update_region'], 'update.region.info');
+            // пользуемся тем, что map_alias передается двумя путями: `POST edit:alias:map` или `GET map`
+            AppRouter::group([
+                'before'    =>  [ \Livemap\Middlewares\AuthMiddleware::class, 'check_can_edit']
+            ], static function(){
+
+                AppRouter::get('/region/edit', [\Livemap\Controllers\RegionsController::class, 'view_region_edit_form'], 'edit.region.info');
+                AppRouter::post('/region/edit', [\Livemap\Controllers\RegionsController::class, 'callback_update_region'], 'update.region.info');
+
+                // редактирование ABOUT карты
+                AppRouter::get('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'view_map_edit_form'], 'edit.map.about');
+                AppRouter::post('/map/edit:about', [ \Livemap\Controllers\MapsController::class, 'callback_update_map'], 'update.map.about');
+            });
         }
     );
+
 
     // админские роуты
     // Роуты этой группы доступны только СУПЕРАДМИНИСТРАТОРУ

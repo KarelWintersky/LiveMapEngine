@@ -3,3 +3,4 @@
     "id_region": '{$region_id}',
     "content"  : '{$region_text}'
 }
+{* не используется *}

@@ -69,6 +69,7 @@ function logSiteUsage(LoggerInterface $logger, $is_print = false)
     $logger->notice('', $metrics);
 }
 
+//@TODO: use Arris\Helpers\Arrays::filter_array_for_allowed()
 function filter_array_for_allowed($input_array, $required_key, $allowed_values, $default_value)
 {
     return
@@ -117,6 +118,7 @@ function convertDateTime($datetime):string
  * @param string $separator
  * @return bool
  */
+//@TODO: use Arris\Helpers\Objects::property_exists_recursive()
 function property_exists_recursive($object, string $path, string $separator = '->'): bool
 {
     if (!\is_object($object)) {

@@ -140,6 +140,7 @@ $(function() {
     let controlRegionsBoxPresent    = MapControls.declareControl_RegionsBox();
     let controlInfoBoxPresent       = MapControls.declareControl_InfoBox();
     let controlBackwardPresent      = MapControls.declareControl_Backward();
+    let controlMapAbout             = MapControls.declareControl_MapAbout();
 
     // не показываем контрол "назад" если страница загружена в iframe
     if (! MapControls.isLoadedToIFrame()) {
@@ -155,6 +156,33 @@ $(function() {
         if (controlRegionsBoxPresent) {
             _mapManager.map.addControl( new L.Control.RegionsBox() );
         }
+    }
+
+    if (controlMapAbout) {
+        _mapManager.map.addControl( new L.Control.About() );
+        $(`#actor-map-info`).on('click', function (){
+            let map_alias = window._mapManager.map_alias;
+            let url = MapManager.makeURL(
+                'about',
+                map_alias,
+                null,
+                MapControls.isLoadedToIFrame()
+            );
+            console.log(url);
+
+            $.get( url, function() {
+
+            }).done(function(data) {
+                let colorbox_width  = 800;
+                let colorbox_height = 600;
+
+                $.colorbox({
+                    html: data,
+                    width: colorbox_width,
+                    height: colorbox_height,
+                });
+            });
+        });
     }
 
     // анализируем window.location.hash

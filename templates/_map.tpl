@@ -33,15 +33,18 @@
     <script src="/frontend/leaflet/SmoothWheelZoom.js"></script>
 
     {if $sections_present.colorbox}
-        <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
-        <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
+
+    <script type="text/javascript" src="/frontend/colorbox/jquery.colorbox-min.js"></script>
+    <link rel="stylesheet" href="/frontend/colorbox/colorbox.css">
+
     {/if}
 
     <script data-comment="init">
         window.theMap = { };
         window.REGION_URLS = {
             "view": "{Arris\AppRouter::getRouter('view.region.info')}",
-            "edit": "{Arris\AppRouter::getRouter('edit.region.info')}"
+            "edit": "{Arris\AppRouter::getRouter('edit.region.info')}",
+            "about": "{Arris\AppRouter::getRouter('view.map.about')}"
         };
 
         var map_alias = '{$map_alias}';
@@ -142,6 +145,12 @@
 {if $sections_present.title}
     <section id="section-region-title" class="invisible section-region-title-viewbox" {* data-leaflet-control-position=... *}>
         <span>Selected region: </span><strong id="section-region-title-content" class="section-region-title-content"></strong>
+    </section>
+{/if}
+
+{if $sections_present.about}
+    <section id="section-map-about" class="invisible section-map-about-viewbox">
+        <button id="actor-map-info">{$sections_present.about|default:'About'}</button>
     </section>
 {/if}
 

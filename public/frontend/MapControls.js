@@ -3,6 +3,34 @@
  */
 class MapControls {
 
+    /**
+     * Создает в объекте L Control-элемент: описание карты
+     *
+     * @param target
+     * @param position
+     * @returns {boolean}
+     */
+    static declareControl_MapAbout(target = 'section-map-about', position = 'topright') {
+        if ($(`#${target}`).length === 0) {
+            return false;
+        }
+
+        L.Control.About = L.Control.extend({
+            options: {
+                position: position || 'topright'
+            },
+            onAdd: function(map) {
+                let div = L.DomUtil.get(target);
+                L.DomUtil.removeClass(div, 'invisible');
+                L.DomEvent.disableScrollPropagation(div);
+                L.DomEvent.disableClickPropagation(div);
+                return div;
+            },
+            onRemove: function(map){ }
+        });
+        return true;
+    }
+
 
     /**
      * Создает в объекте L Control-элемент: имя региона (для карт типа folio)

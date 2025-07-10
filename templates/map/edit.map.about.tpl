@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <title>Карта {$title_map}, редактирование региона {$id_region}</title>
+    <title>Редактирование карты {$title_map}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
     {include file="_common/favicon_defs.tpl"}
@@ -63,22 +63,6 @@
                 "filemanager": "/frontend/filemanager/plugin.js"
             },
             paste_as_text: true,
-
-            templates: [
-                {foreach $edit_templates as $template}
-                {
-                    "title": "{$template.title}",
-                    "description": "{$template.desc}",
-                    "url": "{$template.url}"
-                },
-                {/foreach}
-            ],
-
-            {if $edit_templates_options}
-            template_popup_width: {$edit_templates_options.template_popup_width},
-            template_popup_height: {$edit_templates_options.template_popup_height},
-            content_css: "{$edit_templates_options.content_css}"
-            {/if}
         };
 
         // add markdown and simple configs
@@ -104,7 +88,7 @@
                 document.location.href = '{$html_callback}';
             });
             // Аякс-обработчик сохранения, спиннер, вывод результата. Не забываем на время обработки дизейблить кнопки, а при ошибке - энэйблить.
-            $("#form-edit-region").on('submit', function(){
+            $("#form-edit-map").on('submit', function(){
                 let url = $(this).attr('action');
                 if (saving_in_progress) return false;
 
@@ -147,9 +131,8 @@
 <body>
 <h3 style="margin-bottom: 1px">Регион:<span style="color: blue">  {if $is_present}{$region_title}{else}{$id_region}{/if}</span></h3>
 
-<form action="{$form_actor}" method="post" id="form-edit-region">
+<form action="{$form_actor}" method="post" id="form-edit-map">
     <input type="hidden" name="edit:id:map"     value="{$id_map}">
-    <input type="hidden" name="edit:id:region"  value="{$id_region}">
     <input type="hidden" name="edit:alias:map"  value="{$alias_map}">
     <input type="hidden" name="edit:html_callback" value="{$html_callback}" />
     <input type="hidden" name="edit:layout:type" value="svg">
@@ -159,21 +142,10 @@
             <td>
                 <fieldset class="fields_area">
                     <div class="field">
-                        <label for="title">Название региона:</label> <br>
-                        <input type="text" name="edit:region:title" id="title" size="90" value="{$region_title}" tabindex="1" required />
-                        <span class="mark-required">*</span>
+                        <label for="title">Название карты:</label> <br>
+                        <input type="text" name="edit:map:title" id="title" size="90" value="{$title}" tabindex="1"/>
                     </div>
                 </fieldset>
-            </td>
-            <td>
-                <label tabindex="2">
-                    В списках:
-                    <select name="edit:is:excludelists">
-                        <option value="N"{if $is_exludelists eq "N"} selected{/if}>Во всех</option>
-                        <option value="F"{if $is_exludelists eq "F"} selected{/if}>Только слоя</option>
-                        <option value="A"{if $is_exludelists eq "A"} selected{/if}>Нигде</option>
-                    </select>
-                </label>
             </td>
             <td>
                 <label tabindex="3">
@@ -192,35 +164,32 @@
 
 
     <label for="edit-textarea" class="label_textarea label_fullwidth">
-        <textarea name="edit:region:content" id="edit-textarea" cols="10" tabindex="4">{$region_text}</textarea>
+        <textarea name="edit:map:about" id="edit-textarea" cols="10" tabindex="4">{$content}</textarea>
     </label>
+
     <fieldset class="fields_area">
         <div class="field">
-            <label for="edit-restricted">Сообщение при недоступности региона:
-                <input type="text" name="edit:region:content_restricted" size="120" value="{$region_restricted}" id="edit-restricted" tabindex="5" autocomplete="off"/>
-            </label>
-        </div>
-        <hr />
-        <div class="field">
             <label for="edit-reason">Комментарий редактора:
-                <input type="text" name="edit:region:comment" size="90" value="" id="edit-reason" tabindex="6" autocomplete="off"/>
+                <input type="text" name="edit:comment" size="90" value="" id="edit-reason" tabindex="6" autocomplete="off"/>
             </label>
         </div>
     </fieldset>
+
     <div class="clear"></div>
 
     <fieldset>
         <div class="label_fullwidth">
-            <button type="submit" id="actor-submit" tabindex="7">Сохранить</button>
+            <button type="submit" id="actor-submit" tabindex="7" style="color: limegreen">Сохранить</button>
             <span id="ajax-process" style="display: none">
                 Сохраняю... &nbsp;
                 <img src="/frontend/images.spinners/21.svg" height="18" alt="ready"/>
             </span>
             <span id="ajax-result" style="display: none;">Сохранение успешно! Через несколько секунд возвращаемся на карту.</span>
-            <button type="button" id="actor-back" style="float:right" tabindex="8">Назад на карту</button>
+            <button type="button" id="actor-back" style="float:right; color: red" tabindex="8">Назад на карту</button>
         </div>
     </fieldset>
 </form>
+{*
 {if !empty($region_revisions)}
     <fieldset id="revisions_fieldset">
         <ul>
@@ -235,6 +204,7 @@
         </ul>
     </fieldset>
 {/if}
+*}
 <div class="clear"></div>
 <hr>
 <small style="float: left">Logged as <strong>{$is_logged_user}</strong> from <strong>{$is_logged_user_ip}</strong></small>

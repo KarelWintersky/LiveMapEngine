@@ -67,6 +67,22 @@ class MapLegacy extends \Livemap\AbstractClass
         $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
     }
 
+    /**
+     * Получить about карты
+     *
+     * @param $map_alias
+     * @return array
+     */
+    public function getMapAbout($map_alias)
+    {
+        $sth = $this->pdo->prepare("SELECT * FROM map_about WHERE alias_map = :alias_map ORDER BY edit_date DESC LIMIT 1" );
+        $sth->execute(
+            [ 'alias_map' =>  $map_alias ]
+        );
+
+        return $sth->fetch() ?? [];
+    }
+
     public function loadMap($map_alias)
     {
         $viewmode = 'folio';
@@ -336,11 +352,11 @@ SELECT
     {
         $result = new Result();
 
-        $role_can_edit = ACL::simpleCheckCanEdit($map_alias);
+        // $role_can_edit = ACL::simpleCheckCanEdit($map_alias);
 
-        if (false == $role_can_edit) {
+        /*if (false == $role_can_edit) {
             throw new AccessDeniedException("Обновление региона недоступно, недостаточный уровень допуска");
-        }
+        }*/
 
         $query = "
         INSERT INTO map_data_regions

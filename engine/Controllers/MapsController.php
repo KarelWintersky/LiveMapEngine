@@ -2,10 +2,17 @@
 
 namespace Livemap\Controllers;
 
+use AJUR\Template\Template;
+use AJUR\Template\TemplateInterface;
 use AllowDynamicProperties;
+use Arris\AppRouter;
+use Arris\Entity\Result;
+use Arris\Helpers\Server;
 use Livemap\AbstractClass;
 use Livemap\App;
+use Livemap\Exceptions\AccessDeniedException;
 use Livemap\OpenGraph;
+use Livemap\Units\ACL;
 use Livemap\Units\MapLegacy;
 use Livemap\Units\MapConfig;
 use Psr\Log\LoggerInterface;
@@ -13,10 +20,101 @@ use Psr\Log\LoggerInterface;
 #[AllowDynamicProperties]
 class MapsController extends AbstractClass
 {
+    private MapLegacy $engine;
+
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
         $this->template->setTemplate("_map.tpl");
+
+        $this->engine = new MapLegacy();
+    }
+
+    public function view_map_edit_form()
+    {
+        $map_alias = $_REQUEST['map'];
+
+        $map_about = $this->engine->getMapAbout($map_alias);
+
+        $this->template->setTemplate('map/edit.map.about.tpl');
+
+        $this->template->assign([
+            'id_map'            =>  0,
+            'form_actor'        =>  AppRouter::getRouter('update.map.about'),
+            'alias_map'         =>  $map_alias,
+            'html_callback'     =>  "/map/{$map_alias}/",
+
+            'title_map'         =>  $map_alias,
+
+            'content'           =>  $map_about['content'] ?? '',
+            'title'             =>  $map_about['title'] ?? '',
+
+            'is_present'        =>  !empty($map_about),
+
+            'is_logged_user'    =>  config('auth.username'),
+            'is_logged_user_ip' =>  config('auth.ipv4'),
+
+            // copyright
+            'copyright'         =>  config('app.copyright'),
+        ]);
+
+        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');
+        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_CURRENT_MAP'), $map_alias, 0, '/');
+
+    }
+
+    public function callback_update_map()
+    {
+        $map_alias = $_REQUEST['edit:alias:map'];
+        $result = new Result();
+
+        $query = "
+INSERT INTO map_about 
+    (alias_map, edit_whois, edit_ipv4, title, content, edit_comment, is_publicity)
+VALUES
+    (:alias_map, :edit_whois, :edit_ipv4, :title, :content, :edit_comment, :is_publicity)
+";
+        $data = [
+            'alias_map'     =>  $map_alias,
+            'edit_whois'    =>  config('auth.id') ?? 0,
+            'edit_ipv4'     =>  ip2long(Server::getIP()),
+            'title'         =>  $_REQUEST['edit:map:title'] ?? '',
+            'content'       =>  $_REQUEST['edit:map:about'] ?? '',
+            'edit_comment'  =>  $_REQUEST['edit:comment'],
+            'is_publicity'  =>  $_REQUEST['edit:is:publicity']
+        ];
+
+        try {
+            $sth = $this->pdo->prepare($query);
+            $sth->execute($data);
+        } catch (\PDOException $e) {
+            $result->error($e->getMessage());
+        }
+
+        $this->template->assignRAW($result->serialize());
+        $this->template->sendHeader(TemplateInterface::CONTENT_TYPE_JS);
+    }
+
+    public function view_map_about()
+    {
+        $map_alias = $_REQUEST['map'];
+
+        $map_about = $this->engine->getMapAbout($map_alias);
+
+        $t = new Template(App::$smarty);
+        $t->assign('map_alias', $map_alias);
+        $t->assign('is_can_edit', \Arris\config('auth.is_admin'));
+        $t->assign("edit_button_url", AppRouter::getRouter('edit.map.about'));
+
+        $t->assign("is_present", !empty($map_about));
+        $t->assign("title", $map_about['title'] ?? '');
+        $t->assign("content", $map_about['content'] ?? '');
+
+        $t->setTemplate('map/view.map.about.tpl');
+
+        $content = $t->render();
+
+        $this->template->assignRAW($content);
     }
 
     /**
@@ -63,7 +161,8 @@ class MapsController extends AbstractClass
             'regions'   =>  true && ( $this->mapConfig->display->sections->regions ?? true ),
             'backward'  =>  true && ( $this->mapConfig->display->sections->backward ?? true ),
             'title'     =>  false,
-            'colorbox'  =>  false,
+            'colorbox'  =>  true,
+            'about'     =>  $this->mapConfig->display->about ?? ''
         ]);
 
         // Backward имеет нестандартное определение в конфиге (непустое)

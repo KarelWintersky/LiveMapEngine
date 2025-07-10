@@ -524,6 +524,29 @@ class MapManager {
         $infobox_toggle_button.data('content-visibility', current_infobox_visible_state);
     }
 
+    showAboutColorbox() {
+        let url = MapManager.makeURL(
+            'about',
+            this.theMap.map['id'],
+            null,
+            MapControls.isLoadedToIFrame()
+        );
+
+        $.get( url, function() {
+
+        }).done(function(data) {
+            let colorbox_width  = 800;
+            let colorbox_height = 600;
+
+            $.colorbox({
+                html: data,
+                width: colorbox_width,
+                height: colorbox_height,
+                title: 'About',
+            });
+        });
+    }
+
     /**
      * Показывает контентное окно colorbox'ом
      *
@@ -565,7 +588,7 @@ class MapManager {
      * @param is_iframe
      * @returns {string}
      */
-    static makeURL(action = 'view', map_alias, id_region, is_iframe = false) {
+    static makeURL(action = 'view', map_alias = null, id_region = null, is_iframe = false) {
         let _act = null;
         switch (action) {
             case 'view': {
@@ -576,8 +599,25 @@ class MapManager {
                 _act = window.REGION_URLS['edit'];
                 break;
             }
+            case 'about': {
+                _act = window.REGION_URLS['about']
+                break;
+            }
         }
-        return `${_act}?map=${map_alias}&id=${id_region}${ is_iframe ? '&resultType=iframe' : '' }`;
+
+        let set = [
+            map_alias ? `map=${map_alias}` : null,
+            id_region ? `id=${id_region}` : null,
+            is_iframe ? 'resultType=iframe' : null
+        ];
+
+        return _act + set
+            .filter(Boolean) // Удаляем `null` и пустые строки
+            .join('&')       // Соединяем оставшиеся части через `&`
+            .replace(/^&+|&+$/g, '') // Удаляем лишние `&` в начале и конце
+            .replace(/^/, _act ? '?' : ''); // Добавляем `?` только если есть параметры
+
+        // return `${_act}?map=${map_alias}&id=${id_region}${ is_iframe ? '&resultType=iframe' : '' }`;
     }
 
     /**

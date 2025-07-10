@@ -41,15 +41,15 @@ class RegionsController extends AbstractClass
 
         switch ($template) {
             case 'iframe': {
-                $t->setTemplate('view.region/view.region.iframe.tpl');;
+                $t->setTemplate('region/view.region.iframe.tpl');;
                 break;
             }
             case 'fieldset': {
-                $t->setTemplate('view.region/view.region.fieldset.tpl');
+                $t->setTemplate('region/view.region.fieldset.tpl');
                 break;
             }
             default: {
-                $t->setTemplate('view.region/view.region.html.tpl');
+                $t->setTemplate('region/view.region.html.tpl');
                 break;
             }
         }
@@ -85,10 +85,13 @@ class RegionsController extends AbstractClass
             throw new \RuntimeException("Map definition file not found, requested {$filename}");
         }
 
+        /*
+        // закомментировано, поскольку отлавливается посредником
         $can_edit = ACL::simpleCheckCanEdit($map_alias);
         if (!$can_edit) {
             throw new AccessDeniedException("Обновление региона недоступно, недостаточный уровень допуска");
         }
+        */
 
         $json = json5_decode( file_get_contents( $filename ) );
 
@@ -124,7 +127,7 @@ class RegionsController extends AbstractClass
                 : 400;
         }
 
-        $this->template->setTemplate('edit.region/edit.region.page.tpl');
+        $this->template->setTemplate('region/edit.region.page.tpl');
 
         $this->template->assign([
             'id_region'         =>  $region_id,
