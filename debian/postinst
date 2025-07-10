@@ -13,6 +13,8 @@ PATH_CONFIG=/etc/arris/livemap
 PATH_STORAGE_LINKED=${PATH_PUBLIC}/storage
 PATH_CACHE_SMARTY=${PATH_PROJECT}/cache
 
+VERSIONS=$(ls /etc/init.d/ | grep php | grep fpm | cut -d'-' -f1 | sed 's/php//')
+
 case "$1" in
     configure)
         echo "\n ${ANSI_YELLOW} Running LIVEMAP post-install tasks... ${ANSI_RESET} \n"
@@ -47,6 +49,21 @@ case "$1" in
         echo "Fixing access rights..."
         chown -R www-data:www-data ${PATH_PROJECT}/*
         echo "${ANSI_GREEN} Ok. ${ANSI_RESET}"
+
+        echo "Restarting PHP..."
+
+        for VER in $VERSIONS; do
+            SERVICE="php${VER}-fpm"
+
+            echo -e "\n${YELLOW}● Обработка PHP ${VER}${NC}"
+            service $SERVICE restart >/dev/null 2>&1
+
+            if [ $? -eq 0 ]; then
+                echo -e "${GREEN}успешно${NC}"
+            else
+                echo -e "${RED}ошибка${NC}"
+            fi
+        done
 
         echo
         echo "${ANSI_YELLOW} ... post-install finished. ${ANSI_RESET}"
