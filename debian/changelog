@@ -1,3 +1,9 @@
+livemap (2.4.1) stable; urgency=medium
+
+  * fix template helper
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Thu, 10 Jul 2025 08:56:50 +0300
+
 livemap (2.4.0) stable; urgency=medium
 
   * [R] переход на библиотеки latest-версий, в том числе arris.presenter

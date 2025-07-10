@@ -4,7 +4,7 @@ namespace Livemap;
 
 class TemplateHelper
 {
-    private static array $titles;
+    public static array $titles = [];
 
     public static function addTitle(string $title_part): void
     {
