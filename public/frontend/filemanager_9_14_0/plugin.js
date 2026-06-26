@@ -7,35 +7,45 @@
  * Contributing: https://github.com/trippo/ResponsiveFilemanager
  */
 
-tinymce.PluginManager.add('responsivefilemanager', function(editor) {
+tinymce.PluginManager.add('filemanager', function(editor) {
 
-	function responsivefilemanager_onMessage(event){
+	editor.settings.file_picker_types = 'file image media';
+	editor.settings.file_picker_callback = filemanager;
+
+	function filemanager_onMessage(event){
 		if(editor.settings.external_filemanager_path.toLowerCase().indexOf(event.origin.toLowerCase()) === 0){
 			if(event.data.sender === 'responsivefilemanager'){
-				tinymce.activeEditor.insertContent(event.data.html);
+				tinymce.activeEditor.windowManager.getParams().setUrl(event.data.url);
 				tinymce.activeEditor.windowManager.close();
 
 				// Remove event listener for a message from ResponsiveFilemanager
 				if(window.removeEventListener){
-					window.removeEventListener('message', responsivefilemanager_onMessage, false);
+					window.removeEventListener('message', filemanager_onMessage, false);
 				} else {
-					window.detachEvent('onmessage', responsivefilemanager_onMessage);
+					window.detachEvent('onmessage', filemanager_onMessage);
 				}
 			}
 		}
 	}
-    
-	function openmanager() {
-		var width = window.innerWidth-20;
-		var height = window.innerHeight-40;
-		if(width > 1800) width=1800;
-		if(height > 1200) height=1200;
-		if(width>600){
-			var width_reduce = (width - 20) % 138;
+
+	function filemanager(callback, value, meta) {
+		let width = window.innerWidth - 30;
+		let height = window.innerHeight - 60;
+
+		if (width > 1800) width=1800;
+		if (height > 1200) height=1200;
+		if (width>600){
+			let width_reduce = (width - 20) % 138;
 			width = width - width_reduce + 10;
 		}
+		// width = 860;
+		// height = 570;
 
-		editor.focus(true);
+		// DEFAULT AS FILE
+		urltype=2;
+		if (meta.filetype === 'image' || meta.mediaType === 'image') { urltype=1; }
+		if (meta.filetype === 'media' || meta.mediaType === 'media') { urltype=3; }
+
 		var title="RESPONSIVE FileManager";
 		if (typeof editor.settings.filemanager_title !== "undefined" && editor.settings.filemanager_title) {
 			title=editor.settings.filemanager_title;
@@ -48,7 +58,7 @@ tinymce.PluginManager.add('responsivefilemanager', function(editor) {
 		if (typeof editor.settings.filemanager_sort_by !== "undefined" && editor.settings.filemanager_sort_by) {
 			sort_by="&sort_by="+editor.settings.filemanager_sort_by;
 		}
-		var descending="false";
+		var descending=0;
 		if (typeof editor.settings.filemanager_descending !== "undefined" && editor.settings.filemanager_descending) {
 			descending=editor.settings.filemanager_descending;
 		}
@@ -62,70 +72,43 @@ tinymce.PluginManager.add('responsivefilemanager', function(editor) {
 
 			// Add handler for a message from ResponsiveFilemanager
 			if(window.addEventListener){
-				window.addEventListener('message', responsivefilemanager_onMessage, false);
+				window.addEventListener('message', filemanager_onMessage, false);
 			} else {
-				window.attachEvent('onmessage', responsivefilemanager_onMessage);
+				window.attachEvent('onmessage', filemanager_onMessage);
 			}
 		}
 
-		const fileUrl = editor.settings.external_filemanager_path+'dialog.php?type=4&descending='+descending+sort_by+fldr+crossdomain+'&lang='+editor.settings.language+'&akey='+akey;
+		window.addEventListener('message', function receiveMessage(event) {
+			window.removeEventListener('message', receiveMessage, false);
+			if (event.data.sender === 'responsivefilemanager') {
+				callback(event.data.url);
+			}
+		}, false);
 
-		if (tinymce.majorVersion < 5) {
-			win = editor.windowManager.open({
+		var dialogUrl = editor.settings.external_filemanager_path+'dialog.php?type='+urltype+'&descending='+descending+sort_by+fldr+crossdomain+'&lang='+editor.settings.language+'&akey='+akey;
+
+		if (tinymce.majorVersion > 4) {
+			tinymce.activeEditor.windowManager.openUrl({
 				title: title,
-				file: fileUrl,
+				url: dialogUrl,
 				width: width,
 				height: height,
-				inline: 1,
 				resizable: true,
-				maximizable: true
+				maximizable: true,
+				inline: 1,
 			});
 		} else {
-			win = editor.windowManager.openUrl({
+			tinymce.activeEditor.windowManager.open({
 				title: title,
-				url: fileUrl,
+				file: dialogUrl,
 				width: width,
 				height: height,
-				inline: 1,
 				resizable: true,
-				maximizable: true
+				maximizable: true,
+				inline: 1,
 			});
 		}
 	}
 
-	if (tinymce.majorVersion < 5) {
-		editor.addButton('responsivefilemanager', {
-			icon: 'browse',
-			tooltip: 'Insert file',
-			shortcut: 'Ctrl+E',
-			onClick: openmanager
-		});
-
-		editor.addShortcut('Ctrl+E', '', openmanager);
-
-		editor.addMenuItem('responsivefilemanager', {
-			icon: 'browse',
-			text: 'Insert file',
-			shortcut: 'Ctrl+E',
-			onClick: openmanager,
-			context: 'insert'
-		});
-	} else {
-		editor.ui.registry.addButton('responsivefilemanager', {
-			icon: 'browse',
-			tooltip: 'Insert file',
-			shortcut: 'Ctrl+E',
-			onAction: openmanager
-		});
-
-		editor.addShortcut('Ctrl+E', '', openmanager);
-
-		editor.ui.registry.addMenuItem('responsivefilemanager', {
-			icon: 'browse',
-			text: 'Insert file',
-			shortcut: 'Ctrl+E',
-			onAction: openmanager,
-			context: 'insert'
-		});
-	}
+	return false;
 });

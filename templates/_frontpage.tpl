@@ -36,7 +36,15 @@
 
 <header class="top-bar" id="top-bar">
     <div class="top-bar-inner">
-        <a href="/" class="top-bar-logo">StoryMaps</a>
+        <a href="/" class="top-bar-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="rgba(255,255,255,0.15)"/>
+                <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+                <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+            </svg>
+            StoryMaps
+        </a>
         <nav class="top-bar-nav" id="top-bar-nav">
             <a href="/map:about/" class="nav-link">Что это такое</a>
             {if $is_logged_in}
@@ -69,13 +77,14 @@
                                 onerror="this.parentElement.classList.add('map-card-img--placeholder'); this.style.display='none';"
                             >
                         {/if}
-                    </div>
-                    <div class="map-card-body">
+                        <div class="map-card-overlay"></div>
                         <h2 class="map-card-title">{$map.title}</h2>
-                        {if $map.description}
-                            <p class="map-card-desc">{$map.description}</p>
-                        {/if}
                     </div>
+                    {if $map.description}
+                        <div class="map-card-body">
+                            <p class="map-card-desc">{$map.description}</p>
+                        </div>
+                    {/if}
                 </a>
             {foreachelse}
                 <p class="maps-empty">Пока нет опубликованных карт.</p>
