@@ -53,6 +53,8 @@ class MapsController extends AbstractClass
 
             // copyright
             'copyright'         =>  config('app.copyright'),
+            'data'              =>  $map_about,
+            'rfm_version'       =>  '_' . config('RFM_VERSION')
         ]);
 
         setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');

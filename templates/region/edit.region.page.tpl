@@ -57,10 +57,10 @@
             // responsive filemanager
             relative_urls: false,
             document_base_url: "/",
-            external_filemanager_path: "/frontend/filemanager/",
+            external_filemanager_path: "/frontend/filemanager{$rfm_version}/",
             filemanager_title: "Responsive Filemanager",
             external_plugins: {
-                "filemanager": "/frontend/filemanager/plugin.js"
+                "filemanager": "/frontend/filemanager{$rfm_version}/plugin.js"
             },
             paste_as_text: true,
 

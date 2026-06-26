@@ -70,15 +70,7 @@ class App extends \Arris\App
             'copyright'     =>  getenv('COPYRIGHT') ?? 'LiveMap Engine version 1.5+ "Algrist"',
         ]);
 
-/*        config('domains', [
-            'scheme'    =>  getenv('SCHEME'),
-            'site'      =>  getenv('DOMAIN'),
-            'fqdn'      =>  getenv('DOMAIN.FQDN')
-        ]);*/
-
-        /*config('limits', [
-            'MAX_UPLOAD_SIZE'   =>  min(get_ini_value('post_max_size'), get_ini_value('upload_max_filesize'), Common::return_bytes(_env('MAX_UPLOAD_SIZE', '64M')))
-        ]);*/
+        config('RFM_VERSION', '9_4_0'); // or 9_14_0
     }
 
     public static function initErrorHandler()

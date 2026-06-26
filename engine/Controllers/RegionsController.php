@@ -168,6 +168,8 @@ class RegionsController extends AbstractClass
 
             'is_exludelists'    =>  $region_data['is_exludelists'] ?? 'N',
             'is_publicity'      =>  $region_data['is_publicity'] ?? 'ANYONE',
+
+            'rfm_version'       =>  '_' . config('RFM_VERSION')
         ]);
 
         // ставим куки для файлменеджера

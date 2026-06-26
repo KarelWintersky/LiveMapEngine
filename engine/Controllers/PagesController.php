@@ -28,7 +28,7 @@ class PagesController extends AbstractClass
     {
         $storage = new Storage();
 
-        $this->template->assign("inner_template", "pages/frontpage.tpl");
+        $this->template->setTemplate("_frontpage.tpl");
         $this->template->assign("maps_list", $storage->getPublicMapsList());
 
         $this->template->assign("is_logged_in", config('auth.is_logged_in'));

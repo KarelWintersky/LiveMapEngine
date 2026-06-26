@@ -54,13 +54,15 @@
                 ["0x2601", 'cloud']
             ],
 
+            {assign var="__rfm_version" value="_9_4_0"}
+
             // responsive filemanager
             relative_urls: false,
             document_base_url: "/",
-            external_filemanager_path: "/frontend/filemanager/",
+            external_filemanager_path: "/frontend/filemanager{$rfm_version}/",
             filemanager_title: "Responsive Filemanager",
             external_plugins: {
-                "filemanager": "/frontend/filemanager/plugin.js"
+                "filemanager": "/frontend/filemanager{$rfm_version}/plugin.js"
             },
             paste_as_text: true,
         };
@@ -143,7 +145,7 @@
                 <fieldset class="fields_area">
                     <div class="field">
                         <label for="title">Название карты:</label> <br>
-                        <input type="text" name="edit:map:title" id="title" size="90" value="{$title}" tabindex="1"/>
+                        <input type="text" name="edit:map:title" id="title" size="90" value="{$data.title|escape}" tabindex="1"/>
                     </div>
                 </fieldset>
             </td>
