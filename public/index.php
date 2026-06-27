@@ -1,12 +1,8 @@
 <?php
 
+use App\App;
 use Arris\AppLogger;
 use Arris\AppRouter;
-use Arris\Exceptions\AppRouterNotFoundException;
-use Dotenv\Dotenv;
-use Livemap\App;
-use Livemap\Controllers\AuthController;
-use Livemap\Controllers\UsersController;
 
 define('__PATH_ROOT__', dirname(__DIR__, 1));
 define('__PATH_CONFIG__', '/etc/arris/livemap/');
@@ -19,9 +15,7 @@ try {
     }
     require_once __PATH_ROOT__ . '/vendor/autoload.php';
 
-    Dotenv::create( __PATH_CONFIG__, 'common.conf' )->load();
-
-    $app = App::factory();
+    $app = App::factory(['/etc/arris/livemap/config.yaml']);
 
     App::init();
 
@@ -29,11 +23,11 @@ try {
 
     App::initLogger();
 
-    App::initTemplate();
+    App::initPresenter();
 
     App::initMobileDetect();
 
-    App::initDBConnection();
+    App::initDatabase();
 
     App::initAuth();
 

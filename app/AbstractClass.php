@@ -1,21 +1,17 @@
 <?php
 
-namespace Livemap;
+namespace App;
 
-use Arris\App;
 use Arris\AppLogger;
 use Arris\Presenter\Template;
 use PDO;
 use Psr\Log\LoggerInterface;
-use Smarty;
 
 class AbstractClass
 {
     public App $app;
 
     public PDO $pdo;
-
-    public Smarty $smarty;
 
     public Template $template;
 
@@ -26,7 +22,7 @@ class AbstractClass
     /**
      * @var LoggerInterface
      */
-    public $logger;
+    public LoggerInterface $logger;
 
     public bool $is_internal_request;
 
@@ -39,7 +35,7 @@ class AbstractClass
 
         $this->options = $options;
 
-        $this->tables = new DBConfigTables();
+        // $this->tables = new DBConfigTables();
 
         $this->is_internal_request = array_key_exists('mode', $_GET) && $_GET['mode'] == 'internal';
     }

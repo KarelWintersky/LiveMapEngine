@@ -13,7 +13,7 @@
             "engine/_functions.php"
         ],
         "psr-4": {
-            "Livemap\\": "engine/"
+            "App\\": "app/"
         }
     },
     "require": {
@@ -28,7 +28,7 @@
         "ext-gd": "*",
         "ext-fileinfo": "*",
         "ext-exif": "*",
-        "vlucas/phpdotenv": "^3.3",
+        "ext-imagick": "*",
         "psr/log": "*",
         "spatie/regex": "^1.4",
         "symfony/var-dumper": "^5.3",
@@ -44,14 +44,12 @@
         "ajur-media/kcaptcha": "^1.1",
         "mobiledetect/mobiledetectlib": "^3.74",
         "kuria/error": "^4.2",
-        "slim/psr7": "^1.6",
         "colinodell/json5": "^2.3",
-        "fluxsoft/php-turnstile": "^0.1.3",
         "livemap/svg-parser": "^1",
-        "ext-imagick": "*"
+        "karelwintersky/arris.entity.path": "^1.0"
     },
-    "require-dev": {
-        "roave/security-advisories": "dev-latest",
-        "rector/rector": "*"
+    "suggest": {
+        "fluxsoft/php-turnstile": "^0.1.3",
+        "slim/psr7": "^1.6"
     }
 }

@@ -1,16 +1,18 @@
 <?php
 
-use Arris\Database\DBWrapper;
-use Arris\Helpers\Server;
-use Livemap\App;
 use Psr\Log\LoggerInterface;
+
+function setConfig($key = '', $value = null): void
+{
+    \Arris\App::factory()->addConfig([ $key => $value]);
+}
 
 /**
  * @param string|array $key
  * @param $value [optional]
  * @return string|array|bool|mixed|null
  */
-function config($key = '', $value = null) {
+/*function config($key = '', $value = null) {
     $app = App::factory();
 
     if (!is_null($value) && !empty($key)) {
@@ -30,7 +32,7 @@ function config($key = '', $value = null) {
     }
 
     return $app->getConfig($key);
-}
+}*/
 
 function logSiteUsage(LoggerInterface $logger, $is_print = false)
 {
