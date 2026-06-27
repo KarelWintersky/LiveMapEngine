@@ -1,11 +1,12 @@
 <?php
 
-namespace Livemap\Units;
+namespace App\Units;
 
-use Livemap\App;
+use App\AbstractClass;
+use App\App;
 use PDO;
 
-class ACL extends \Livemap\AbstractClass
+class ACL extends AbstractClass
 {
     const USERID_SUPERADMIN = 1;
 
@@ -33,7 +34,7 @@ class ACL extends \Livemap\AbstractClass
         $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
         $allowed_editors = array_merge($map->can_edit ?? [], $admin_emails);
 
-        return !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+        return !is_null(App::config('auth.email')) && in_array(App::config('auth.email'), $allowed_editors);
     }
 
     /**
@@ -61,7 +62,7 @@ class ACL extends \Livemap\AbstractClass
         /**
          * @var PDO $pdo
          */
-        $pdo = App::factory()->pdo;
+        $pdo = App::$pdo;
 
         $sth = $pdo->prepare("SELECT :role FROM settings_acl WHERE user_id = :user_id AND map_alias = :map_alias");
         $sth->execute([
@@ -87,7 +88,7 @@ class ACL extends \Livemap\AbstractClass
             return 'OWNER';
         }
 
-        $pdo = App::factory()->pdo;
+        $pdo = App::$pdo;
 
         $sth = $pdo->prepare("SELECT user_id, owner, edit, view FROM settings_acl WHERE user_id = :user_id AND map_alias = :map_alias");
         $sth->execute([

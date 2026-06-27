@@ -1,15 +1,13 @@
 <?php
 
-namespace Livemap\Units;
+namespace App\Units;
 
-use Arris\Entity\Result;
-use Arris\Helpers\Server;
-use Livemap\App;
-use Livemap\Exceptions\AccessDeniedException;
+use App\AbstractClass;
+use App\App;
 use PDO;
 use Psr\Log\LoggerInterface;
 
-class MapLegacy extends \Livemap\AbstractClass
+class MapLegacy extends AbstractClass
 {
     const allowed_cursors = [
         'auto', 'default', 'none', 'context-menu', 'help', 'pointer', 'progress', 'wait', 'cell', 'crosshair',
@@ -24,6 +22,7 @@ class MapLegacy extends \Livemap\AbstractClass
         'wide:infobox>regionbox', 'wide:regionbox>infobox',
         'infobox>regionbox', 'regionbox>infobox'
     ];
+
 
     /**
      * @var array
@@ -54,6 +53,7 @@ class MapLegacy extends \Livemap\AbstractClass
      * @var \stdClass
      */
     public $mapConfig;
+
 
     public function __construct($options = [], LoggerInterface $logger = null)
     {
@@ -91,8 +91,8 @@ class MapLegacy extends \Livemap\AbstractClass
             $viewmode = $this->mapConfig->display->viewmode;
         }
 
-        $viewmode = filter_array_for_allowed($_GET, 'viewmode', self::valid_view_modes, $viewmode);
-        $viewmode = filter_array_for_allowed($_GET, 'view',     self::valid_view_modes, $viewmode);
+        $viewmode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'viewmode', self::valid_view_modes, $viewmode);
+        $viewmode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'view',     self::valid_view_modes, $viewmode);
 
         $this->mapViewMode = $viewmode;
 
@@ -216,6 +216,7 @@ SELECT
 
         return $all_regions;
     }
+
 
     /**
      * Проходит по массиву регионов и видимость региона для текущего пользователя на основе прав доступа к контенту
@@ -376,7 +377,7 @@ SELECT
             'id_map'        =>  $request['edit:id:map'],
             'alias_map'     =>  $request['edit:alias:map'],
             'edit_whois'    =>  0,
-            'edit_ipv4'     =>  ip2long(Server::getIP()),
+            'edit_ipv4'     =>  ip2long(App::config('auth.ipv4')),
             'id_region'     =>  $request['edit:id:region'],
             'title'         =>  $request['edit:region:title'],
             'content'       =>  $request['edit:region:content'],

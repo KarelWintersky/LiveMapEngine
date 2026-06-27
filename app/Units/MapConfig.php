@@ -1,13 +1,15 @@
 <?php
 
-namespace Livemap\Units;
+namespace App\Units;
 
+use App\AbstractClass;
+use App\App;
+use Arris\Entity\Path;
 use Arris\Exceptions\AppRouterNotFoundException;
-use Arris\Path;
 use ColinODell\Json5\SyntaxError;
 use Psr\Log\LoggerInterface;
 
-class MapConfig extends \Livemap\AbstractClass
+class MapConfig extends AbstractClass
 {
     /**
      * @var string
@@ -48,6 +50,8 @@ class MapConfig extends \Livemap\AbstractClass
      */
     public string $error_message = '';
 
+
+
     public function __construct($map_id, $mode = 'file', $options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
@@ -87,7 +91,7 @@ class MapConfig extends \Livemap\AbstractClass
      */
     private function loadConfig_File()
     {
-        $fn_path = Path::create( config('path.storage') )->join($this->map_id);
+        $fn_path = Path::create( App::config('path.storage') )->join($this->map_id);
 
         $fn = $fn_path->joinName('index.json')->toString();
         $fn5 = $fn_path->joinName('index.json5')->toString();
@@ -97,7 +101,7 @@ class MapConfig extends \Livemap\AbstractClass
         } elseif (is_readable($fn)) {
             $this->json_config_filename = $fn;
         } else {
-            throw new AppRouterNotFoundException("Карта не найдена", 404, null, [
+            throw new AppRouterNotFoundException("Карта не найдена", 404, [], [
                 'method'    =>  'GET',
                 'map'       =>  $this->map_id
             ]);
@@ -130,7 +134,6 @@ class MapConfig extends \Livemap\AbstractClass
     {
 
     }
-
 
 
 }

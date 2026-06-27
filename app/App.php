@@ -38,7 +38,8 @@ class App extends AppCore
 
         return [
             'app'   =>  [
-                'copyright' =>  'LiveMap Engine version 1.0 "Aerlis"'
+                'is_production' =>  false,
+                'copyright'     =>  'LiveMap Engine version 1.0 "Aerlis"',
             ],
             'path'  =>  [
                 'install'   =>  $path_install->toString(true),
@@ -60,6 +61,10 @@ class App extends AppCore
             ],
             'debug'     =>  [
                 'smarty_force_compile'  =>  true
+            ],
+            'cookies'   =>  [
+                'filemanager_storage_path'  =>  'kw_livemap_filemanager_storagepath',
+                'filemanager_current_map'   =>  'kw_livemap_filemanager_current_map'
             ]
         ];
     }
@@ -139,10 +144,10 @@ class App extends AppCore
         App::getInstance()->addConfig([
             'auth' => [
                 'id'            =>  App::$auth->id(),
-                'is_logged_in'  =>  App::$auth->isLoggedIn(),       // флаг "залогинен"
-                'username'      =>  App::$auth->getUsername(),      // пользователь
+                'is_logged_in'  =>  App::$auth->isLoggedIn(),
+                'username'      =>  App::$auth->getUsername(),
                 'email'         =>  App::$auth->getEmail(),
-                'ipv4'          =>  \Arris\Helpers\Server::getIP(),                // IPv4
+                'ipv4'          =>  \Arris\Helpers\Server::getIP(),
 
                 // основная роль пользователя
                 // 'is_banned'     =>  App::$auth->hasRole(\Livemap\AuthRoles::BANNED),

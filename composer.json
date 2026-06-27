@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "files": [
-            "engine/_functions.php"
+            "app/_functions.php"
         ],
         "psr-4": {
             "App\\": "app/"
