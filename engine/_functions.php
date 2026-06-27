@@ -1,38 +1,12 @@
 <?php
 
+use App\App;
 use Psr\Log\LoggerInterface;
 
 function setConfig($key = '', $value = null): void
 {
     \Arris\App::factory()->addConfig([ $key => $value]);
 }
-
-/**
- * @param string|array $key
- * @param $value [optional]
- * @return string|array|bool|mixed|null
- */
-/*function config($key = '', $value = null) {
-    $app = App::factory();
-
-    if (!is_null($value) && !empty($key)) {
-        $app->setConfig($key, $value);
-        return true;
-    }
-
-    if (is_array($key)) {
-        foreach ($key as $k => $v) {
-            $app->setConfig($k, $v);
-        }
-        return true;
-    }
-
-    if (empty($key)) {
-        return $app->getConfig();
-    }
-
-    return $app->getConfig($key);
-}*/
 
 function logSiteUsage(LoggerInterface $logger, $is_print = false)
 {
@@ -41,7 +15,7 @@ function logSiteUsage(LoggerInterface $logger, $is_print = false)
         'memory.usage'      =>  memory_get_usage(true),
         'memory.peak'       =>  memory_get_peak_usage(true),
         'site.url'          =>  $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
-        'isMobile'          =>  config('features.is_mobile'),
+        'isMobile'          =>  App::config('features.is_mobile'),
     ];
 
     /**
@@ -55,7 +29,7 @@ function logSiteUsage(LoggerInterface $logger, $is_print = false)
         $metrics['mysql.time'] = $stats->getTotalQueryTime();
     }
 
-    $metrics['ipv4'] = Server::getIP();
+    $metrics['ipv4'] = App::config('auth.ipv4');
 
     /*if ($is_print) {
         $site_usage_stats = sprintf(

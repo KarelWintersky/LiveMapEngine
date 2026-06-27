@@ -18,19 +18,19 @@ use PDO;
 
 class App extends AppCore
 {
-    private static App $app;
+    public static App $app;
 
-    private static FlashMessagesInterface $flash;
+    public static FlashMessagesInterface $flash;
 
-    private static TemplateInterface $template;
+    public static TemplateInterface $template;
     /**
      * @var array|Connector|mixed|null
      */
-    private static PDO $pdo;
+    public static PDO $pdo;
     /**
      * @var Auth|array|mixed|null
      */
-    private static Auth $auth;
+    public static Auth $auth;
 
     protected function getDefaultConfig():array
     {
@@ -57,6 +57,9 @@ class App extends AppCore
             ],
             'features'  =>  [
                 'rfm_version'   =>  '9_4_0', // or 9_14_0
+            ],
+            'debug'     =>  [
+                'smarty_force_compile'  =>  true
             ]
         ];
     }
@@ -93,19 +96,18 @@ class App extends AppCore
      */
     public static function initPresenter():void
     {
-        App::factory()->addConfig([
+        /*App::factory()->addConfig([
             'smarty'    =>  [
-                'template'      =>  App::config('path.install') . 'templates/',
-                'force_compile' =>  App::config('debug.smarty_force_compile', false)
+                'test' => 5
             ]
-        ]);
+        ]);*/
 
         App::$template = new \Arris\Presenter\Template();
 
         App::$template
             ->setTemplateDir( App::config('path.install') . 'templates/')
             ->setCompileDir(App::config('path.cache'))
-            ->setForceCompile(App::config('debug.smarty_force_compile', false))
+            ->setForceCompile(App::config('debug.smarty_force_compile') ?? false)
             ->registerPlugin(Template::PLUGIN_MODIFIER, 'dd', 'dd', false)
             ->registerPlugin(Template::PLUGIN_MODIFIER, 'size_format', [ Plugins::class, 'size_format' ], false)
             ->registerPlugin(Template::PLUGIN_MODIFIER, "convertDateTime", "convertDateTime")

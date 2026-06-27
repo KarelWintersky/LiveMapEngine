@@ -1,7 +1,10 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
+use App\AbstractClass;
+use App\App;
+use App\Exceptions\AccessDeniedException;
 use Arris\AppLogger;
 use Arris\AppRouter;
 use Arris\DelightAuth\Auth\Exceptions\AttemptCancelledException;
@@ -10,15 +13,9 @@ use Arris\DelightAuth\Auth\Exceptions\EmailNotVerifiedException;
 use Arris\DelightAuth\Auth\Exceptions\InvalidEmailException;
 use Arris\DelightAuth\Auth\Exceptions\InvalidPasswordException;
 use Arris\DelightAuth\Auth\Exceptions\TooManyRequestsException;
-use Livemap\App;
-use Livemap\Exceptions\AccessDeniedException;
 use Psr\Log\LoggerInterface;
 
-/**
- * Страницы и коллбэки авторизации
- */
-#[AllowDynamicProperties]
-class AuthController extends \Livemap\AbstractClass
+class AuthController extends AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)
     {
@@ -62,7 +59,8 @@ class AuthController extends \Livemap\AbstractClass
             throw new AccessDeniedException('Другая проблема: <br>' . $e->getMessage());
         }
 
-        $ip = config('auth.ipv4');
+        $ip = App::config('auth.ipv4');
+
         AppLogger::scope('main')->debug("Logged in user {$_REQUEST['email']} from {$ip}");
 
         App::$flash->addMessage("success", "Успешно залогинились");
@@ -94,7 +92,6 @@ class AuthController extends \Livemap\AbstractClass
 
         App::$template->setRedirect( AppRouter::getRouter('view.frontpage') );
     }
-
 
     public function view_form_register()
     {
@@ -156,9 +153,5 @@ class AuthController extends \Livemap\AbstractClass
         }
     }
 
-    public function view_form_recover_password()
-    {
-        dd('todo');
-    }
 
 }

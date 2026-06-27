@@ -1,15 +1,13 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
+use App\AbstractClass;
+use App\App;
 use Arris\AppRouter;
-use Arris\Path;
+use Arris\Entity\Path;
 use Arris\Presenter\Template;
-use Livemap\AbstractClass;
-use Livemap\App;
-use Livemap\Units\MapLegacy;
 
-#[AllowDynamicProperties]
 class RegionsController extends AbstractClass
 {
     /**
@@ -65,6 +63,7 @@ class RegionsController extends AbstractClass
         $this->template->assignRAW($content);
     }
 
+
     public function view_region_edit_form()
     {
         // $auth = Auth::getInstance();
@@ -82,7 +81,7 @@ class RegionsController extends AbstractClass
         $region_data = $map_engine->getMapRegionData($map_alias, $region_id);
 
         $filename
-            = Path::create( getenv('PATH.STORAGE') )
+            = Path::create( App::config('path.storage') )
             ->join($map_alias)
             ->joinName('index.json5')
             ->toString();

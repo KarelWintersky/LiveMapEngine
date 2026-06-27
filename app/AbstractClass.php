@@ -29,8 +29,8 @@ class AbstractClass
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         $this->app = App::factory();
-        $this->pdo = $this->app->getService('pdo');
-        $this->template = $this->app->getService(Template::class);
+        $this->pdo = App::$pdo;
+        $this->template = App::$template;
         $this->logger = AppLogger::scope('main');
 
         $this->options = $options;

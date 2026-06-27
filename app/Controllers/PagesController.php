@@ -1,15 +1,13 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
+use App\AbstractClass;
+use App\App;
+use App\Units\OpenGraph;
+use App\Units\Storage;
 use ColinODell\Json5\SyntaxError;
-use Livemap\AbstractClass;
-use Livemap\OpenGraph;
-use Livemap\Units\Storage;
 
-/**
- * Контроллер отвечает за главную страницу и прочие информационные
- */
 class PagesController extends AbstractClass
 {
     public function __construct()
@@ -31,11 +29,12 @@ class PagesController extends AbstractClass
         $this->template->setTemplate("_frontpage.tpl");
         $this->template->assign("maps_list", $storage->getPublicMapsList());
 
-        $this->template->assign("is_logged_in", config('auth.is_logged_in'));
-        $this->template->assign("logged_email", config('auth.email'));
+        $this->template->assign("is_logged_in", App::config('auth.is_logged_in'));
+        $this->template->assign("logged_email", App::config('auth.email'));
 
         $this->template->assign("og", OpenGraph::makeForMap(null));
 
     }
+
 
 }

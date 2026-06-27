@@ -1,14 +1,10 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
-use Livemap\AbstractClass;
+use App\AbstractClass;
 use Psr\Log\LoggerInterface;
 
-/**
- * Страницы и коллбэки пользователя
- */
-#[AllowDynamicProperties]
 class UsersController extends AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)
@@ -20,7 +16,5 @@ class UsersController extends AbstractClass
     {
         dd('show my profile');
     }
-
-
 
 }

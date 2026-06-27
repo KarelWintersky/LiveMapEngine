@@ -1,6 +1,6 @@
 <?php
 
-namespace Livemap;
+namespace App\Units;
 
 class TemplateHelper
 {
@@ -31,5 +31,4 @@ class TemplateHelper
 
         return $t;
     }
-
 }

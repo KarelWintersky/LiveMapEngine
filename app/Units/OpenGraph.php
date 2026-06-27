@@ -1,8 +1,7 @@
 <?php
 
-namespace Livemap;
+namespace App\Units;
 
-#[AllowDynamicProperties]
 class OpenGraph
 {
     private static function getDefault()

@@ -46,7 +46,8 @@
         "kuria/error": "^4.2",
         "colinodell/json5": "^2.3",
         "livemap/svg-parser": "^1",
-        "karelwintersky/arris.entity.path": "^1.0"
+        "karelwintersky/arris.entity.path": "^1.0",
+        "symfony/yaml": "^7.4"
     },
     "suggest": {
         "fluxsoft/php-turnstile": "^0.1.3",

@@ -1,12 +1,12 @@
 <?php
 
-namespace Livemap\Units;
+namespace App\Units;
 
-use Arris\Path;
+use App\App;
+use Arris\Entity\Path;
 use ColinODell\Json5\SyntaxError;
-use Livemap\AbstractClass;
 
-class Storage extends AbstractClass
+class Storage
 {
     /**
      * Возвращает список публичных карт
@@ -18,9 +18,11 @@ class Storage extends AbstractClass
     {
         $maps_list = [];
 
-        $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json')->toString();
+        $path_storage = App::config('path.storage');
+
+        $indexfile = Path::create($path_storage)->joinName('list.json')->toString();
         if (!is_readable($indexfile)) {
-            $indexfile = Path::create(getenv('PATH.STORAGE'))->joinName('list.json5')->toString();
+            $indexfile = Path::create($path_storage)->joinName('list.json5')->toString();
         }
 
         if (!is_readable($indexfile)) {
@@ -47,9 +49,9 @@ class Storage extends AbstractClass
             $description = '';
             $image_url = '';
 
-            $config_path = Path::create(getenv('PATH.STORAGE'))->join($alias)->joinName('index.json5');
+            $config_path = Path::create($path_storage)->join($alias)->joinName('index.json5');
             if (!is_readable($config_path)) {
-                $config_path = Path::create(getenv('PATH.STORAGE'))->join($alias)->joinName('index.json');
+                $config_path = Path::create($path_storage)->join($alias)->joinName('index.json');
             }
             if (is_readable($config_path)) {
                 $raw_config = file_get_contents($config_path);

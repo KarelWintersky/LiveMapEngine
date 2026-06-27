@@ -1,12 +1,11 @@
 <?php
 
-namespace Livemap\Middlewares;
+namespace App\Middlewares;
 
-use Arris\Helpers\Server;
-use Livemap\AbstractClass;
-use Livemap\App;
-use Livemap\Exceptions\AccessDeniedException;
-use Livemap\Units\MapConfig;
+use App\AbstractClass;
+use App\App;
+use App\AuthRoles;
+use App\Exceptions\AccessDeniedException;
 
 class AuthMiddleware extends AbstractClass
 {
@@ -20,7 +19,7 @@ class AuthMiddleware extends AbstractClass
     public function check_not_logged_in($uri, $route_info)
     {
         if (App::$auth->isLoggedIn()) {
-            Server::redirect('/');
+            \Arris\Helpers\Server::redirect('/');
         }
     }
 
@@ -43,7 +42,7 @@ class AuthMiddleware extends AbstractClass
      */
     public function check_is_admin_logged($uri, $route_info)
     {
-        if (!App::$auth->isLoggedIn() && App::$auth->hasRole(\Livemap\AuthRoles::ADMIN)) {
+        if (!App::$auth->isLoggedIn() && App::$auth->hasRole(AuthRoles::ADMIN)) {
             throw new AccessDeniedException("У вас недостаточный уровень допуска. <br><br>Возможно, истекла сессия авторизации.");
         }
     }

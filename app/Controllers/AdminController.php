@@ -1,13 +1,13 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
-use Livemap\App;
-use Livemap\AuthRoles;
+use App\AbstractClass;
+use App\App;
+use App\AuthRoles;
 use Psr\Log\LoggerInterface;
 
-#[AllowDynamicProperties]
-class AdminController extends \Livemap\AbstractClass
+class AdminController extends AbstractClass
 {
     public function __construct($options = [], LoggerInterface $logger = null)
     {
@@ -93,6 +93,5 @@ class AdminController extends \Livemap\AbstractClass
     {
         $this->template->assign("inner_template", 'admin/maps/edit.tpl');
     }
-
 
 }

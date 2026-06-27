@@ -1,6 +1,6 @@
 <?php
 
-namespace Livemap\Exceptions;
+namespace App\Exceptions;
 
 use Arris\AppRouter;
 use Throwable;

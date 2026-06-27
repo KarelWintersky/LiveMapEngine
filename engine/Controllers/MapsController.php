@@ -3,15 +3,15 @@
 namespace Livemap\Controllers;
 
 use AllowDynamicProperties;
+use App\Units\OpenGraph;
 use Arris\AppRouter;
 use Arris\Entity\Result;
 use Arris\Helpers\Server;
 use Arris\Presenter\Template;
 use Livemap\AbstractClass;
 use Livemap\App;
-use Livemap\OpenGraph;
-use Livemap\Units\MapLegacy;
 use Livemap\Units\MapConfig;
+use Livemap\Units\MapLegacy;
 use Psr\Log\LoggerInterface;
 
 #[AllowDynamicProperties]

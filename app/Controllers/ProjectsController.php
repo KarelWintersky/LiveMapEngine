@@ -1,8 +1,8 @@
 <?php
 
-namespace Livemap\Controllers;
+namespace App\Controllers;
 
-use Livemap\AbstractClass;
+use App\AbstractClass;
 use Psr\Log\LoggerInterface;
 
 class ProjectsController extends AbstractClass

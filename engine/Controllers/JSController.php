@@ -26,16 +26,6 @@ class JSController extends AbstractClass
     private $error;
     private $error_message;
 
-    public function __construct($options = [], LoggerInterface $logger = null)
-    {
-        parent::__construct($options, $logger);
-    }
-
-    public function __invoke($map_alias)
-    {
-
-    }
-
     /**
      *
      *
