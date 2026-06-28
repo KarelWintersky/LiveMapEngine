@@ -29,7 +29,7 @@ class Storage
             $image_url = '';
 
             try {
-                $cfg = (new MapConfigYAML($alias))->loadConfig()->getConfig();
+                $cfg = (new MapConfig($alias))->loadConfig()->getConfig();
 
                 $description = $cfg->description ?? '';
 

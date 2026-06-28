@@ -26,7 +26,7 @@ class MapLegacy extends AbstractClass
 
 
     /**
-     * @var array
+     * @var string
      */
     public $mapRegionsWithInfo_IDS;
 
@@ -63,9 +63,9 @@ class MapLegacy extends AbstractClass
         $this->mapConfig = new \stdClass();
     }
 
-    public function loadConfig($map_alias)
+    public function loadConfig($map_alias): void
     {
-        $this->mapConfig = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
+        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
     }
 
     /**
@@ -74,28 +74,28 @@ class MapLegacy extends AbstractClass
      * @param $map_alias
      * @return array
      */
-    public function getMapAbout($map_alias)
+    public function getMapAbout($map_alias): array
     {
         $sth = $this->pdo->prepare("SELECT * FROM map_about WHERE alias_map = :alias_map ORDER BY edit_date DESC LIMIT 1" );
         $sth->execute(
             [ 'alias_map' =>  $map_alias ]
         );
 
-        return $sth->fetch() ?? [];
+        return $sth->fetch() ?: [];
     }
 
-    public function loadMap($map_alias)
+    public function loadMap($map_alias): void
     {
-        $viewmode = 'folio';
+        $view_mode = 'folio';
 
         if (!empty($this->mapConfig->display->viewmode)) {
-            $viewmode = $this->mapConfig->display->viewmode;
+            $view_mode = $this->mapConfig->display->viewmode;
         }
 
-        $viewmode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'viewmode', self::valid_view_modes, $viewmode);
-        $viewmode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'view',     self::valid_view_modes, $viewmode);
+        $view_mode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'viewmode', self::valid_view_modes, $view_mode);
+        $view_mode = \Arris\Helpers\Arrays::filterArrayForAllowed($_GET, 'view',     self::valid_view_modes, $view_mode);
 
-        $this->mapViewMode = $viewmode;
+        $this->mapViewMode = $view_mode;
 
         // извлекаем все регионы с информацией
         $this->mapRegionsWithInfo = self::getRegionsWithInfo( $map_alias, []);

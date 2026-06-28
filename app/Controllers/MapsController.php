@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\AbstractClass;
 use App\App;
-use App\Units\MapConfigYAML;
+use App\Units\MapConfig;
 
 
 use App\Units\MapLegacy;
@@ -129,7 +129,7 @@ VALUES
      */
     public function view_map_fullscreen($map_alias)
     {
-        $mc = new MapConfigYAML($map_alias);
+        $mc = new MapConfig($map_alias);
         $mc->loadConfig();
 
         $this->mapConfig = $mc->getConfig();
@@ -207,7 +207,7 @@ VALUES
      */
     public function view_iframe($map_alias)
     {
-        $this->mapConfig = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
+        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
         $this->template->assign("inner_template", "view.map/view.map.iframe_colorbox.tpl");
 
         $this->template->assign('map_alias', $map_alias);
@@ -236,7 +236,7 @@ VALUES
      */
     public function view_map_folio($map_alias)
     {
-        $this->mapConfig = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
+        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
 
         $this->template->assign('map_alias', $map_alias);
         $this->template->assign('html_title', $this->mapConfig->title);

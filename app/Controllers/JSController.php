@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\AbstractClass;
 use App\App;
-use App\Units\MapConfigYAML;
+use App\Units\MapConfig;
 use App\Units\MapLegacy;
 use Arris\Entity\Path;
 use Arris\Presenter\Template;
@@ -37,7 +37,7 @@ class JSController extends AbstractClass
      */
     public function view_js_map_definition($map_alias): void
     {
-        $_map_config = new MapConfigYAML($map_alias);
+        $_map_config = new MapConfig($map_alias);
         $_map_config->loadConfig();
         $json = $_map_config->getConfig();
 

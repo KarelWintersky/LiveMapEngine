@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\AbstractClass;
 use App\App;
 use App\Units\MapLegacy;
-use App\Units\MapConfigYAML;
+use App\Units\MapConfig;
 use Arris\AppRouter;
 use Arris\Entity\Path;
 use Arris\Presenter\Template;
@@ -80,7 +80,7 @@ class RegionsController extends AbstractClass
         $region_data = $map_engine->getMapRegionData($map_alias, $region_id);
 
         try {
-            $cfg = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
+            $cfg = (new MapConfig($map_alias))->loadConfig()->getConfig();
         } catch (\Throwable $e) {
             throw new \RuntimeException("Map definition file not found for {$map_alias}");
         }
