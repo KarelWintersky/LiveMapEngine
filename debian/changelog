@@ -1,3 +1,11 @@
+livemap (2.6.0) stable; urgency=medium
+
+  * Release
+  * required php or yaml config
+  * new design
+
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Sun, 28 Jun 2026 03:29:58 +0300
+
 livemap (2.5.0) stable; urgency=medium
 
   * New design
