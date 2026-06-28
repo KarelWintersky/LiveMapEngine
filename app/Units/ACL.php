@@ -31,7 +31,7 @@ class ACL extends AbstractClass
     public static function simpleCheckCanEdit($map_alias)
     {
         $map = (new MapConfig($map_alias))->loadConfig()->getConfig();
-        $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
+        $admin_emails = App::config('auth.admin_emails');
         $allowed_editors = array_merge($map->can_edit ?? [], $admin_emails);
 
         return !is_null(App::config('auth.email')) && in_array(App::config('auth.email'), $allowed_editors);

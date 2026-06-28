@@ -5,7 +5,6 @@ namespace App\Units;
 use App\App;
 use Arris\Entity\Path;
 use Arris\Exceptions\AppRouterNotFoundException;
-use ColinODell\Json5\SyntaxError;
 use Symfony\Component\Yaml\Yaml;
 
 class MapConfigFileDriver implements MapConfigDriverInterface
@@ -23,10 +22,8 @@ class MapConfigFileDriver implements MapConfigDriverInterface
         $fn_path = Path::create(App::config('path.storage'))->join($map_id);
 
         $candidates = [
-            'yaml'  => ['path' => $fn_path->joinName('index.yaml')->toString(),  'format' => 'yaml'],
-            'yml'   => ['path' => $fn_path->joinName('index.yml')->toString(),   'format' => 'yaml'],
-            'json5' => ['path' => $fn_path->joinName('index.json5')->toString(), 'format' => 'json5'],
-            'json'  => ['path' => $fn_path->joinName('index.json')->toString(),  'format' => 'json'],
+            'yaml' => ['path' => $fn_path->joinName('index.yaml')->toString(), 'format' => 'yaml'],
+            'yml'  => ['path' => $fn_path->joinName('index.yml')->toString(),  'format' => 'yaml'],
         ];
 
         $raw = null;
@@ -46,12 +43,7 @@ class MapConfigFileDriver implements MapConfigDriverInterface
             ]);
         }
 
-        return match ($this->loaded_format) {
-            'yaml'  => $this->parseYaml($raw),
-            'json5' => $this->parseJson5($raw),
-            'json'  => $this->parseJson($raw),
-            default => throw new \RuntimeException("Unknown format: {$this->loaded_format}"),
-        };
+        return $this->parseYaml($raw);
     }
 
     public function getLoadedFiles(): array
@@ -74,22 +66,5 @@ class MapConfigFileDriver implements MapConfigDriverInterface
         }
     }
 
-    private function parseJson5(string $raw): array
-    {
-        try {
-            $obj = json5_decode($raw);
-            return json_decode(json_encode($obj), true) ?? throw new \RuntimeException("JSON5 decode returned null");
-        } catch (SyntaxError $e) {
-            throw new \RuntimeException("JSON5 parse error: " . $e->getMessage());
-        }
-    }
 
-    private function parseJson(string $raw): array
-    {
-        $data = json_decode($raw, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("JSON parse error: " . json_last_error_msg());
-        }
-        return $data;
-    }
 }

@@ -144,7 +144,6 @@ class RegionsController extends AbstractClass
             'edit_templates'            =>  $edit_templates,
             'edit_templates_options'    => $edit_templates_options,
 
-            // copyright
             'copyright'         =>  App::config('app.copyright'),
 
             // revisions
@@ -157,8 +156,8 @@ class RegionsController extends AbstractClass
         ]);
 
         // ставим куки для файлменеджера
-        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_STORAGE_PATH'), $map_alias, 0, '/');
-        setcookie( getenv('AUTH.COOKIES.FILEMANAGER_CURRENT_MAP'), $map_alias, 0, '/');
+        setcookie( App::config('cookies.filemanager_storage_path'), $map_alias, 0, '/');
+        setcookie( App::config('cookies.filemanager_current_map'), $map_alias, 0, '/');
     }
 
     /**

@@ -5,13 +5,14 @@
  *
  * Postinst script, генерирует /robots.txt
  */
-use Arris\App;
-use Arris\CLIConsole;
-use Arris\Path;
-use Dotenv\Dotenv;
+
+use App\App;
+use Arris\Entity\Path;
+use Arris\Toolkit\CLIConsole;
 
 define('PATH_ROOT', dirname(__DIR__, 1));
-define('__PATH_CONFIG__', '/etc/arris/livemap/');
+
+const APP_CONFIG = '/etc/arris/livemap/config.yaml';
 
 $cli_options = getopt('h', ['make:robots', 'help']);
 $options = [
@@ -24,7 +25,7 @@ $options = [
 require_once PATH_ROOT . '/vendor/autoload.php';
 
 try {
-    foreach (['site.conf' ] as $file) { Dotenv::create( PATH_CONFIG, $file )->load(); }
+    App::init([ APP_CONFIG ]);
 
     if (empty($cli_options) || $options['help']) {
         CLIConsole::say(<<<HOWTOUSE
@@ -44,7 +45,7 @@ HOWTOUSE
 
     $_path_install = Path::create( getenv('PATH.INSTALL'));
 
-    if ($options['make:robots']) {
+    /*if ($options['make:robots']) {
         throw new Exception("Not implemented");
         $host = getenv('DOMAIN');
         $fqdn = getenv('DOMAIN.FQDN');
@@ -65,11 +66,7 @@ HOWTOUSE
         fwrite($f, $template);
         fclose($f);
         CLIConsole::say(" <font color='green'>{$target} file generated</font>");
-    }
-
-    if ($options['clear:smarty']) {
-
-    }
+    }*/
 
 } catch (Exception $e) {
     CLIConsole::say(" <font color='red'>{$e->getMessage()}</font>");

@@ -1,70 +1,80 @@
 <?php
 
+use App\App;
+use Arris\Database\Config;
+use Arris\Database\Connector;
 use Arris\DelightAuth\Auth\Auth;
-use Arris\DelightAuth\Auth\InvalidEmailException;
-use Arris\DelightAuth\Auth\InvalidPasswordException;
-use Arris\DelightAuth\Auth\TooManyRequestsException;
-use Arris\DelightAuth\Auth\UserAlreadyExistsException;
-use Dotenv\Dotenv;
+
+date_default_timezone_set('Europe/Moscow');
 
 define("__ROOT__", dirname(__DIR__));
 define('ENGINE_START_TIME', microtime(true));
-define('PATH_CONFIG', '/etc/arris/livemap/');
 
-$PATH_INSTALL = dirname(__DIR__, 1);
+const APP_CONFIG = '/etc/arris/livemap/config.yaml';
 
-require_once __ROOT__ . '/vendor/autoload.php';
-
-foreach ([ 'common.conf' ] as $file) { Dotenv::create( PATH_CONFIG, $file )->load(); }
-
-$connection = [
-    'driver'    =>  'mysql',
-    'hostname'  =>  'localhost',
-    'username'  =>  getenv('DB.USERNAME'),
-    'password'  =>  getenv('DB.PASSWORD'),
-    'database'  =>  getenv('DB.NAME'),
-    'charset'   =>  'utf8mb4',
-];
-
-$db = new \PDO(
-    "mysql:dbname={$connection['database']};host={$connection['hostname']};charset=utf8mb4",
-    $connection['username'],
-    $connection['password']
-);
-
-$auth = new Auth($db);
-
-$cli_options = getopt('', ['help', 'email:', 'password:', 'role:', 'username:']);
-
-$credentials = [
-    'email'     =>  array_key_exists('email', $cli_options) ? $cli_options['email'] : '',
-    'password'  =>  array_key_exists('password', $cli_options) ? $cli_options['password'] : '',
-    'is_admin'  => array_key_exists('role', $cli_options) && $cli_options['role'] == 'admin'
-];
-
-if (empty($credentials['email']) || empty($credentials['password'])) {
-    echo <<<MSG1
-Both EMAIL and PASSWORD options required. 
-Use register.php --email email --password password [--role admin|editor] 
-MSG1;
-    echo PHP_EOL;
-    die;
-}
-
-$credentials['username'] = array_key_exists('username', $cli_options) ? $cli_options['username'] : explode('@', $credentials['email'])[0];
+require_once __DIR__ . '/../vendor/autoload.php';
 
 try {
-    $userId = $auth->admin()->createUser($credentials['email'], $credentials['password'], $credentials['username']);
+    App::init([ APP_CONFIG ]);
 
-    if ($credentials['is_admin']) {
-        $auth->admin()->addRoleForUserById($userId, \Arris\DelightAuth\Auth\Role::ADMIN);
-    } else {
-        $auth->admin()->addRoleForUserById($userId, \Arris\DelightAuth\Auth\Role::EDITOR);
-    }
+    $pdo_config = new Config();
+    $pdo_config
+        ->setUsername(App::config('database.username'))
+        ->setPassword(App::config('database.password'))
+        ->setDatabase(App::config('database.database'));
+
+    $pdo = new Connector($pdo_config);
+    $auth = new Auth($pdo);
+
+    // get users
+    $users = $pdo->query("SELECT id, email, username  FROM auth_users ORDER BY id")->fetchAll();
+
+
+    Laravel\Prompts\info('Users: ');
+    Laravel\Prompts\table(
+        headers: ['id', 'E-Mail', 'Username'],
+        rows: $users
+    );
+
+    $email = Laravel\Prompts\text(
+        label: 'Введите email пользователя:',
+        required: true,
+        validate: function (string $email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL) ? null : 'Incorrect email';
+        }
+    );
+
+    $username = Laravel\Prompts\text(
+        label: 'Введите имя пользователя: ',
+        required: true,
+        validate: fn (string $value) => match (true) {
+            strlen($value) < 3 => 'The name must be at least 3 characters.',
+            strlen($value) > 255 => 'The name must not exceed 255 characters.',
+            default => null
+        }
+    );
+
+    $password = Laravel\Prompts\password(
+        label: 'Введите пароль пользователя: ',
+        required: true,
+        validate: fn (string $value) => match (true) {
+            strlen($value) < 8 => 'The password must be at least 8 characters.',
+            default => null
+        },
+        hint: 'Minimum 8 characters.'
+    );
+
+    $userId = $auth->admin()->createUser($email, $password, $username);
+
+    var_dump($userId);
+
+    $auth->admin()->addRoleForUserById($userId, AuthRoles::ADMIN);
 
     echo 'We have created and activated a new user with the ID ' . $userId . PHP_EOL;
-}
-catch (InvalidEmailException $e) {
+
+
+
+}catch (InvalidEmailException $e) {
     die('Invalid email address');
 }
 catch (InvalidPasswordException $e) {
@@ -76,7 +86,4 @@ catch (UserAlreadyExistsException $e) {
 catch (TooManyRequestsException $e) {
     die('Too many requests');
 }
-
-
-
 

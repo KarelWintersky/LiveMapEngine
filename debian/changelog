@@ -1,3 +1,12 @@
+livemap (2.6.3) stable; urgency=medium
+
+  * Release
+  * yaml config
+  * unified Map Config Scheme
+  * minor template fixes
+ 
+ -- Karel Wintersky <karel.wintersky@gmail.com>  Sun, 28 Jun 2026 18:49:40 +0300
+
 livemap (2.6.0) stable; urgency=medium
 
   * Release
