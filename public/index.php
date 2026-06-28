@@ -52,6 +52,7 @@ try {
     // публичный показ карты
 
     AppRouter::get('/',                             [\App\Controllers\PagesController::class, 'view_frontpage'],         'view.frontpage');
+
     AppRouter::get('/map/{map_alias:[\w\.]+}[/]',          [\App\Controllers\MapsController::class, 'view_map_fullscreen'],    'view.map.fullscreen');
     AppRouter::get('/map:js/{map_alias:[\w\.]+}.js',       [\App\Controllers\JSController::class, 'view_js_map_definition'],  'view.map.js');
 
@@ -64,6 +65,9 @@ try {
 
     // роут получения информации о карте
     AppRouter::get('/map:about/', [ \App\Controllers\MapsController::class, 'view_map_about'], 'view.map.about');
+
+    // о проекте
+    AppRouter::get('/about', [ \App\Controllers\PagesController::class, 'view_about'], 'view.about');
 
     // проекты
     AppRouter::get('/project/{id:[\w]+}[/]', [ \App\Controllers\ProjectsController::class, 'view_project'], 'view.project');

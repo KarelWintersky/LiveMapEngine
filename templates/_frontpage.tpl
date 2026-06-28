@@ -46,7 +46,7 @@
             StoryMaps
         </a>
         <nav class="top-bar-nav" id="top-bar-nav">
-            <a href="/map:about/" class="nav-link">Что это такое</a>
+            <a href="{Arris\AppRouter::getRouter('view.about')}" class="nav-link">Что это такое</a>
             {if $is_logged_in}
                 <a href="{Arris\AppRouter::getRouter('view.form.logout')}" class="nav-link nav-link--login">Выйти</a>
             {else}
