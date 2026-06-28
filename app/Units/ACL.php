@@ -30,7 +30,7 @@ class ACL extends AbstractClass
      */
     public static function simpleCheckCanEdit($map_alias)
     {
-        $map = (new MapConfig($map_alias))->loadConfig()->getConfig();
+        $map = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
         $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
         $allowed_editors = array_merge($map->can_edit ?? [], $admin_emails);
 

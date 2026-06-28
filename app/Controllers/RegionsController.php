@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\AbstractClass;
 use App\App;
 use App\Units\MapLegacy;
+use App\Units\MapConfigYAML;
 use Arris\AppRouter;
 use Arris\Entity\Path;
 use Arris\Presenter\Template;
@@ -78,33 +79,19 @@ class RegionsController extends AbstractClass
         $map_engine = new MapLegacy();
         $region_data = $map_engine->getMapRegionData($map_alias, $region_id);
 
-        $filename
-            = Path::create( App::config('path.storage') )
-            ->join($map_alias)
-            ->joinName('index.json5')
-            ->toString();
-
-        if (!is_file($filename)) {
-            throw new \RuntimeException("Map definition file not found, requested {$filename}");
+        try {
+            $cfg = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException("Map definition file not found for {$map_alias}");
         }
-
-        /*
-        // закомментировано, поскольку отлавливается посредником
-        $can_edit = ACL::simpleCheckCanEdit($map_alias);
-        if (!$can_edit) {
-            throw new AccessDeniedException("Обновление региона недоступно, недостаточный уровень допуска");
-        }
-        */
-
-        $json = json5_decode( file_get_contents( $filename ) );
 
         $edit_templates = [];
         $edit_templates_options = [];
         $edit_templates_index = 1;
         $edit_templates_styles = '';
 
-        if (!empty($json->edit_templates)) {
-            foreach ($json->edit_templates->templates as $template_record) {
+        if (!empty($cfg->edit_templates)) {
+            foreach ($cfg->edit_templates->templates as $template_record) {
                 $template = [
                     'title'     =>  $template_record->title ?? "#{$edit_templates_index}",
                     'desc'      =>  $template_record->description ?? "#{$edit_templates_index}",
@@ -115,18 +102,18 @@ class RegionsController extends AbstractClass
                 $edit_templates_index++;
             }
 
-            if (!empty($json->edit_templates->content_css)) {
-                $edit_templates_options['content_css'] = "/storage/{$map_alias}/edit_templates/" . $json->edit_templates->content_css;
+            if (!empty($cfg->edit_templates->content_css)) {
+                $edit_templates_options['content_css'] = "/storage/{$map_alias}/edit_templates/" . $cfg->edit_templates->content_css;
             }
 
             $edit_templates_options['template_popup_width']
-                = (!empty($json->edit_templates->template_popup_width))
-                ? $json->edit_templates->template_popup_width
+                = (!empty($cfg->edit_templates->template_popup_width))
+                ? $cfg->edit_templates->template_popup_width
                 : 800;
 
             $edit_templates_options['template_popup_height']
-                = (!empty($json->edit_templates->template_popup_height))
-                ? $json->edit_templates->template_popup_height
+                = (!empty($cfg->edit_templates->template_popup_height))
+                ? $cfg->edit_templates->template_popup_height
                 : 400;
         }
 

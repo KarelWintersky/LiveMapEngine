@@ -53,11 +53,11 @@ class AuthMiddleware extends AbstractClass
         $allowed = true;
 
         if ($map_alias) {
-            $map = (new MapConfig($map_alias))->loadConfig()->getConfig();
+            $map = (new \App\Units\MapConfigYAML($map_alias))->loadConfig()->getConfig();
             $admin_emails = getenv('AUTH.ADMIN_EMAILS') ? explode(' ', getenv('AUTH.ADMIN_EMAILS')) : [];
             $allowed_editors = array_merge($map->can_edit ?? [], $admin_emails);
 
-            $allowed = !is_null(config('auth.email')) && in_array(config('auth.email'), $allowed_editors);
+            $allowed = !is_null(App::config('auth.email')) && in_array(App::config('auth.email'), $allowed_editors);
         }
 
         if (!$allowed) {

@@ -4,6 +4,7 @@ namespace App\Units;
 
 use App\AbstractClass;
 use App\App;
+use Arris\Entity\Result;
 use PDO;
 use Psr\Log\LoggerInterface;
 
@@ -64,7 +65,7 @@ class MapLegacy extends AbstractClass
 
     public function loadConfig($map_alias)
     {
-        $this->mapConfig = (new MapConfig($map_alias))->loadConfig()->getConfig();
+        $this->mapConfig = (new MapConfigYAML($map_alias))->loadConfig()->getConfig();
     }
 
     /**

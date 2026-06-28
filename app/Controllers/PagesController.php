@@ -45,12 +45,15 @@ class PagesController extends AbstractClass
         ");
     }
 
-    public function view_frontpage()
+    /**
+     * @throws SyntaxError
+     */
+    public function view_frontpage(): void
     {
         $storage = new Storage();
 
         $this->template->setTemplate("_frontpage.tpl");
-        $this->template->assign("maps_list", $storage->getPublicMapsList());
+        $this->template->assign("maps_list", $maps_list = $storage->getPublicMapsList());
 
         $this->template->assign("is_logged_in", App::config('auth.is_logged_in'));
         $this->template->assign("logged_email", App::config('auth.email'));

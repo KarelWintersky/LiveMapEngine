@@ -61,7 +61,7 @@
 
 <main>
     <section class="hero">
-        <h1 class="hero-title">StoryMaps —<br>интерактивные карты вымышленных миров</h1>
+        <h1 class="hero-title">StoryMaps<br>интерактивные карты вымышленных миров</h1>
     </section>
 
     <section class="maps-section">
