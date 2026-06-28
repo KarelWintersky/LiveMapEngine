@@ -88,10 +88,10 @@ try {
             AppRouter::get('/auth/activate', [AuthController::class, 'callback_activate_account']);
 
             // Восстановить пароль, заготовки
-            AppRouter::get('/auth/recover', [AuthController::class, 'view_form_recover_password'], 'view.auth.recover.form'); // форма восстановления пароля
-            AppRouter::post('/auth/recover', [AuthController::class, 'callback_recover_password']); // обработчик формы, шлет запрос на почту
-            AppRouter::get('/auth/reset', [AuthController::class, 'view_form_new_password']); // принимает ключ сброса пароля и предлагает ввести новый
-            AppRouter::post('/auth/reset', [AuthController::class, 'callback_new_password']); // коллбэк: устанавливает новый пароль
+            AppRouter::get('/auth/recover', [AuthController::class, 'view_form_recover_password'], 'view.auth.recover.form');
+            AppRouter::post('/auth/recover', [AuthController::class, 'callback_recover_password']);
+            AppRouter::get('/auth/reset', [AuthController::class, 'view_form_new_password']);
+            AppRouter::post('/auth/reset', [AuthController::class, 'callback_new_password']);
         }
     );
 

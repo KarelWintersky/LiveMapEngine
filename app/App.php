@@ -65,6 +65,11 @@ class App extends AppCore
             'cookies'   =>  [
                 'filemanager_storage_path'  =>  'kw_livemap_filemanager_storagepath',
                 'filemanager_current_map'   =>  'kw_livemap_filemanager_current_map'
+            ],
+            'auth'      =>  [
+                'registration_allowed'  =>  true,
+                'login_allowed'         =>  true,
+                'admin_emails'          =>  []
             ]
         ];
     }
@@ -101,11 +106,12 @@ class App extends AppCore
      */
     public static function initPresenter():void
     {
-        /*App::factory()->addConfig([
+        App::factory()->addConfig([
             'smarty'    =>  [
-                'test' => 5
+                'path_template' =>  App::config('path.install') . 'templates/',
+                'path_cache'    =>  App::config('path.cache')
             ]
-        ]);*/
+        ]);
 
         App::$template = new \Arris\Presenter\Template();
 

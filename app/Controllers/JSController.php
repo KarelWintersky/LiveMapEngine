@@ -3,10 +3,24 @@
 namespace App\Controllers;
 
 use App\AbstractClass;
+use App\App;
+use App\Units\MapConfig;
+use App\Units\MapLegacy;
+use Arris\Entity\Path;
+use Arris\Presenter\Template;
+use LiveMapEngine\SVGParser;
+use LiveMapEngine\SVGParser\Entity\ImageInfo;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class JSController extends AbstractClass
 {
+    /**
+     * @var true
+     */
+    public bool $error = false;
+    public string $error_message = '';
+
     public function __construct($options = [], LoggerInterface $logger = null)
     {
         parent::__construct($options, $logger);
@@ -16,10 +30,10 @@ class JSController extends AbstractClass
      *
      *
      * @param $map_alias
+     *
      * @return void
-     * @throws JsonException
-     * @throws SmartyException
      * @route  /map:js/alias.js
+     * @throws \SmartyException
      */
     public function view_js_map_definition($map_alias): void
     {
@@ -27,7 +41,7 @@ class JSController extends AbstractClass
         $_map_config->loadConfig();
         $json = $_map_config->getConfig();
 
-        $image_info = new SVGParser\Entity\ImageInfo(
+        $image_info = new ImageInfo(
             width: 0,
             height: 0,
             ox: 0,
@@ -45,7 +59,7 @@ class JSController extends AbstractClass
 
             // это данные по сдвигу из конфига карты
             if (!empty($json->image)) {
-                $image_info = new SVGParser\Entity\ImageInfo(
+                $image_info = new ImageInfo(
                     width: $json->image->width,
                     height: $json->image->height,
                     ox: $json->image->ox,
@@ -58,7 +72,7 @@ class JSController extends AbstractClass
                 throw new RuntimeException( "[JS Builder] Layout file not defined." );
             }
             $svg_filename
-                = Path::create( getenv('PATH.STORAGE'))
+                = Path::create( App::config('path.storage'))
                 ->join($map_alias)
                 ->joinName($json->layout->file)
                 ->toString();
@@ -115,7 +129,7 @@ class JSController extends AbstractClass
                 $layer_config = null;
 
                 /**
-                 * @var stdClass $layer_config
+                 * @var \stdClass $layer_config
                  */
                 if (!empty($json->layers->{$layer})) {
                     $layer_config = $json->layers->{$layer};
@@ -235,8 +249,8 @@ class JSController extends AbstractClass
 
         $t = new Template();
         $t
-            ->setTemplateDir(config('smarty.path_template'))
-            ->setCompileDir(config('smarty.path_cache'))
+            ->setTemplateDir(App::config('smarty.path_template'))
+            ->setCompileDir(App::config('smarty.path_cache'))
             ->setTemplate("_js/theMapDefinition.tpl")
             ->registerPlugin(Template::PLUGIN_MODIFIER, "json_decode", "json_decode")
             ->registerPlugin(Template::PLUGIN_MODIFIER, "json_encode", "json_encode")

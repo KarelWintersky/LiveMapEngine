@@ -30,7 +30,12 @@ class AuthController extends AbstractClass
      */
     public function view_form_login()
     {
-        $this->template->assign("inner_template", 'auth/login.tpl');
+        $template
+            = App::getInstance()->getConfig('auth.login_allowed')
+            ? 'auth/login.tpl'
+            : 'auth/login_closed.tpl';
+
+        $this->template->assign("inner_template", $template);
     }
 
     /**
@@ -95,8 +100,14 @@ class AuthController extends AbstractClass
 
     public function view_form_register()
     {
+        $template
+            = App::getInstance()->getConfig('auth.registration_allowed')
+            ? 'auth/register.tpl'
+            : 'auth/register_closed.tpl';
+
+        $this->template->assign("inner_template", $template);
+
         $this->template->assign("sid", session_id());
-        $this->template->assign("inner_template", 'auth/register.tpl');
     }
 
     /**
@@ -151,6 +162,48 @@ class AuthController extends AbstractClass
             App::$flash->addMessage("error", $e->getMessage());
             $this->template->setRedirect( AppRouter::getRouter('view.form.register') );
         }
+    }
+
+    /**
+     * Форма восстановления пароля.
+     *
+     * @return void
+     */
+    public function view_form_recover_password()
+    {
+        $this->template->assign("sid", session_id());
+        $this->template->assign("inner_template", 'auth/recover.tpl');
+    }
+
+    /**
+     * Обработчик формы, шлет запрос на почту
+     *
+     * @return void
+     */
+    public function callback_recover_password()
+    {
+        dd('Not implemented');
+    }
+
+    /**
+     * Принимает ключ сброса пароля и предлагает ввести новый
+     *
+     * @return void
+     */
+    public function view_form_new_password()
+    {
+        $this->template->assign("sid", session_id());
+        $this->template->assign("inner_template", 'auth/recover.tpl');
+    }
+
+    /**
+     * коллбэк: устанавливает новый пароль
+     *
+     * @return void
+     */
+    public function callback_new_password()
+    {
+        die('Not implemented');
     }
 
 

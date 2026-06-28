@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\AbstractClass;
 use App\App;
+use App\Units\MapLegacy;
 use Arris\AppRouter;
 use Arris\Entity\Path;
 use Arris\Presenter\Template;
@@ -27,12 +28,9 @@ class RegionsController extends AbstractClass
 
         $t = new Template();
         $t
-            ->setTemplateDir(config('smarty.path_template'))
-            ->setCompileDir(config('smarty.path_cache'))
+            ->setTemplateDir(App::config('smarty.path_template'))
+            ->setCompileDir(App::config('smarty.path_cache'))
             ->setTemplate("_js/theMapDefinition.tpl")
-            // ->registerPlugin(Template::PLUGIN_MODIFIER, "json_decode", "json_decode")
-            // ->registerPlugin(Template::PLUGIN_MODIFIER, "json_encode", "json_encode")
-            // ->registerClass("Arris\AppRouter", "Arris\AppRouter")
         ;
 
         $t->assign('is_present', $region_data['is_present']);
@@ -153,14 +151,14 @@ class RegionsController extends AbstractClass
 
             'is_present'        =>  $region_data['is_present'],      // 1 - регион существует, 0 - новый регион
 
-            'is_logged_user'    =>  config('auth.username'),
-            'is_logged_user_ip' =>  config('auth.ipv4'),
+            'is_logged_user'    =>  App::config('auth.username'),
+            'is_logged_user_ip' =>  App::config('auth.ipv4'),
 
             'edit_templates'            =>  $edit_templates,
             'edit_templates_options'    => $edit_templates_options,
 
             // copyright
-            'copyright'         =>  config('app.copyright'),
+            'copyright'         =>  App::config('app.copyright'),
 
             // revisions
             // 'region_revisions'  =>  $map_engine->getRegionRevisions( $map_alias, $region_id ),
@@ -168,7 +166,7 @@ class RegionsController extends AbstractClass
             'is_exludelists'    =>  $region_data['is_exludelists'] ?? 'N',
             'is_publicity'      =>  $region_data['is_publicity'] ?? 'ANYONE',
 
-            'rfm_version'       =>  '_' . config('RFM_VERSION')
+            'rfm_version'       =>  '_' . App::config('features.rfm_version')
         ]);
 
         // ставим куки для файлменеджера

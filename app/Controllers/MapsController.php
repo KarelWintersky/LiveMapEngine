@@ -101,8 +101,8 @@ VALUES
 
         $t = new Template();
         $t
-            ->setTemplateDir(config('smarty.path_template'))
-            ->setCompileDir(config('smarty.path_cache'));
+            ->setTemplateDir(App::config('smarty.path_template'))
+            ->setCompileDir(App::config('smarty.path_cache'));
 
         $t->assign('map_alias', $map_alias);
         $t->assign('is_can_edit', \Arris\config('auth.is_admin'));
